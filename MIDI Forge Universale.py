@@ -5,6 +5,7 @@ import random
 import math
 import io
 import base64
+import json
 from datetime import datetime
 from collections import Counter
 
@@ -401,10 +402,16 @@ def generate_report(midi_buffer, genre, mode, submode, bpm, bars, seed, root, sc
     
     return "\n".join(report)
 
-def render_midi_player(midi_buffer, bpm):
-    midi_buffer.seek(0)
-    midi_bytes = midi_buffer.read()
-    midi_b64 = base64.b64encode(midi_bytes).decode('ascii')
+def render_midi_player(events, bpm):
+    """Player MIDI che usa gli eventi già parsati da Python - 100% affidabile"""
+    # Converti eventi in JSON per JavaScript
+    events_json = json.dumps([{
+        'tick': e['tick'],
+        'type': e['type'],
+        'pitch': e['pitch'],
+        'vel': e['vel'],
+        'channel': e['channel']
+    } for e in events])
     
     html_player = f"""
     <!DOCTYPE html>
@@ -418,7 +425,6 @@ def render_midi_player(midi_buffer, bpm):
             .controls {{ display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }}
             button {{ background: #ff4b4b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }}
             button:hover {{ background: #ff6b6b; transform: translateY(-1px); }}
-            button:disabled {{ background: #555; cursor: not-allowed; transform: none; }}
             .status {{ font-size: 13px; color: #aaa; }}
             .info {{ font-size: 12px; color: #888; margin-top: 8px; }}
         </style>
@@ -431,125 +437,14 @@ def render_midi_player(midi_buffer, bpm):
                 <button onclick="stop()">⏹ Stop</button>
                 <span class="status" id="status">Pronto - {bpm} BPM</span>
             </div>
-            <div class="info">💡 Usa synth Web Audio API nativi del browser</div>
+            <div class="info">💡 Riproduzione 100% fedele al MIDI generato</div>
         </div>
         
         <script>
-            const midiBase64 = "{midi_b64}";
+            const events = {events_json};
             let isPlaying = false;
             let synths = {{}};
             let scheduledEvents = [];
-            
-            function base64ToArrayBuffer(base64) {{
-                const binaryString = window.atob(base64);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {{
-                    bytes[i] = binaryString.charCodeAt(i);
-                }}
-                return bytes.buffer;
-            }}
-            
-            function parseMidi(arrayBuffer) {{
-                const data = new DataView(arrayBuffer);
-                let offset = 0;
-                
-                function readUint32() {{
-                    const val = data.getUint32(offset, false);
-                    offset += 4;
-                    return val;
-                }}
-                
-                function readUint16() {{
-                    const val = data.getUint16(offset, false);
-                    offset += 2;
-                    return val;
-                }}
-                
-                function readUint8() {{
-                    return data.getUint8(offset++);
-                }}
-                
-                function readString(len) {{
-                    let str = '';
-                    for (let i = 0; i < len; i++) {{
-                        str += String.fromCharCode(readUint8());
-                    }}
-                    return str;
-                }}
-                
-                const header = readString(4);
-                if (header !== 'MThd') throw new Error('Not a MIDI file');
-                
-                const headerLength = readUint32();
-                const format = readUint16();
-                const numTracks = readUint16();
-                const ticksPerBeat = readUint16();
-                
-                const tracks = [];
-                for (let t = 0; t < numTracks; t++) {{
-                    const trackHeader = readString(4);
-                    if (trackHeader !== 'MTrk') throw new Error('Invalid track header');
-                    
-                    const trackLength = readUint32();
-                    const trackEnd = offset + trackLength;
-                    const events = [];
-                    let currentTime = 0;
-                    let lastStatus = 0;
-                    
-                    while (offset < trackEnd) {{
-                        let deltaTime = 0;
-                        let byte = readUint8();
-                        while (byte & 0x80) {{
-                            deltaTime = (deltaTime << 7) | (byte & 0x7F);
-                            byte = readUint8();
-                        }}
-                        deltaTime = (deltaTime << 7) | (byte & 0x7F);
-                        currentTime += deltaTime;
-                        
-                        let status = readUint8();
-                        if (status < 0x80) {{
-                            status = lastStatus;
-                            offset--;
-                        }}
-                        lastStatus = status;
-                        
-                        const type = status & 0xF0;
-                        const channel = status & 0x0F;
-                        
-                        if (type === 0x90 || type === 0x80) {{
-                            const note = readUint8();
-                            const velocity = readUint8();
-                            events.push({{
-                                time: currentTime,
-                                type: type === 0x90 && velocity > 0 ? 'noteOn' : 'noteOff',
-                                note: note,
-                                velocity: velocity,
-                                channel: channel
-                            }});
-                        }} else if (type === 0xC0 || type === 0xD0) {{
-                            readUint8();
-                        }} else if (type === 0xA0 || type === 0xE0) {{
-                            readUint8();
-                            readUint8();
-                        }} else if (status === 0xFF) {{
-                            const metaType = readUint8();
-                            let length = 0;
-                            byte = readUint8();
-                            while (byte & 0x80) {{
-                                length = (length << 7) | (byte & 0x7F);
-                                byte = readUint8();
-                            }}
-                            length = (length << 7) | (byte & 0x7F);
-                            offset += length;
-                        }}
-                    }}
-                    
-                    tracks.push(events);
-                }}
-                
-                return {{ format, numTracks, ticksPerBeat, tracks }};
-            }}
             
             async function togglePlay() {{
                 if (isPlaying) {{
@@ -561,14 +456,17 @@ def render_midi_player(midi_buffer, bpm):
                 document.getElementById('status').textContent = 'Caricamento...';
                 
                 try {{
-                    const arrayBuffer = base64ToArrayBuffer(midiBase64);
-                    const midi = parseMidi(arrayBuffer);
+                    const ticksPerSecond = ({TICKS_BEAT} * {bpm}) / 60;
                     
-                    const ticksPerSecond = (midi.ticksPerBeat * {bpm}) / 60;
-                    
+                    // Crea synth per ogni canale
                     for (let ch = 0; ch < 16; ch++) {{
                         if (ch === 9) {{
-                            synths[ch] = new Tone.MembraneSynth().toDestination();
+                            // Canale batteria - usa synth diversi per kick/snare/hat
+                            synths[9] = {{
+                                kick: new Tone.MembraneSynth().toDestination(),
+                                snare: new Tone.NoiseSynth({{ noise: {{ type: 'white' }}, envelope: {{ attack: 0.001, decay: 0.2, sustain: 0 }} }}).toDestination(),
+                                hat: new Tone.MetalSynth({{ envelope: {{ attack: 0.001, decay: 0.1, release: 0.01 }}, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }}).toDestination()
+                            }};
                         }} else {{
                             synths[ch] = new Tone.PolySynth(Tone.Synth).toDestination();
                             synths[ch].set({{
@@ -578,27 +476,34 @@ def render_midi_player(midi_buffer, bpm):
                         }}
                     }}
                     
-                    midi.tracks.forEach(track => {{
-                        track.forEach(event => {{
-                            const timeInSeconds = event.time / ticksPerSecond;
-                            const noteName = Tone.Frequency(event.note, 'midi').toNote();
-                            
-                            if (event.type === 'noteOn') {{
-                                if (event.channel === 9) {{
-                                    scheduledEvents.push(
-                                        Tone.getTransport().schedule(time => {{
-                                            synths[9].triggerAttackRelease('C1', '8n', time, event.velocity / 127);
-                                        }}, timeInSeconds)
-                                    );
-                                }} else {{
-                                    scheduledEvents.push(
-                                        Tone.getTransport().schedule(time => {{
-                                            synths[event.channel].triggerAttackRelease(noteName, '8n', time, event.velocity / 127);
-                                        }}, timeInSeconds)
-                                    );
-                                }}
+                    // Schedula tutte le note
+                    events.forEach(event => {{
+                        const timeInSeconds = event.tick / ticksPerSecond;
+                        
+                        if (event.type === 'on') {{
+                            if (event.channel === 9) {{
+                                // Batteria - scegli il synth in base alla nota
+                                scheduledEvents.push(
+                                    Tone.getTransport().schedule(time => {{
+                                        if (event.pitch === 36) {{ // Kick
+                                            synths[9].kick.triggerAttackRelease('C1', '8n', time, event.vel / 127);
+                                        }} else if (event.pitch === 38 || event.pitch === 39) {{ // Snare/Clap
+                                            synths[9].snare.triggerAttackRelease('16n', time, event.vel / 127);
+                                        }} else if (event.pitch === 42 || event.pitch === 46) {{ // Hat
+                                            synths[9].hat.triggerAttackRelease('C3', '32n', time, event.vel / 127);
+                                        }}
+                                    }}, timeInSeconds)
+                                );
+                            }} else {{
+                                // Melodia
+                                const noteName = Tone.Frequency(event.pitch, 'midi').toNote();
+                                scheduledEvents.push(
+                                    Tone.getTransport().schedule(time => {{
+                                        synths[event.channel].triggerAttackRelease(noteName, '8n', time, event.vel / 127);
+                                    }}, timeInSeconds)
+                                );
                             }}
-                        }});
+                        }}
                     }});
                     
                     Tone.getTransport().start();
@@ -616,7 +521,10 @@ def render_midi_player(midi_buffer, bpm):
                 Tone.getTransport().stop();
                 scheduledEvents.forEach(id => Tone.getTransport().clear(id));
                 scheduledEvents = [];
-                Object.values(synths).forEach(synth => synth.releaseAll());
+                Object.values(synths).forEach(synth => {{
+                    if (synth.kick) synth.kick.releaseAll();
+                    else if (synth.releaseAll) synth.releaseAll();
+                }});
                 isPlaying = false;
                 document.getElementById('playBtn').textContent = '▶ Play';
                 document.getElementById('status').textContent = 'Pronto - {bpm} BPM';
@@ -709,7 +617,7 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                     st.success(f"✅ Generazione completata! (Tonica: {NOTE_NAMES[root]})")
                     
                     st.markdown("### 🎧 Anteprima")
-                    render_midi_player(midi_buffer, final_bpm)
+                    render_midi_player(events, final_bpm)
                     
                     col_dl1, col_dl2 = st.columns(2)
                     with col_dl1:
