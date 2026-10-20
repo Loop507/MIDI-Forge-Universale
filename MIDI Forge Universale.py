@@ -1,4 +1,3 @@
-
 import streamlit as st
 import streamlit.components.v1 as components
 import mido
@@ -60,11 +59,81 @@ GM_CLAP = 39
 GM_HAT_CLOSED = 42
 GM_HAT_OPEN = 46
 
+# ================= FUNZIONI AUXILIARIE =================
+
+def _root_to_key_name(root, is_minor):
+    """Converte root (0-11) + modalità in stringa key signature (es. 'Gm', 'C')."""
+    return NOTE_NAMES[root] + ('m' if is_minor else '')
+
+def _is_minor_scale(scale):
+    """Determina se la scala è minore (contiene terza minore = intervallo 3)."""
+    return 3 in scale
+
+def _compute_key_signature(root, scale):
+    """Calcola la key signature dal root e dalla scala."""
+    return _root_to_key_name(root, _is_minor_scale(scale))
+
+def _drum_velocities(seed_rng, drum_mode):
+    """Genera velocity dinamiche per batteria con accenti sul battere."""
+    kicks, snares, hats, claps = [], [], [], []
+    for s in range(16):
+        is_accent = (s % 4 == 0)
+        
+        if drum_mode == 'kick_hat':
+            kicks.append(110 + seed_rng.randint(0, 5) if is_accent else 95 + seed_rng.randint(0, 10))
+            hats.append(65 + seed_rng.randint(0, 15))
+            snares.append(0)
+            claps.append(0)
+        elif drum_mode == 'kick_only':
+            kicks.append(105 + seed_rng.randint(0, 5) if is_accent else 90 + seed_rng.randint(0, 10))
+            hats.append(50 + seed_rng.randint(0, 10))
+            snares.append(0)
+            claps.append(0)
+        elif drum_mode == 'build':
+            kicks.append(115 + seed_rng.randint(0, 5) if is_accent else 100 + seed_rng.randint(0, 10))
+            hats.append(75 + seed_rng.randint(0, 15))
+            snares.append(60 + seed_rng.randint(0, 20) + (s // 4) * 10)
+            claps.append(0)
+        elif drum_mode == 'full':
+            kicks.append(120 + seed_rng.randint(0, 5) if is_accent else 100 + seed_rng.randint(0, 10))
+            hats.append(75 + seed_rng.randint(0, 20))
+            snares.append(105 + seed_rng.randint(0, 10))
+            claps.append(90 + seed_rng.randint(0, 10))
+        else:
+            kicks.append(0)
+            hats.append(0)
+            snares.append(0)
+            claps.append(0)
+    
+    return {'kick': kicks, 'snare': snares, 'hat': hats, 'clap': claps}
+
+def _compute_note_durations(events):
+    """Converte eventi on/off in liste di note con durata reale."""
+    pending = {}
+    notes = []
+    for e in sorted(events, key=lambda x: x['tick']):
+        key = (e['pitch'], e.get('channel', 0))
+        if e['type'] == 'on':
+            pending[key] = e
+        elif e['type'] == 'off' and key in pending:
+            start = pending[key]['tick']
+            dur = e['tick'] - start
+            vel = pending[key]['vel']
+            notes.append({
+                'tick': start,
+                'dur': max(1, dur),
+                'pitch': e['pitch'],
+                'vel': vel,
+                'channel': e.get('channel', 0)
+            })
+            del pending[key]
+    return notes
+
 # ================= MOTORE DI ARRANGIAMENTO DJ-FRIENDLY =================
 
 def get_arrangement_plan(total_bars, genre):
     """
-    Genera la struttura: INTRO ➡️ BREAK 1 ➡️ BUILD-UP ➡️ DROP ➡️ BREAK 2 ️ OUTRO
+    Genera la struttura: INTRO -> BREAK 1 -> BUILD-UP -> DROP -> BREAK 2 -> OUTRO
     INTRO e OUTRO sono sempre drum-only (DJ-friendly).
     """
     club_genres = ['techno', 'minimal_techno', 'deep', 'trance', 'edm_2000s',
@@ -74,7 +143,6 @@ def get_arrangement_plan(total_bars, genre):
     ambient_genres = ['ambient', 'drone', 'lowercase', 'microsound', 'noise', 'harsh_noise',
                       'glitch', 'sperimentale', 'onkyo', 'armonico']
 
-    # INTRO e OUTRO drum-only
     if total_bars >= 64:
         intro_bars = 8
         outro_bars = 8
@@ -129,64 +197,6 @@ def get_arrangement_plan(total_bars, genre):
          'layers': {'bass': False, 'arp': False, 'pad': False, 'chords': False, 'lead': False, 'fx': False}}
     ]
     return plan, total_bars
-
-# ================= FUNZIONI AUXILIARIE =================
-
-def _root_to_key_name(root, is_minor):
-    return NOTE_NAMES[root] + ('m' if is_minor else '')
-
-def _is_minor_scale(scale):
-    return 3 in scale
-
-def _compute_key_signature(root, scale):
-    return _root_to_key_name(root, _is_minor_scale(scale))
-
-def _drum_velocities(seed_rng, drum_mode):
-    kicks, snares, hats, claps = [], [], [], []
-    for s in range(16):
-        is_accent = (s % 4 == 0)
-        if drum_mode == 'kick_hat':
-            kicks.append(110 + seed_rng.randint(0, 5) if is_accent else 95 + seed_rng.randint(0, 10))
-            hats.append(65 + seed_rng.randint(0, 15))
-            snares.append(0)
-            claps.append(0)
-        elif drum_mode == 'kick_only':
-            kicks.append(105 + seed_rng.randint(0, 5) if is_accent else 90 + seed_rng.randint(0, 10))
-            hats.append(50 + seed_rng.randint(0, 10))
-            snares.append(0)
-            claps.append(0)
-        elif drum_mode == 'build':
-            kicks.append(115 + seed_rng.randint(0, 5) if is_accent else 100 + seed_rng.randint(0, 10))
-            hats.append(75 + seed_rng.randint(0, 15))
-            snares.append(60 + seed_rng.randint(0, 20) + (s // 4) * 10)
-            claps.append(0)
-        elif drum_mode == 'full':
-            kicks.append(120 + seed_rng.randint(0, 5) if is_accent else 100 + seed_rng.randint(0, 10))
-            hats.append(75 + seed_rng.randint(0, 20))
-            snares.append(105 + seed_rng.randint(0, 10))
-            claps.append(90 + seed_rng.randint(0, 10))
-        else:
-            kicks.append(0)
-            hats.append(0)
-            snares.append(0)
-            claps.append(0)
-    return {'kick': kicks, 'snare': snares, 'hat': hats, 'clap': claps}
-
-def _compute_note_durations(events):
-    pending = {}
-    notes = []
-    for e in sorted(events, key=lambda x: x['tick']):
-        key = (e['pitch'], e.get('channel', 0))
-        if e['type'] == 'on':
-            pending[key] = e
-        elif e['type'] == 'off' and key in pending:
-            start = pending[key]['tick']
-            dur = e['tick'] - start
-            vel = pending[key]['vel']
-            notes.append({'tick': start, 'dur': max(1, dur), 'pitch': e['pitch'],
-                          'vel': vel, 'channel': e.get('channel', 0)})
-            del pending[key]
-    return notes
 
 # ================= FUNZIONI CORE =================
 
@@ -243,7 +253,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
 
     m = [random.randrange(len(scale)) if random.random() < g['arp_density'] else None for _ in range(8)]
 
-    # INTRO e OUTRO drum-only (4 battute ciascuno)
     intro_bars = min(4, bars // 4)
     outro_bars = min(4, bars // 4)
 
@@ -259,7 +268,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
             else:
                 m = [None if random.random() < 0.3 else x for x in m]
 
-        # Determina drum_mode in base alla sezione
         if bar < intro_bars or bar >= (bars - outro_bars):
             drum_mode = 'kick_hat'
         else:
@@ -272,7 +280,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
             p_step = s % 16
             swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
 
-            # BATTERIA
             if drum_vel['kick'][p_step] > 0:
                 tracks['drums'].extend([
                     {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': drum_vel['kick'][p_step], 'channel': DRUM_CH},
@@ -294,7 +301,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
                 ])
 
-            # BASSO & ARP (sempre presenti nel corpo del brano)
             if bar >= intro_bars and bar < (bars - outro_bars):
                 if submode == 'extract' and s in notes_by_step:
                     low_p, high_p = min(notes_by_step[s]), max(notes_by_step[s])
@@ -486,7 +492,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
         for role_name, channel, _ in roles:
             tracks[role_name] = []
 
-    # Genera piano di arrangiamento
     arrangement_plan, total_bars = get_arrangement_plan(bars, 'techno')
 
     current_bar = 0
@@ -500,7 +505,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             global_bar = current_bar + bar
             base_tick = global_bar * 4 * TICKS_BEAT
 
-            # BATTERIA
             for s in range(16):
                 tick = base_tick + s * (TICKS_BEAT // 4)
                 p_step = s % 16
@@ -529,7 +533,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                         {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
                     ])
 
-            # STRUMENTI MELODICI (solo per generative)
             if submode != 'faithful':
                 for role_name, channel, (low_pitch, high_pitch) in roles:
                     layer_key = 'fx' if role_name == 'fx_perc' else role_name
@@ -896,7 +899,23 @@ def render_midi_player(tracks, bpm):
 # ================= INTERFACCIA STREAMLIT CON SESSION STATE =================
 
 if 'generated' not in st.session_state:
-    st.session_state.generated = None
+    st.session_state.generated = {
+        'tracks': None,
+        'root': None,
+        'scale': None,
+        'headers': None,
+        'bars': None,
+        'bpm': None,
+        'midi_bytes': None,
+        'report_text': '',
+        'label': None,
+        'mode': None,
+        'submode': None,
+        'genre': None,
+        'duration_mode': None,
+        'duration_seconds': None,
+        'original_filename': None
+    }
 
 st.title("MIDI Forge Universale")
 st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Struttura DJ-Friendly: INTRO -> BREAK -> BUILD -> DROP -> BREAK -> OUTRO")
@@ -977,10 +996,21 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                         seed, root, scale, duration_mode, duration_seconds, uploaded_file.name)
 
                     st.session_state.generated = {
-                        'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
-                        'bars': final_bars, 'bpm': final_bpm,
-                        'midi_bytes': midi_buffer.getvalue(), 'report_text': report_text,
-                        'label': label, 'mode': mode, 'submode': submode, 'genre': genre
+                        'tracks': tracks,
+                        'root': root,
+                        'scale': scale,
+                        'headers': headers,
+                        'bars': final_bars,
+                        'bpm': final_bpm,
+                        'midi_bytes': midi_buffer.getvalue(),
+                        'report_text': report_text,
+                        'label': label,
+                        'mode': mode,
+                        'submode': submode,
+                        'genre': genre,
+                        'duration_mode': duration_mode,
+                        'duration_seconds': duration_seconds,
+                        'original_filename': uploaded_file.name
                     }
 
                     key_sig = _compute_key_signature(root, scale)
@@ -988,10 +1018,8 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
             except Exception as e:
                 st.error(f"Errore: {str(e)}")
 
-# Mostra risultati da session state (persistono dopo rerun)
-if st.session_state.generated:
-    g = st.session_state.generated
-
+g = st.session_state.generated
+if g and g.get('midi_bytes') is not None and g.get('report_text'):
     st.markdown("### Anteprima")
     render_midi_player(g['tracks'], g['bpm'])
 
@@ -1015,6 +1043,8 @@ if st.session_state.generated:
 
     with st.expander("Visualizza Report"):
         st.code(g['report_text'], language=None)
+else:
+    st.info("Carica un MIDI e clicca 'Genera' per iniziare.")
 
 st.markdown("---")
 st.caption("MIDI Forge Universale | Standard General MIDI | Struttura DJ-Friendly | 100% Open Source & Free")
