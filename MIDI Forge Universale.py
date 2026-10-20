@@ -12,60 +12,106 @@ st.set_page_config(page_title="MIDI Forge Universale", page_icon="🎛️", layo
 
 # ================= DATABASE DEI GENERI =================
 GENRES = {
-    'acid': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
+    'acid': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0,  0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
     'ambient': {'bpm_default': 80, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0},
-    'armonico': {'bpm_default': 100, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.70, 'swing': 0.10},
+    'armonico': {'bpm_default': 100, 'bars_default': 64, 'kick': [ 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.70, 'swing': 0.10},
     'breakcore': {'bpm_default': 200, 'bars_default': 48, 'kick': [1,0,0,1, 0,1,0,0, 1,0,1,0, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,1,0,0, 1,0,0,1], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,1], 'arp_density': 0.80, 'swing': 0.05},
-    'commerciale_90s': {'bpm_default': 130, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'arp_density': 0.60, 'swing': 0.0},
-    'deep': {'bpm_default': 124, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.50, 'swing': 0.15},
-    'disco': {'bpm_default': 122, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.05},
-    'drone': {'bpm_default': 70, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.05, 'swing': 0.0},
-    'drum_n_bass': {'bpm_default': 174, 'bars_default': 48, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,1, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.70, 'swing': 0.0},
-    'dub_techno': {'bpm_default': 128, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'arp_density': 0.40, 'swing': 0.0},
-    'edm_2000s': {'bpm_default': 132, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
-    'elettronico': {'bpm_default': 130, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
-    'funk': {'bpm_default': 112, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,1,0,0], 'arp_density': 0.60, 'swing': 0.15},
-    'glitch': {'bpm_default': 125, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,1, 0,0,0,0, 1,0,0,0], 'arp_density': 0.95, 'swing': 0.0},
-    'harsh_noise': {'bpm_default': 100, 'bars_default': 64, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 1.0, 'swing': 0.0},
-    'hip_hop': {'bpm_default': 92, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.30, 'swing': 0.35},
-    'idm': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'snare': [0,0,1,0, 1,0,0,1, 0,0,1,0, 1,0,1,0], 'hat': [1]*16, 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.85, 'swing': 0.10},
-    'industrial': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.70, 'swing': 0.0},
-    'lowercase': {'bpm_default': 60, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.05, 'swing': 0.0},
-    'microsound': {'bpm_default': 80, 'bars_default': 96, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.10, 'swing': 0.0},
-    'minimal': {'bpm_default': 126, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.30, 'swing': 0.0},
-    'minimal_techno': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.50, 'swing': 0.0},
-    'minimalismo_ritmico': {'bpm_default': 115, 'bars_default': 64, 'kick': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.60, 'swing': 0.05},
+    'commerciale_90s': {'bpm_default': 130, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0 ,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 1 ,0,0,0, 1,0,0,0, 1,0,0,0], 'arp_density': 0.60, 'swing': 0.0},
+    'deep': {'bpm_default': 124, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0 ,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5 0, 'swing': 0.15},
+    'disco': {'bpm_default': 122, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0,  1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.05},
+    'drone': {'bpm_default':  70, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.05, 'swing': 0.0},
+    'drum_n_bass': {'bpm_def ault': 174, 'bars_default': 48, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1 ,0,0,1, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.70, 'swing': 0.0},
+    'dub_techno': {'bpm_default': 128, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare' : [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'arp_density': 0.40, 'swing': 0.0},
+    'edm_2000s':  {'bpm_default': 132, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0],  'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
+    'elettronico': {'bpm_default': 130, 'bars_default': 6 4, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0 ,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
+    'funk': {'bpm_default': 112, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0, 0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,1,0,0], 'arp_density': 0.60, 'swing': 0.15},
+    'glitch': {'bpm_default': 125, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1, 0,1,0], 'bass': [1,0,0,0, 0,0,0,1, 0,0,0,0, 1,0,0,0], 'arp_density': 0.95, 'swing': 0.0},
+    'harsh_noise': {'bpm_default': 100, 'bars_default': 64, 'kick': [0]*16, 'snare': [0]*16, ' hat': [0]*16, 'bass': [1]*16, 'arp_density': 1.0, 'swing': 0.0},
+    'hip_hop': {'bpm_default': 92, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'snare': [0,0,0,0,  1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.30, 'swing': 0.35},
+    'idm': {'bpm_default':  135, 'bars_default': 64, 'kick': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'snare': [0,0,1,0, 1,0,0,1, 0,0,1,0, 1,0,1,0], 'hat': [1]*16, 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], ' arp_density': 0.85, 'swing': 0.10},
+    'industrial': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0, 0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.70, 'swing': 0.0},
+    'lowercase': {'bpm_default': 60, 'bars_default':  128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.05, 'swing': 0.0},
+    'microsound': {'bpm_default': 80, 'bars_default': 96, 'kick': [0]*16, 'snar e': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.10, 'swing': 0.0},
+    'minimal': {'bpm_default': 126, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'sn are': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.30, 'swing': 0.0},
+    'minimal_ techno': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0, 0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.50, 'swing': 0.0},
+    'minimalismo_ritmico': {'bpm_default': 115, 'bars_default': 64, 'kick': [1,0,0,1, 0,1,0,0,  1,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.60, ' swing': 0.05},
     'noise': {'bpm_default': 120, 'bars_default': 64, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 0.90, 'swing': 0.0},
-    'onkyo': {'bpm_default': 50, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.02, 'swing': 0.0},
-    'r&b': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.55, 'swing': 0.25},
-    'reggaeton': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.50, 'swing': 0.0},
-    'sperimentale': {'bpm_default': 100, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.70, 'swing': 0.10},
-    'soul': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.60, 'swing': 0.30},
-    'synthpop': {'bpm_default': 120, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.75, 'swing': 0.0},
-    'techno': {'bpm_default': 138, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
-    'trap': {'bpm_default': 140, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.40, 'swing': 0.0},
-    'trance': {'bpm_default': 140, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1]*16, 'arp_density': 0.90, 'swing': 0.0},
-    'underground': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.65, 'swing': 0.0}
+    'onkyo': {'bpm_ default': 50, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.02, 'swing': 0.0},
+    'r &b': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0 ], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.55, 'swing': 0.25},
+    'reggaeton': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1 ,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.50, 'swing': 0.0},
+    ' sperimentale': {'bpm_default': 100, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1 ,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.70, 'swing': 0.10},
+    'soul': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0,  0,1,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.60, 'swing': 0 .30},
+    'synthpop': {'bpm_default': 120, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0 ,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.75, 'swing': 0.0},
+    'techno': {'bpm_default': 138, 'bar s_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0,  0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
+    'trap': {'bpm_default': 140, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 0, 0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.40, 'swing': 0.0},
+    'trance': {'bpm_def ault': 140, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1 ]*16, 'arp_density': 0.90, 'swing': 0.0},
+    'underground': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0,  1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.65, 'swing': 0.0}
 }
 
 NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 TICKS_BEAT = 480
 
 # ================= STANDARD GENERAL MIDI =================
-DRUM_CH = 9  # Canale 10 (0-indexed = 9)
-
-# Pitch GM standard per percussioni
+DRUM_CH = 9
 GM_KICK = 36
 GM_SNARE = 38
 GM_CLAP = 39
 GM_HAT_CLOSED = 42
 GM_HAT_OPEN = 46
 
+# ================= FUNZIONI AUXILIARIE =================
+
+def _root_to_key_name(root, is_minor):
+    """Converte root (0-11) + modalità in stringa key signature (es. 'Gm', 'C')."""
+    return NOTE_NAMES[root] + ('m' if is_minor else '')
+
+def _is_minor_scale(scale):
+    """Determina se la scala è minore (contiene terza minore = intervallo 3)."""
+    return 3 in scale
+
+def _compute_key_signature(root, scale):
+    """Calcola la key signature dal root e dalla scala."""
+    return _root_to_key_name(root, _is_minor_scale(scale))
+
+def _drum_velocities(seed_rng):
+    """Genera velocity dinamiche per batteria con accenti sul battere."""
+    kicks, snares, hats, claps = [], [], [], []
+    for s in range(16):
+        is_accent = (s % 4 == 0)
+        kicks.append(115 + seed_rng.randint(0, 5) if is_accent else 95 + seed_rng.randint(0, 10))
+        snares.append(100 + seed_rng.randint(0, 10))
+        hats.append(70 + seed_rng.randint(0, 20))
+        claps.append(85 + seed_rng.randint(0, 10))
+    return {'kick': kicks, 'snare': snares, 'hat': hats, 'clap': claps}
+
+def _compute_note_durations(events):
+    """Converte eventi on/off in liste di note con durata reale."""
+    pending = {}
+    notes = []
+    for e in sorted(events, key=lambda x: x['tick']):
+        key = (e['pitch'], e.get('channel', 0))
+        if e['type'] == 'on':
+            pending[key] = e
+        elif e['type'] == 'off' and key in pending:
+            start = pending[key]['tick']
+            dur = e['tick'] - start
+            vel = pending[key]['vel']
+            notes.append({
+                'tick': start,
+                'dur': max(1, dur),
+                'pitch': e['pitch'],
+                'vel': vel,
+                'channel': e.get('channel', 0)
+            })
+            del pending[key]
+    return notes
+
 # ================= FUNZIONI CORE =================
+
 def extract_notes(mid_file):
     notes = []
     mid = mido.MidiFile(file=mid_file)
-    scale_t = TICKS_BEAT / mid.ticks_per_beat  # normalizza il PPQ (Logic esporta a 960)
+    scale_t = TICKS_BEAT / mid.ticks_per_beat
     for track in mid.tracks:
         current_tick = 0
         for msg in track:
@@ -98,12 +144,9 @@ def snap_to_scale(pitch, root, scale):
 def generate_minimal(notes_data, g, submode, bars, seed):
     random.seed(seed)
     root, scale = extract_dna(notes_data)
+    drum_vel = _drum_velocities(random.Random(seed + 1))
     
-    tracks = {
-        'bass': [],
-        'arp': [],
-        'drums': []
-    }
+    tracks = {'bass': [], 'arp': [], 'drums': []}
     
     if submode == 'extract':
         notes_by_step = {}
@@ -127,29 +170,27 @@ def generate_minimal(notes_data, g, submode, bars, seed):
             p_step = s % 16
             swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
             
-            # BATTERIA - CANALE 9 (GM 10), PITCH GM
             if g['kick'][p_step]:
                 tracks['drums'].extend([
-                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': 110, 'channel': DRUM_CH},
+                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': drum_vel['kick'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}
                 ])
             if g.get('snare', [0]*16)[p_step]:
                 tracks['drums'].extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': 100, 'channel': DRUM_CH},
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': drum_vel['snare'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}
                 ])
             if g.get('clap', [0]*16)[p_step]:
                 tracks['drums'].extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': 90, 'channel': DRUM_CH},
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': drum_vel['clap'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
                 ])
             if g['hat'][p_step]:
                 tracks['drums'].extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': 70 + random.randint(0, 20), 'channel': DRUM_CH},
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': drum_vel['hat'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
                 ])
             
-            # BASSO & ARP
             if submode == 'extract' and s in notes_by_step:
                 low_p, high_p = min(notes_by_step[s]), max(notes_by_step[s])
                 if g['bass'][p_step]:
@@ -183,7 +224,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
 def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True):
     random.seed(seed)
     mid = mido.MidiFile(file=mid_file_bytes)
-    
     all_notes_flat = []
     for track in mid.tracks:
         current_tick = 0
@@ -193,36 +233,55 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                 all_notes_flat.append({'pitch': msg.note, 'tick': current_tick})
     
     root, scale = extract_dna(all_notes_flat)
-    
     tracks = {}
-    
     headers = {}
-    scale_t = TICKS_BEAT / mid.ticks_per_beat  # normalizza il PPQ della sorgente
-    free_channels = [c for c in range(16) if c != DRUM_CH]  # il canale 10 resta riservato alla batteria
-
+    scale_t = TICKS_BEAT / mid.ticks_per_beat
+    free_channels = [c for c in range(16) if c != DRUM_CH]
+    
     if submode == 'faithful':
+        # GRIGLIA FINE: 64esimi per preservare sincopi e micro-timing
+        GRID = TICKS_BEAT // 16
         track_idx = 0
         for original_track in mid.tracks:
             if any(msg.channel == DRUM_CH for msg in original_track if hasattr(msg, 'channel')):
                 continue
-
             original_name = next((m.name for m in original_track if m.type == 'track_name'), None)
             header = _extract_instrument_header(original_track)
-
             ch = free_channels[track_idx % len(free_channels)]
-            track_events = []
-            current_tick = 0
+            
+            # Estrai coppie note con durata vera
+            pending = {}
+            pairs = []
+            current_tick_raw = 0
             for msg in original_track:
-                current_tick += msg.time
+                current_tick_raw += msg.time
                 if msg.type == 'note_on' and msg.velocity > 0:
-                    step = round(current_tick * scale_t / (TICKS_BEAT // 4))
-                    tick = step * (TICKS_BEAT // 4)
-                    pitch = snap_to_scale(msg.note, root, scale)
-                    track_events.extend([
-                        {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': msg.velocity, 'channel': ch},
-                        {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': ch}
-                    ])
-
+                    pending[msg.note] = (current_tick_raw, msg.velocity)
+                elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
+                    if msg.note in pending:
+                        on_raw, vel = pending.pop(msg.note)
+                        # Quantizza SOLO l'attacco alla griglia fine
+                        on_quantized = round(on_raw * scale_t / GRID) * GRID
+                        # Durata vera quantizzata
+                        dur_raw = current_tick_raw - on_raw
+                        dur_quantized = max(GRID, round(dur_raw * scale_t / GRID) * GRID)
+                        pitch = snap_to_scale(msg.note, root, scale)
+                        pairs.append({'tick': on_quantized, 'dur': dur_quantized, 'pitch': pitch, 'vel': vel})
+            
+            # Chiudi note pendenti
+            for note, (on_raw, vel) in pending.items():
+                on_quantized = round(on_raw * scale_t / GRID) * GRID
+                dur_quantized = GRID * 4
+                pitch = snap_to_scale(note, root, scale)
+                pairs.append({'tick': on_quantized, 'dur': dur_quantized, 'pitch': pitch, 'vel': vel})
+            
+            track_events = []
+            for p in pairs:
+                track_events.extend([
+                    {'tick': p['tick'], 'type': 'on', 'pitch': p['pitch'], 'vel': p['vel'], 'channel': ch},
+                    {'tick': p['tick'] + p['dur'], 'type': 'off', 'pitch': p['pitch'], 'vel': 0, 'channel': ch}
+                ])
+            
             if track_events:
                 track_key = (original_name or '').strip() or f'instrument_{track_idx}'
                 base_key, n = track_key, 2
@@ -243,12 +302,10 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             ('lead', 5, (67, 79)),
             ('fx_perc', 6, (72, 84))
         ]
-        
         for role_name, channel, (low_pitch, high_pitch) in roles:
             track_events = []
             for bar in range(bars):
                 base_tick = bar * 4 * TICKS_BEAT
-                
                 if role_name == 'sub_bass':
                     if bar % 4 == 0:
                         pitch = root - 24 + scale[0]
@@ -307,17 +364,15 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                                 {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 50, 'channel': channel},
                                 {'tick': tick + 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}
                             ])
-            
             if track_events:
                 tracks[role_name] = track_events
     
-    # In faithful le tracce melodiche seguono il brano sorgente (non vengono mai tagliate): la batteria
-    # deve coprire le stesse battute, altrimenti finisce prima del resto.
     if tracks:
         last_tick = max(e['tick'] for ev in tracks.values() for e in ev)
         bars = max(bars, -(-last_tick // (4 * TICKS_BEAT)))
-
-    # BATTERIA
+    
+    # BATTERIA con velocity dinamiche
+    drum_vel = _drum_velocities(random.Random(seed + 2))
     drum_events = []
     for bar in range(bars):
         base_tick = bar * 4 * TICKS_BEAT
@@ -325,25 +380,24 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             tick = base_tick + s * (TICKS_BEAT // 4)
             p_step = s % 16
             swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
-            
             if g['kick'][p_step]:
                 drum_events.extend([
-                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': 110, 'channel': DRUM_CH},
+                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': drum_vel['kick'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}
                 ])
             if g.get('snare', [0]*16)[p_step]:
                 drum_events.extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': 100, 'channel': DRUM_CH},
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': drum_vel['snare'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}
                 ])
             if g.get('clap', [0]*16)[p_step]:
                 drum_events.extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': 90, 'channel': DRUM_CH},
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': drum_vel['clap'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
                 ])
             if g['hat'][p_step]:
                 drum_events.extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': 75, 'channel': DRUM_CH},
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': drum_vel['hat'][p_step], 'channel': DRUM_CH},
                     {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
                 ])
     
@@ -353,7 +407,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             tracks = split_drum_track(tracks)
     
     return tracks, root, scale, headers, bars
-
 
 GM_PROGRAM_NAMES = [
     'Acoustic Grand Piano', 'Bright Acoustic Piano', 'Electric Grand Piano', 'Honky-tonk Piano',
@@ -390,16 +443,13 @@ GM_PROGRAM_NAMES = [
     'Telephone Ring', 'Helicopter', 'Applause', 'Gunshot',
 ]
 
-# Nomi-chiave -> programma GM, per dare uno strumento alle tracce senza program change
 _GM_NAME_HINTS = [
-    (("bass", "basso", "contrabb"), 33), (("chitarr", "guitar"), 25), (("piano", "pianof"), 0), (("organ", "organo"), 19),
-    (("string", "archi", "violin", "cello"), 48), (("pad",), 89), (("lead",), 80), (("vox", "voce", "vocal", "choir", "coro"), 52),
-    (("flaut", "flute"), 73), (("sax",), 65), (("trump", "tromba"), 56), (("tromb",), 57), (("synth",), 81),
+    (("bass ",  "basso ",  "contrabb "), 33), (("chitarr ",  "guitar "), 25), (("piano ",  "pianof "), 0), (("organ ",  "organo "), 19),
+    (("string ",  "archi ",  "violin ",  "cello "), 48), (("pad ",), 89), (("lead ",), 80), (("vox ",  "voce ",  "vocal ",  "choir ",  "coro "), 52),
+    (("flaut ",  "flute "), 73), (("sax ",), 65), (("trump ",  "tromba "), 56), (("tromb ",), 57), (("synth ",), 81),
 ]
 
-# CC che definiscono strumento e mix: bank select (0/32), volume, pan, expression, riverbero, chorus
 _MIX_CCS = (7, 10, 11, 91, 93)
-
 
 def _guess_program(name):
     low = (name or "").lower()
@@ -408,10 +458,7 @@ def _guess_program(name):
             return prog
     return 0
 
-
 def _extract_instrument_header(track):
-    """Messaggi di strumento e mix letti prima della prima nota (program change, bank select,
-    volume/pan/expression/riverbero/chorus). Senza di essi Logic assegna lo strumento di default."""
     header = []
     for msg in track:
         if msg.type in ('note_on', 'note_off'):
@@ -422,15 +469,10 @@ def _extract_instrument_header(track):
             header.append({'type': 'control_change', 'control': msg.control, 'value': msg.value})
     return header
 
-
-# Pezzi del kit -> traccia dedicata (tutte sul canale 10, come le tracce "Ritmica" di MidiDecomposer)
 DRUM_PIECES = [(GM_KICK, 'drum_kick'), (GM_SNARE, 'drum_snare'), (GM_HAT_CLOSED, 'drum_hat'), (GM_CLAP, 'drum_clap')]
 DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap'}
 
-
 def split_drum_track(tracks):
-    """tracks['drums'] -> una traccia per pezzo del kit (Kick/Snare/Hat/Clap). Nessuna nota va persa:
-    eventuali altezze fuori dalla mappa restano in 'drums'."""
     events = tracks.get('drums')
     if not events:
         return tracks
@@ -445,24 +487,17 @@ def split_drum_track(tracks):
         out['drums'] = rest
     return out
 
-
 GM_ROLE_PROGRAMS = {
     'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38,
     'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117
 }
-
 LOGIC_ROLE_NAMES = {
     'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass',
     'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano',
     'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drums'
 }
 
-
 def _events_to_notes(events):
-    """Coppie on/off -> note (start, end, pitch, vel) pulite per Logic.
-    - pitch/velocity forzati nel range MIDI valido
-    - note identiche sulla stessa posizione fuse, sovrapposte sullo stesso pitch troncate
-      (altrimenti il primo note_off taglia la seconda nota o la lascia appesa)"""
     notes = []
     i, n = 0, len(events)
     while i < n:
@@ -476,11 +511,9 @@ def _events_to_notes(events):
             i += 2
         else:
             i += 1
-
     by_pitch = {}
     for nt in notes:
         by_pitch.setdefault(nt[2], []).append(nt)
-
     cleaned_all = []
     for lst in by_pitch.values():
         lst.sort(key=lambda x: (x[0], -x[3]))
@@ -493,46 +526,43 @@ def _events_to_notes(events):
                 cleaned[-1][1] = nt[0]
             cleaned.append(nt)
         cleaned_all.extend(cleaned)
-
     cleaned_all.sort(key=lambda x: (x[0], x[2]))
     return cleaned_all
 
-
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
-    """MIDI Format 1 per Logic Pro (File > Apri), con le stesse convenzioni di MidiDecomposer (daw_optimize):
-      - prima traccia con SOLO tempo e metrica espliciti al tick 0 + marker 'Loop507 - ...'
-      - una traccia = un canale, con nome e (bank select, program change, mix) al tick 0
-      - batteria sul canale 10 (Kick/Snare/Hat/Clap su tracce separate, oppure 'Drums') con program change 0
-      - tutte le tracce chiudono con end_of_track sull'ultima nota del brano: le regioni finiscono insieme."""
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, root=None, scale=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
-
     notes_by_track = {}
     for key, events in tracks.items():
         notes = _events_to_notes(events)
         if notes:
             notes_by_track[key] = (events[0].get('channel', 0), notes)
-
+    
     mid = mido.MidiFile(type=1, ticks_per_beat=TICKS_BEAT)
     total_end = max((nt[1] for _, notes in notes_by_track.values() for nt in notes), default=0)
-
+    
     t_tempo = mido.MidiTrack()
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
     t_tempo.append(mido.MetaMessage('time_signature', numerator=4, denominator=4, time=0))
+    
+    # KEY SIGNATURE
+    if root is not None and scale is not None:
+        key_sig = _compute_key_signature(root, scale)
+        t_tempo.append(mido.MetaMessage('key_signature', key=key_sig, time=0))
+    
     if label:
-        text = ("Loop507 - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
+        text = ("MIDI Forge - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
         t_tempo.append(mido.MetaMessage('marker', text=text, time=0))
     t_tempo.append(mido.MetaMessage('end_of_track', time=total_end))
     mid.tracks.append(t_tempo)
-
+    
     used_names = Counter()
     for key, (ch, notes) in notes_by_track.items():
         is_drums = (ch == DRUM_CH)
-
         header = list(headers.get(key, []))
         if not any(h['type'] == 'program_change' for h in header):
             if is_drums:
-                pc = 0  # Standard Kit GM, come _rb_render_track di MidiDecomposer
+                pc = 0
             else:
                 pc = None if faithful else GM_ROLE_PROGRAMS.get(key)
                 if pc is None:
@@ -545,7 +575,6 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
             if h['type'] == 'control_change' and h['control'] not in (0, 32):
                 mix[h['control']] = h
         program = pcs[0]['program'] & 0x7F if pcs else None
-
         if is_drums:
             name = DRUM_TRACK_NAMES.get(key, 'Drums')
         elif key.startswith('instrument_'):
@@ -557,7 +586,6 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
         used_names[name] += 1
         if used_names[name] > 1:
             name = f'{name} {used_names[name]}'
-
         midi_track = mido.MidiTrack()
         midi_track.append(mido.MetaMessage('track_name', name=name, time=0))
         for h in bank:
@@ -566,13 +594,11 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
             midi_track.append(mido.Message('program_change', program=program, channel=ch, time=0))
         for h in mix.values():
             midi_track.append(mido.Message('control_change', control=h['control'], value=h['value'], channel=ch, time=0))
-
         ev = []
         for start, end, pitch, vel in notes:
             ev.append((end, 0, pitch, 0))
             ev.append((start, 1, pitch, vel))
-        ev.sort(key=lambda x: (x[0], x[1]))  # a pari tick: prima i note_off
-
+        ev.sort(key=lambda x: (x[0], x[1]))
         prev = 0
         for tick, is_on, pitch, vel in ev:
             midi_track.append(mido.Message('note_on' if is_on else 'note_off',
@@ -580,25 +606,22 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
             prev = tick
         midi_track.append(mido.MetaMessage('end_of_track', time=max(0, total_end - prev)))
         mid.tracks.append(midi_track)
-
+    
     buf = io.BytesIO()
     mid.save(file=buf)
     buf.seek(0)
     return buf
 
-
 def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename):
     report = []
     report.append("=" * 60)
-    report.append("🎛️ MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE")
+    report.append("️ MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE")
     report.append("=" * 60)
     report.append("")
-    
-    report.append("📅 DATA E ORA")
+    report.append(" DATA E ORA")
     report.append(f"   Generato il: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     report.append("")
-    
-    report.append("⚙️ PARAMETRI GENERAZIONE")
+    report.append("️ PARAMETRI GENERAZIONE")
     report.append(f"   File originale: {original_filename}")
     report.append(f"   Modalità: {mode.upper()}")
     report.append(f"   Sotto-modalità: {submode.upper()}")
@@ -615,14 +638,14 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     secs = int((duration_actual - mins) * 60)
     report.append(f"   Durata effettiva: {mins}:{secs:02d}")
     report.append("")
-    
     report.append("🎵 ANALISI TONALE")
     report.append(f"   Tonica rilevata: {NOTE_NAMES[root]}")
     scale_notes = [NOTE_NAMES[(root + i) % 12] for i in scale]
     report.append(f"   Scala: {' - '.join(scale_notes)}")
     report.append(f"   Intervalli: {scale}")
+    key_sig = _compute_key_signature(root, scale)
+    report.append(f"   Key Signature: {key_sig}")
     report.append("")
-    
     g = GENRES[genre]
     report.append("🥁 PATTERN RITMICI (1 sedicesimi)")
     report.append(f"   Kick (GM 36):  {''.join(['█' if x else '·' for x in g['kick']])}")
@@ -634,7 +657,6 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     report.append(f"   Swing: {g['swing'] * 100:.0f}%")
     report.append(f"   Densità Arp: {g['arp_density'] * 100:.0f}%")
     report.append("")
-    
     report.append("🎼 TRACCE OUTPUT")
     track_idx = 1
     for track_key in tracks.keys():
@@ -646,36 +668,33 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
             report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
         track_idx += 1
     report.append("")
-    
     total_notes = sum(1 for events in tracks.values() for e in events if e['type'] == 'on')
-    
     report.append("📊 STATISTICHE MIDI")
     report.append(f"   Note totali generate: {total_notes}")
     report.append(f"   Tracce MIDI: {len(tracks) + 1}")
     report.append("")
-    
-    report.append("💡 NOTE PER LOGIC PRO :: LOGIC PRO NOTES")
+    report.append(" NOTE PER LOGIC PRO :: LOGIC PRO NOTES")
     report.append("   - Apri con File > Apri (non Importa) :: Use File > Open (not Import)")
     report.append("   - Importa ignora tempo, metrica, nomi traccia e marker; Apri li legge :: Import ignores tempo, time signature, track names and markers; Open reads them")
     report.append("   - Ogni traccia ha nome e program change al tick 0: lo strumento giusto sulla traccia giusta :: Every track has a name and a tick-0 program change: right instrument on the right track")
     report.append("   - Batteria su canale 10 (Kick/Snare/Hat/Clap o 'Drums'): se non carica un kit, assegna Drum Kit Designer :: Drums on ch.10 (Kick/Snare/Hat/Clap or 'Drums'): if no kit loads, assign Drum Kit Designer")
     report.append("")
-    
     report.append("=" * 60)
     report.append("Generato con MIDI Forge Universale | 100% Free & Open Source")
     report.append("=" * 60)
-    
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
-    all_events = []
+    # Calcola durate reali per ogni traccia
+    all_notes_with_dur = []
     for events in tracks.values():
-        all_events.extend(events)
+        notes = _compute_note_durations(events)
+        all_notes_with_dur.extend(notes)
     
-    events_json = json.dumps([{
-        'tick': e['tick'], 'type': e['type'], 'pitch': e['pitch'],
-        'vel': e['vel'], 'channel': e.get('channel', 0)
-    } for e in all_events])
+    notes_json = json.dumps([{
+        'tick': n['tick'], 'dur': n['dur'], 'pitch': n['pitch'],
+        'vel': n['vel'], 'channel': n['channel']
+    } for n in all_notes_with_dur])
     
     html_player = f"""
     <!DOCTYPE html>
@@ -694,28 +713,23 @@ def render_midi_player(tracks, bpm):
     </head>
     <body>
         <div class="player">
-            <div class="title">🎧 Anteprima MIDI</div>
+            <div class="title"> Anteprima MIDI (con durate reali)</div>
             <div class="controls">
                 <button id="playBtn" onclick="togglePlay()">▶ Play</button>
-                <button onclick="stop()">⏹ Stop</button>
+                <button onclick="stop()"> Stop</button>
                 <span class="status" id="status">Pronto - {bpm} BPM</span>
             </div>
         </div>
-        
         <script>
-            const events = {events_json};
+            const notes = {notes_json};
             let isPlaying = false;
             let synths = {{}};
             let scheduledEvents = [];
-            
             async function togglePlay() {{
                 if (isPlaying) {{ stop(); return; }}
-                
                 await Tone.start();
-                
                 try {{
                     const ticksPerSecond = ({TICKS_BEAT} * {bpm}) / 60;
-                    
                     for (let ch = 0; ch < 16; ch++) {{
                         if (ch === {DRUM_CH}) {{
                             synths[ch] = {{
@@ -729,41 +743,35 @@ def render_midi_player(tracks, bpm):
                             synths[ch].set({{ oscillator: {{ type: 'triangle' }}, envelope: {{ attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.5 }} }});
                         }}
                     }}
-                    
-                    events.forEach(event => {{
-                        const timeInSeconds = event.tick / ticksPerSecond;
-                        
-                        if (event.type === 'on') {{
-                            if (event.channel === {DRUM_CH}) {{
-                                scheduledEvents.push(
-                                    Tone.getTransport().schedule(time => {{
-                                        if (event.pitch === {GM_KICK}) synths[{DRUM_CH}].kick.triggerAttackRelease('C1', '8n', time, event.vel / 127);
-                                        else if (event.pitch === {GM_SNARE}) synths[{DRUM_CH}].snare.triggerAttackRelease('16n', time, event.vel / 127);
-                                        else if (event.pitch === {GM_CLAP}) synths[{DRUM_CH}].clap.triggerAttackRelease('16n', time, event.vel / 127);
-                                        else if (event.pitch === {GM_HAT_CLOSED} || event.pitch === {GM_HAT_OPEN}) synths[{DRUM_CH}].hat.triggerAttackRelease('C3', '32n', time, event.vel / 127);
-                                    }}, timeInSeconds)
-                                );
-                            }} else {{
-                                const noteName = Tone.Frequency(event.pitch, 'midi').toNote();
-                                scheduledEvents.push(
-                                    Tone.getTransport().schedule(time => {{
-                                        synths[event.channel].triggerAttackRelease(noteName, '8n', time, event.vel / 127);
-                                    }}, timeInSeconds)
-                                );
-                            }}
+                    notes.forEach(note => {{
+                        const timeInSeconds = note.tick / ticksPerSecond;
+                        const durInSeconds = note.dur / ticksPerSecond;
+                        if (note.channel === {DRUM_CH}) {{
+                            scheduledEvents.push(
+                                Tone.getTransport().schedule(time => {{
+                                    if (note.pitch === {GM_KICK}) synths[{DRUM_CH}].kick.triggerAttackRelease('C1', durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_SNARE}) synths[{DRUM_CH}].snare.triggerAttackRelease(durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_CLAP}) synths[{DRUM_CH}].clap.triggerAttackRelease(durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_HAT_CLOSED} || note.pitch === {GM_HAT_OPEN}) synths[{DRUM_CH}].hat.triggerAttackRelease('C3', durInSeconds, time, note.vel / 127);
+                                }}, timeInSeconds)
+                            );
+                        }} else {{
+                            const noteName = Tone.Frequency(note.pitch, 'midi').toNote();
+                            scheduledEvents.push(
+                                Tone.getTransport().schedule(time => {{
+                                    synths[note.channel].triggerAttackRelease(noteName, durInSeconds, time, note.vel / 127);
+                                }}, timeInSeconds)
+                            );
                         }}
                     }});
-                    
                     Tone.getTransport().start();
                     isPlaying = true;
-                    document.getElementById('playBtn').textContent = '⏸ Pause';
+                    document.getElementById('playBtn').textContent = ' Pause';
                     document.getElementById('status').textContent = 'In riproduzione...';
-                    
                 }} catch (e) {{
                     document.getElementById('status').textContent = 'Errore: ' + e.message;
                 }}
             }}
-            
             function stop() {{
                 Tone.getTransport().stop();
                 scheduledEvents.forEach(id => Tone.getTransport().clear(id));
@@ -778,7 +786,12 @@ def render_midi_player(tracks, bpm):
     """
     components.html(html_player, height=150)
 
-# ================= INTERFACCIA STREAMLIT =================
+# ================= INTERFACCIA STREAMLIT CON SESSION STATE =================
+
+# Inizializza session state
+if 'generated' not in st.session_state:
+    st.session_state.generated = None
+
 st.title("🎛️ MIDI Forge Universale")
 st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Standard General MIDI / DAW-compliant.")
 
@@ -786,9 +799,7 @@ col1, col2 = st.columns([1, 1])
 
 with col1:
     uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
-    
     mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"])
-    
     if mode == "minimal":
         submode = st.selectbox("Sotto-modalità", ["extract", "generate"])
     else:
@@ -798,17 +809,13 @@ with col1:
 with col2:
     genre_list = sorted(GENRES.keys())
     genre = st.selectbox("Genere Musicale", genre_list, index=genre_list.index("techno"))
-    
     g_defaults = GENRES[genre]
-    
     col_bpm1, col_bpm2 = st.columns(2)
     with col_bpm1:
         use_default_bpm = st.checkbox("BPM Automatico", value=True)
         bpm = st.number_input("BPM", min_value=40, max_value=300, value=g_defaults['bpm_default'], disabled=use_default_bpm)
-    
     with col_bpm2:
         duration_mode = st.radio("Durata traccia", ["Battute", "Minuti:Secondi"], horizontal=True)
-        
         if duration_mode == "Battute":
             use_default_bars = st.checkbox("Battute Automatiche", value=True)
             bars = st.number_input("Battute", min_value=8, max_value=512, value=g_defaults['bars_default'], disabled=use_default_bars)
@@ -821,7 +828,6 @@ with col2:
                 seconds = st.number_input("Secondi", min_value=0, max_value=59, value=0)
             duration_seconds = minutes * 60 + seconds
             bars = None
-        
     seed = st.number_input("Seed", min_value=1, max_value=99999, value=42)
 
 st.markdown("---")
@@ -834,12 +840,10 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
             try:
                 file_bytes = io.BytesIO(uploaded_file.getvalue())
                 notes_data = extract_notes(file_bytes)
-                
                 if not notes_data:
                     st.error("Il file MIDI non contiene note valide.")
                 else:
                     final_bpm = g_defaults['bpm_default'] if use_default_bpm else bpm
-                    
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
                         final_bars = int((duration_seconds * final_bpm) / 240)
                         final_bars = max(8, final_bars)
@@ -857,40 +861,59 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                         if final_bars != requested_bars:
                             st.info(f"📏 Durata allineata al brano sorgente: {final_bars} battute (richieste: {requested_bars})")
                     
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=f"MIDI Forge - {genre} - {mode}/{submode}")
+                    label = f"{genre} - {mode}/{submode}"
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, root=root, scale=scale)
                     
-                    st.success(f"✅ Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm})")
+                    report_text = generate_report(
+                        tracks, genre, mode, submode, final_bpm, final_bars,
+                        seed, root, scale, duration_mode, duration_seconds, uploaded_file.name
+                    )
                     
-                    st.markdown("### 🎧 Anteprima")
-                    render_midi_player(tracks, final_bpm)
+                    # Salva in session state
+                    st.session_state.generated = {
+                        'tracks': tracks,
+                        'root': root,
+                        'scale': scale,
+                        'headers': headers,
+                        'bars': final_bars,
+                        'bpm': final_bpm,
+                        'midi_bytes': midi_buffer.getvalue(),
+                        'report_text': report_text,
+                        'label': label,
+                        'mode': mode,
+                        'submode': submode,
+                        'genre': genre
+                    }
                     
-                    col_dl1, col_dl2 = st.columns(2)
-                    with col_dl1:
-                        st.download_button(
-                            label="📥 Scarica MIDI",
-                            data=midi_buffer,
-                            file_name=f"midi_forge_{genre}_{mode}_{submode}.mid",
-                            mime="audio/midi",
-                            use_container_width=True
-                        )
-                    with col_dl2:
-                        report_text = generate_report(
-                            tracks, genre, mode, submode, final_bpm, final_bars, 
-                            seed, root, scale, duration_mode, duration_seconds, uploaded_file.name
-                        )
-                        st.download_button(
-                            label="📄 Scarica Report TXT",
-                            data=report_text.encode('utf-8'),
-                            file_name=f"report_{genre}_{mode}_{submode}.txt",
-                            mime="text/plain",
-                            use_container_width=True
-                        )
-                    
-                    with st.expander("📋 Visualizza Report"):
-                        st.code(report_text, language=None)
-                        
-            except Exception as e:
-                st.error(f"Errore: {str(e)}")
+                    st.success(f"✅ Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm}, Key: {_compute_key_signature(root, scale)})")
+
+# Mostra risultati da session state (persistono dopo rerun)
+if st.session_state.generated:
+    g = st.session_state.generated
+    
+    st.markdown("### 🎧 Anteprima")
+    render_midi_player(g['tracks'], g['bpm'])
+    
+    col_dl1, col_dl2 = st.columns(2)
+    with col_dl1:
+        st.download_button(
+            label="📥 Scarica MIDI",
+            data=g['midi_bytes'],
+            file_name=f"midi_forge_{g['genre']}_{g['mode']}_{g['submode']}.mid",
+            mime="audio/midi",
+            use_container_width=True
+        )
+    with col_dl2:
+        st.download_button(
+            label="📄 Scarica Report TXT",
+            data=g['report_text'].encode('utf-8'),
+            file_name=f"report_{g['genre']}_{g['mode']}_{g['submode']}.txt",
+            mime="text/plain",
+            use_container_width=True
+        )
+    
+    with st.expander("📋 Visualizza Report"):
+        st.code(g['report_text'], language=None)
 
 st.markdown("---")
 st.caption("MIDI Forge Universale | Standard General MIDI | 100% Open Source & Free")
