@@ -2,7 +2,6 @@ import streamlit as st
 import streamlit.components.v1 as components
 import mido
 import random
-import math
 import io
 import json
 from datetime import datetime
@@ -66,12 +65,13 @@ GM_HAT_OPEN = 46
 def extract_notes(mid_file):
     notes = []
     mid = mido.MidiFile(file=mid_file)
+    scale_t = TICKS_BEAT / mid.ticks_per_beat  # normalizza il PPQ (Logic esporta a 960)
     for track in mid.tracks:
         current_tick = 0
         for msg in track:
             current_tick += msg.time
             if msg.type == 'note_on' and msg.velocity > 0:
-                notes.append({'pitch': msg.note, 'tick': current_tick, 'vel': msg.velocity})
+                notes.append({'pitch': msg.note, 'tick': int(round(current_tick * scale_t)), 'vel': msg.velocity})
     return notes
 
 def extract_dna(notes):
@@ -106,7 +106,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
     }
     
     if submode == 'extract':
-        max_tick = max(n['tick'] for n in notes_data)
         notes_by_step = {}
         for n in notes_data:
             step = round(n['tick'] / (TICKS_BEAT // 4))
@@ -197,34 +196,47 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
     
     tracks = {}
     
+    programs = {}
+    scale_t = TICKS_BEAT / mid.ticks_per_beat  # normalizza il PPQ della sorgente
+    free_channels = [c for c in range(16) if c != DRUM_CH]  # il canale 10 resta riservato alla batteria
+
     if submode == 'faithful':
         track_idx = 0
         for original_track in mid.tracks:
             if any(msg.channel == DRUM_CH for msg in original_track if hasattr(msg, 'channel')):
                 continue
-            
+
             original_name = None
+            original_program = None
             for msg in original_track:
-                if msg.type == 'track_name':
+                if msg.type == 'track_name' and original_name is None:
                     original_name = msg.name
-                    break
-            
+                elif msg.type == 'program_change' and original_program is None:
+                    original_program = msg.program
+
+            ch = free_channels[track_idx % len(free_channels)]
             track_events = []
             current_tick = 0
             for msg in original_track:
                 current_tick += msg.time
                 if msg.type == 'note_on' and msg.velocity > 0:
-                    step = round(current_tick / (TICKS_BEAT // 4))
+                    step = round(current_tick * scale_t / (TICKS_BEAT // 4))
                     tick = step * (TICKS_BEAT // 4)
                     pitch = snap_to_scale(msg.note, root, scale)
                     track_events.extend([
-                        {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': msg.velocity, 'channel': track_idx % 16},
-                        {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': track_idx % 16}
+                        {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': msg.velocity, 'channel': ch},
+                        {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': ch}
                     ])
-            
+
             if track_events:
-                track_key = original_name if original_name else f'instrument_{track_idx}'
+                track_key = (original_name or '').strip() or f'instrument_{track_idx}'
+                base_key, n = track_key, 2
+                while track_key in tracks or track_key == 'drums':
+                    track_key = f'{base_key} {n}'
+                    n += 1
                 tracks[track_key] = track_events
+                if original_program is not None:
+                    programs[track_key] = original_program
                 track_idx += 1
     else:
         roles = [
@@ -337,68 +349,139 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
     if drum_events:
         tracks['drums'] = drum_events
     
-    return tracks, root, scale
+    return tracks, root, scale, programs
 
-def build_midi_file(tracks, bpm, mode, submode):
-    """Costruisce un file MIDI con Program Change GM per Logic Pro."""
-    mid = mido.MidiFile(ticks_per_beat=TICKS_BEAT)
-    
-    t_tempo = mido.MidiTrack()
-    t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
-    mid.tracks.append(t_tempo)
-    
-    # Program Change GM per Logic Pro
-    gm_programs = {
-        'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38,
-        'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'drums': 0
-    }
-    
-    # Nomi tracce per Logic Pro
-    logic_names = {
-        'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass',
-        'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano',
-        'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drum Kit'
-    }
-    
-    track_idx = 0
-    for track_key, events in tracks.items():
-        if not events:
-            continue
-        
-        events_sorted = sorted(events, key=lambda e: (e['tick'], 0 if e['type'] == 'off' else 1))
-        
-        midi_track = mido.MidiTrack()
-        mid.tracks.append(midi_track)
-        
-        if track_key.startswith('instrument_'):
-            track_name = f'Instrument {track_idx + 1}'
+
+GM_ROLE_PROGRAMS = {
+    'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38,
+    'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117
+}
+
+LOGIC_ROLE_NAMES = {
+    'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass',
+    'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano',
+    'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drum Kit'
+}
+
+
+def _events_to_notes(events):
+    """Coppie on/off -> note (start, end, pitch, vel) pulite per Logic.
+    - pitch/velocity forzati nel range MIDI valido
+    - note identiche sulla stessa posizione fuse, sovrapposte sullo stesso pitch troncate
+      (altrimenti il primo note_off taglia la seconda nota o la lascia appesa)"""
+    notes = []
+    i, n = 0, len(events)
+    while i < n:
+        e = events[i]
+        if e['type'] == 'on' and i + 1 < n and events[i + 1]['type'] == 'off' and events[i + 1]['pitch'] == e['pitch']:
+            start = int(e['tick'])
+            end = max(int(events[i + 1]['tick']), start + 1)
+            pitch = max(0, min(127, int(e['pitch'])))
+            vel = max(1, min(127, int(e['vel'])))
+            notes.append([start, end, pitch, vel])
+            i += 2
         else:
-            track_name = logic_names.get(track_key, f'Track {track_idx + 1}')
-        
-        midi_track.append(mido.MetaMessage('track_name', name=track_name, time=0))
-        
-        ch = events_sorted[0].get('channel', 0)
-        
-        if track_key != 'drums':
-            pc = gm_programs.get(track_key, 0)
-            midi_track.append(mido.Message('program_change', program=pc, channel=ch, time=0))
-        
-        prev_tick = 0
-        for e in events_sorted:
-            delta = e['tick'] - prev_tick
-            msg_type = 'note_on' if e['type'] == 'on' else 'note_off'
-            vel = e['vel'] if e['type'] == 'on' else 0
-            midi_track.append(mido.Message(
-                msg_type, note=e['pitch'], velocity=vel, time=delta, channel=ch
-            ))
-            prev_tick = e['tick']
-        
+            i += 1
+
+    by_pitch = {}
+    for nt in notes:
+        by_pitch.setdefault(nt[2], []).append(nt)
+
+    cleaned_all = []
+    for lst in by_pitch.values():
+        lst.sort(key=lambda x: (x[0], -x[3]))
+        cleaned = []
+        for nt in lst:
+            if cleaned and nt[0] == cleaned[-1][0]:
+                cleaned[-1][1] = max(cleaned[-1][1], nt[1])
+                continue
+            if cleaned and cleaned[-1][1] > nt[0]:
+                cleaned[-1][1] = nt[0]
+            cleaned.append(nt)
+        cleaned_all.extend(cleaned)
+
+    cleaned_all.sort(key=lambda x: (x[0], x[2]))
+    return cleaned_all
+
+
+def build_midi_file(tracks, bpm, mode, submode, programs=None):
+    """MIDI Format 1 pensato per Logic Pro (File > Open):
+    traccia tempo + time signature, una traccia per strumento con nome unico,
+    Program Change GM (anche sulla batteria, canale 10), end_of_track allineato a fine battuta."""
+    programs = programs or {}
+    faithful = (mode == 'multitrack' and submode == 'faithful')
+    bar_ticks = 4 * TICKS_BEAT
+
+    notes_by_track = {}
+    for key, events in tracks.items():
+        notes = _events_to_notes(events)
+        if notes:
+            notes_by_track[key] = (events[0].get('channel', 0), notes)
+
+    max_end = max((nt[1] for _, notes in notes_by_track.values() for nt in notes), default=bar_ticks)
+    total_ticks = ((max_end + bar_ticks - 1) // bar_ticks) * bar_ticks
+
+    mid = mido.MidiFile(type=1, ticks_per_beat=TICKS_BEAT)
+
+    t_tempo = mido.MidiTrack()
+    t_tempo.append(mido.MetaMessage('track_name', name='Tempo', time=0))
+    t_tempo.append(mido.MetaMessage('time_signature', numerator=4, denominator=4,
+                                    clocks_per_click=24, notated_32nd_notes_per_beat=8, time=0))
+    t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
+    t_tempo.append(mido.MetaMessage('end_of_track', time=total_ticks))
+    mid.tracks.append(t_tempo)
+
+    used_names = Counter()
+    track_idx = 0
+    for key, (ch, notes) in notes_by_track.items():
+        is_drums = (ch == DRUM_CH)
+
+        if is_drums:
+            name = 'Drum Kit'
+        elif key.startswith('instrument_'):
+            name = f'Instrument {track_idx + 1}'
+        elif faithful:
+            name = key
+        else:
+            name = LOGIC_ROLE_NAMES.get(key, key.replace('_', ' ').title())
+        used_names[name] += 1
+        if used_names[name] > 1:
+            name = f'{name} {used_names[name]}'
+
+        if is_drums:
+            pc = 0
+        elif key in programs:
+            pc = programs[key]
+        elif not faithful:
+            pc = GM_ROLE_PROGRAMS.get(key)
+        else:
+            pc = None
+
+        midi_track = mido.MidiTrack()
+        midi_track.append(mido.MetaMessage('track_name', name=name, time=0))
+        if pc is not None:
+            midi_track.append(mido.Message('program_change', program=int(pc) & 0x7F, channel=ch, time=0))
+
+        ev = []
+        for start, end, pitch, vel in notes:
+            ev.append((end, 0, pitch, 0))
+            ev.append((start, 1, pitch, vel))
+        ev.sort(key=lambda x: (x[0], x[1]))  # a pari tick: prima i note_off
+
+        prev = 0
+        for tick, is_on, pitch, vel in ev:
+            midi_track.append(mido.Message('note_on' if is_on else 'note_off',
+                                           note=pitch, velocity=vel, time=tick - prev, channel=ch))
+            prev = tick
+        midi_track.append(mido.MetaMessage('end_of_track', time=max(0, total_ticks - prev)))
+        mid.tracks.append(midi_track)
         track_idx += 1
-    
+
     buf = io.BytesIO()
     mid.save(file=buf)
     buf.seek(0)
     return buf
+
 
 def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename):
     report = []
@@ -467,10 +550,12 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     report.append(f"   Tracce MIDI: {len(tracks) + 1}")
     report.append("")
     
-    report.append("💡 NOTE PER LOGIC PRO")
-    report.append("   - Importa il MIDI trascinandolo nell'Arrange window")
-    report.append("   - Logic caricherà automaticamente gli strumenti")
-    report.append("   - La traccia Drums usa Drum Machine Designer")
+    report.append("💡 NOTE PER LOGIC PRO :: LOGIC PRO NOTES")
+    report.append("   - Apri con File > Open (non trascinare nell'Arrange) :: Use File > Open (not drag & drop into the Arrange)")
+    report.append("   - Tempo, nomi traccia e strumenti arrivano solo con Open :: Tempo, track names and instruments are only read by Open")
+    report.append("   - Strumenti GarageBand scelti dai Program Change GM :: GarageBand instruments are picked from GM Program Changes")
+    report.append("   - Drum Kit su canale 10: se non carica un kit, assegna Drum Kit Designer :: Drum Kit on ch.10: if no kit loads, assign Drum Kit Designer")
+    report.append("   - Tutte le regioni finiscono a fine battuta :: All regions end on a bar line")
     report.append("")
     
     report.append("=" * 60)
@@ -660,11 +745,12 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                     
                     if mode == "minimal":
                         tracks, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed)
+                        programs = {}
                     else:
                         file_bytes.seek(0)
-                        tracks, root, scale = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed)
+                        tracks, root, scale, programs = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed)
                     
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode)
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, programs)
                     
                     st.success(f"✅ Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm})")
                     
