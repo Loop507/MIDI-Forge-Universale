@@ -12,18 +12,18 @@ st.set_page_config(page_title="MIDI Forge Universale", page_icon="🎛️", layo
 
 # ================= DATABASE DEI GENERI =================
 GENRES = {
-    'acid': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
+    'acid': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
     'ambient': {'bpm_default': 80, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0},
     'armonico': {'bpm_default': 100, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.70, 'swing': 0.10},
     'breakcore': {'bpm_default': 200, 'bars_default': 48, 'kick': [1,0,0,1, 0,1,0,0, 1,0,1,0, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,1,0,0, 1,0,0,1], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,1], 'arp_density': 0.80, 'swing': 0.05},
     'commerciale_90s': {'bpm_default': 130, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'arp_density': 0.60, 'swing': 0.0},
-    'deep': {'bpm_default': 124, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.50, 'swing': 0.15},
-    'disco': {'bpm_default': 122, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.05},
+    'deep': {'bpm_default': 124, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.50, 'swing': 0.15},
+    'disco': {'bpm_default': 122, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.05},
     'drone': {'bpm_default': 70, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.05, 'swing': 0.0},
     'drum_n_bass': {'bpm_default': 174, 'bars_default': 48, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,1, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.70, 'swing': 0.0},
-    'dub_techno': {'bpm_default': 128, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'arp_density': 0.40, 'swing': 0.0},
-    'edm_2000s': {'bpm_default': 132, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
-    'elettronico': {'bpm_default': 130, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
+    'dub_techno': {'bpm_default': 128, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'arp_density': 0.40, 'swing': 0.0},
+    'edm_2000s': {'bpm_default': 132, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
+    'elettronico': {'bpm_default': 130, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
     'funk': {'bpm_default': 112, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,1,0,0], 'arp_density': 0.60, 'swing': 0.15},
     'glitch': {'bpm_default': 125, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,1, 0,0,0,0, 1,0,0,0], 'arp_density': 0.95, 'swing': 0.0},
     'harsh_noise': {'bpm_default': 100, 'bars_default': 64, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 1.0, 'swing': 0.0},
@@ -32,8 +32,8 @@ GENRES = {
     'industrial': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.70, 'swing': 0.0},
     'lowercase': {'bpm_default': 60, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.05, 'swing': 0.0},
     'microsound': {'bpm_default': 80, 'bars_default': 96, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.10, 'swing': 0.0},
-    'minimal': {'bpm_default': 126, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.30, 'swing': 0.0},
-    'minimal_techno': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.50, 'swing': 0.0},
+    'minimal': {'bpm_default': 126, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.30, 'swing': 0.0},
+    'minimal_techno': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.50, 'swing': 0.0},
     'minimalismo_ritmico': {'bpm_default': 115, 'bars_default': 64, 'kick': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.60, 'swing': 0.05},
     'noise': {'bpm_default': 120, 'bars_default': 64, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 0.90, 'swing': 0.0},
     'onkyo': {'bpm_default': 50, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.02, 'swing': 0.0},
@@ -41,8 +41,8 @@ GENRES = {
     'reggaeton': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,1,0,1, 0,1,0,1, 0,1,0,1, 0,1,0,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.50, 'swing': 0.0},
     'sperimentale': {'bpm_default': 100, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.70, 'swing': 0.10},
     'soul': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,1,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'arp_density': 0.60, 'swing': 0.30},
-    'synthpop': {'bpm_default': 120, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.75, 'swing': 0.0},
-    'techno': {'bpm_default': 138, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
+    'synthpop': {'bpm_default': 120, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.75, 'swing': 0.0},
+    'techno': {'bpm_default': 138, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
     'trap': {'bpm_default': 140, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.40, 'swing': 0.0},
     'trance': {'bpm_default': 140, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1]*16, 'arp_density': 0.90, 'swing': 0.0},
     'underground': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.65, 'swing': 0.0}
@@ -180,7 +180,7 @@ def generate_minimal(notes_data, g, submode, bars, seed):
                     ])
     return tracks, root, scale
 
-def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
+def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True):
     random.seed(seed)
     mid = mido.MidiFile(file=mid_file_bytes)
     
@@ -226,7 +226,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
             if track_events:
                 track_key = (original_name or '').strip() or f'instrument_{track_idx}'
                 base_key, n = track_key, 2
-                while track_key in tracks or track_key == 'drums':
+                while track_key in tracks or track_key in DRUM_TRACK_NAMES:
                     track_key = f'{base_key} {n}'
                     n += 1
                 tracks[track_key] = track_events
@@ -311,6 +311,12 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
             if track_events:
                 tracks[role_name] = track_events
     
+    # In faithful le tracce melodiche seguono il brano sorgente (non vengono mai tagliate): la batteria
+    # deve coprire le stesse battute, altrimenti finisce prima del resto.
+    if tracks:
+        last_tick = max(e['tick'] for ev in tracks.values() for e in ev)
+        bars = max(bars, -(-last_tick // (4 * TICKS_BEAT)))
+
     # BATTERIA
     drum_events = []
     for bar in range(bars):
@@ -343,8 +349,10 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
     
     if drum_events:
         tracks['drums'] = drum_events
+        if split_drums:
+            tracks = split_drum_track(tracks)
     
-    return tracks, root, scale, headers
+    return tracks, root, scale, headers, bars
 
 
 GM_PROGRAM_NAMES = [
@@ -415,6 +423,29 @@ def _extract_instrument_header(track):
     return header
 
 
+# Pezzi del kit -> traccia dedicata (tutte sul canale 10, come le tracce "Ritmica" di MidiDecomposer)
+DRUM_PIECES = [(GM_KICK, 'drum_kick'), (GM_SNARE, 'drum_snare'), (GM_HAT_CLOSED, 'drum_hat'), (GM_CLAP, 'drum_clap')]
+DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap'}
+
+
+def split_drum_track(tracks):
+    """tracks['drums'] -> una traccia per pezzo del kit (Kick/Snare/Hat/Clap). Nessuna nota va persa:
+    eventuali altezze fuori dalla mappa restano in 'drums'."""
+    events = tracks.get('drums')
+    if not events:
+        return tracks
+    out = {k: v for k, v in tracks.items() if k != 'drums'}
+    known = {p for p, _k in DRUM_PIECES}
+    for pitch, key in DRUM_PIECES:
+        ev = [e for e in events if e['pitch'] == pitch]
+        if ev:
+            out[key] = ev
+    rest = [e for e in events if e['pitch'] not in known]
+    if rest:
+        out['drums'] = rest
+    return out
+
+
 GM_ROLE_PROGRAMS = {
     'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38,
     'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117
@@ -471,8 +502,8 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
     """MIDI Format 1 per Logic Pro (File > Apri), con le stesse convenzioni di MidiDecomposer (daw_optimize):
       - prima traccia con SOLO tempo e metrica espliciti al tick 0 + marker 'Loop507 - ...'
       - una traccia = un canale, con nome e (bank select, program change, mix) al tick 0
-      - batteria sul canale 10, traccia 'Drums', senza program change
-      - nessun end_of_track forzato: la durata e' quella dell'ultima nota."""
+      - batteria sul canale 10 (Kick/Snare/Hat/Clap su tracce separate, oppure 'Drums') con program change 0
+      - tutte le tracce chiudono con end_of_track sull'ultima nota del brano: le regioni finiscono insieme."""
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
 
@@ -483,6 +514,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
             notes_by_track[key] = (events[0].get('channel', 0), notes)
 
     mid = mido.MidiFile(type=1, ticks_per_beat=TICKS_BEAT)
+    total_end = max((nt[1] for _, notes in notes_by_track.values() for nt in notes), default=0)
 
     t_tempo = mido.MidiTrack()
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
@@ -490,6 +522,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
     if label:
         text = ("Loop507 - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
         t_tempo.append(mido.MetaMessage('marker', text=text, time=0))
+    t_tempo.append(mido.MetaMessage('end_of_track', time=total_end))
     mid.tracks.append(t_tempo)
 
     used_names = Counter()
@@ -497,11 +530,16 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
         is_drums = (ch == DRUM_CH)
 
         header = list(headers.get(key, []))
-        if not is_drums and not any(h['type'] == 'program_change' for h in header):
-            pc = None if faithful else GM_ROLE_PROGRAMS.get(key)
-            header.append({'type': 'program_change', 'program': _guess_program(key) if pc is None else pc})
+        if not any(h['type'] == 'program_change' for h in header):
+            if is_drums:
+                pc = 0  # Standard Kit GM, come _rb_render_track di MidiDecomposer
+            else:
+                pc = None if faithful else GM_ROLE_PROGRAMS.get(key)
+                if pc is None:
+                    pc = _guess_program(key)
+            header.append({'type': 'program_change', 'program': pc})
         bank = [h for h in header if h['type'] == 'control_change' and h['control'] in (0, 32)]
-        pcs = [h for h in header if h['type'] == 'program_change'][:1] if not is_drums else []
+        pcs = [h for h in header if h['type'] == 'program_change'][:1]
         mix = {}
         for h in header:
             if h['type'] == 'control_change' and h['control'] not in (0, 32):
@@ -509,7 +547,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
         program = pcs[0]['program'] & 0x7F if pcs else None
 
         if is_drums:
-            name = 'Drums'
+            name = DRUM_TRACK_NAMES.get(key, 'Drums')
         elif key.startswith('instrument_'):
             name = GM_PROGRAM_NAMES[program] if program is not None else key
         elif faithful:
@@ -540,6 +578,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
             midi_track.append(mido.Message('note_on' if is_on else 'note_off',
                                            note=pitch, velocity=vel, time=tick - prev, channel=ch))
             prev = tick
+        midi_track.append(mido.MetaMessage('end_of_track', time=max(0, total_end - prev)))
         mid.tracks.append(midi_track)
 
     buf = io.BytesIO()
@@ -599,8 +638,8 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     report.append("🎼 TRACCE OUTPUT")
     track_idx = 1
     for track_key in tracks.keys():
-        if track_key == 'drums':
-            report.append(f"   {track_idx}. Drums (Canale 10 - GM Drum Map)")
+        if track_key in DRUM_TRACK_NAMES:
+            report.append(f"   {track_idx}. {DRUM_TRACK_NAMES[track_key]} (Canale 10 - GM Drum Map)")
         elif track_key.startswith('instrument_'):
             report.append(f"   {track_idx}. {track_key} (Canale melodico)")
         else:
@@ -619,7 +658,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     report.append("   - Apri con File > Apri (non Importa) :: Use File > Open (not Import)")
     report.append("   - Importa ignora tempo, metrica, nomi traccia e marker; Apri li legge :: Import ignores tempo, time signature, track names and markers; Open reads them")
     report.append("   - Ogni traccia ha nome e program change al tick 0: lo strumento giusto sulla traccia giusta :: Every track has a name and a tick-0 program change: right instrument on the right track")
-    report.append("   - Batteria su canale 10 (traccia 'Drums'): se non carica un kit, assegna Drum Kit Designer :: Drums on ch.10 ('Drums' track): if no kit loads, assign Drum Kit Designer")
+    report.append("   - Batteria su canale 10 (Kick/Snare/Hat/Clap o 'Drums'): se non carica un kit, assegna Drum Kit Designer :: Drums on ch.10 (Kick/Snare/Hat/Clap or 'Drums'): if no kit loads, assign Drum Kit Designer")
     report.append("")
     
     report.append("=" * 60)
@@ -754,6 +793,7 @@ with col1:
         submode = st.selectbox("Sotto-modalità", ["extract", "generate"])
     else:
         submode = st.selectbox("Sotto-modalità", ["faithful", "generative"])
+        split_drums = st.checkbox("🥁 Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True)
 
 with col2:
     genre_list = sorted(GENRES.keys())
@@ -812,7 +852,10 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                         headers = {}
                     else:
                         file_bytes.seek(0)
-                        tracks, root, scale, headers = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed)
+                        requested_bars = final_bars
+                        tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed, split_drums)
+                        if final_bars != requested_bars:
+                            st.info(f"📏 Durata allineata al brano sorgente: {final_bars} battute (richieste: {requested_bars})")
                     
                     midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=f"MIDI Forge - {genre} - {mode}/{submode}")
                     
