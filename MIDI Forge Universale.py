@@ -463,4 +463,281 @@ def render_midi_player(midi_buffer, bpm):
                 function readUint16() {{
                     const val = data.getUint16(offset, false);
                     offset += 2;
-                   
+                    return val;
+                }}
+                
+                function readUint8() {{
+                    return data.getUint8(offset++);
+                }}
+                
+                function readString(len) {{
+                    let str = '';
+                    for (let i = 0; i < len; i++) {{
+                        str += String.fromCharCode(readUint8());
+                    }}
+                    return str;
+                }}
+                
+                const header = readString(4);
+                if (header !== 'MThd') throw new Error('Not a MIDI file');
+                
+                const headerLength = readUint32();
+                const format = readUint16();
+                const numTracks = readUint16();
+                const ticksPerBeat = readUint16();
+                
+                const tracks = [];
+                for (let t = 0; t < numTracks; t++) {{
+                    const trackHeader = readString(4);
+                    if (trackHeader !== 'MTrk') throw new Error('Invalid track header');
+                    
+                    const trackLength = readUint32();
+                    const trackEnd = offset + trackLength;
+                    const events = [];
+                    let currentTime = 0;
+                    let lastStatus = 0;
+                    
+                    while (offset < trackEnd) {{
+                        let deltaTime = 0;
+                        let byte = readUint8();
+                        while (byte & 0x80) {{
+                            deltaTime = (deltaTime << 7) | (byte & 0x7F);
+                            byte = readUint8();
+                        }}
+                        deltaTime = (deltaTime << 7) | (byte & 0x7F);
+                        currentTime += deltaTime;
+                        
+                        let status = readUint8();
+                        if (status < 0x80) {{
+                            status = lastStatus;
+                            offset--;
+                        }}
+                        lastStatus = status;
+                        
+                        const type = status & 0xF0;
+                        const channel = status & 0x0F;
+                        
+                        if (type === 0x90 || type === 0x80) {{
+                            const note = readUint8();
+                            const velocity = readUint8();
+                            events.push({{
+                                time: currentTime,
+                                type: type === 0x90 && velocity > 0 ? 'noteOn' : 'noteOff',
+                                note: note,
+                                velocity: velocity,
+                                channel: channel
+                            }});
+                        }} else if (type === 0xC0 || type === 0xD0) {{
+                            readUint8();
+                        }} else if (type === 0xA0 || type === 0xE0) {{
+                            readUint8();
+                            readUint8();
+                        }} else if (status === 0xFF) {{
+                            const metaType = readUint8();
+                            let length = 0;
+                            byte = readUint8();
+                            while (byte & 0x80) {{
+                                length = (length << 7) | (byte & 0x7F);
+                                byte = readUint8();
+                            }}
+                            length = (length << 7) | (byte & 0x7F);
+                            offset += length;
+                        }}
+                    }}
+                    
+                    tracks.push(events);
+                }}
+                
+                return {{ format, numTracks, ticksPerBeat, tracks }};
+            }}
+            
+            async function togglePlay() {{
+                if (isPlaying) {{
+                    stop();
+                    return;
+                }}
+                
+                await Tone.start();
+                document.getElementById('status').textContent = 'Caricamento...';
+                
+                try {{
+                    const arrayBuffer = base64ToArrayBuffer(midiBase64);
+                    const midi = parseMidi(arrayBuffer);
+                    
+                    const ticksPerSecond = (midi.ticksPerBeat * {bpm}) / 60;
+                    
+                    for (let ch = 0; ch < 16; ch++) {{
+                        if (ch === 9) {{
+                            synths[ch] = new Tone.MembraneSynth().toDestination();
+                        }} else {{
+                            synths[ch] = new Tone.PolySynth(Tone.Synth).toDestination();
+                            synths[ch].set({{
+                                oscillator: {{ type: 'triangle' }},
+                                envelope: {{ attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.5 }}
+                            }});
+                        }}
+                    }}
+                    
+                    midi.tracks.forEach(track => {{
+                        track.forEach(event => {{
+                            const timeInSeconds = event.time / ticksPerSecond;
+                            const noteName = Tone.Frequency(event.note, 'midi').toNote();
+                            
+                            if (event.type === 'noteOn') {{
+                                if (event.channel === 9) {{
+                                    scheduledEvents.push(
+                                        Tone.getTransport().schedule(time => {{
+                                            synths[9].triggerAttackRelease('C1', '8n', time, event.velocity / 127);
+                                        }}, timeInSeconds)
+                                    );
+                                }} else {{
+                                    scheduledEvents.push(
+                                        Tone.getTransport().schedule(time => {{
+                                            synths[event.channel].triggerAttackRelease(noteName, '8n', time, event.velocity / 127);
+                                        }}, timeInSeconds)
+                                    );
+                                }}
+                            }}
+                        }});
+                    }});
+                    
+                    Tone.getTransport().start();
+                    isPlaying = true;
+                    document.getElementById('playBtn').textContent = '⏸ Pause';
+                    document.getElementById('status').textContent = 'In riproduzione...';
+                    
+                }} catch (e) {{
+                    document.getElementById('status').textContent = 'Errore: ' + e.message;
+                    console.error(e);
+                }}
+            }}
+            
+            function stop() {{
+                Tone.getTransport().stop();
+                scheduledEvents.forEach(id => Tone.getTransport().clear(id));
+                scheduledEvents = [];
+                Object.values(synths).forEach(synth => synth.releaseAll());
+                isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶ Play';
+                document.getElementById('status').textContent = 'Pronto - {bpm} BPM';
+            }}
+        </script>
+    </body>
+    </html>
+    """
+    components.html(html_player, height=180)
+
+# ================= INTERFACCIA STREAMLIT =================
+st.title("🎛️ MIDI Forge Universale")
+st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Carica, ascolta in anteprima e scarica.")
+
+col1, col2 = st.columns([1, 1])
+
+with col1:
+    uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
+    
+    mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], 
+                        help="Minimal: 3 tracce compatte. Multitrack: Preserva la struttura a più tracce.")
+    
+    if mode == "minimal":
+        submode = st.selectbox("Sotto-modalità", ["extract", "generate"], 
+                               help="extract: Usa le note originali. generate: Crea melodie nuove da zero.")
+    else:
+        submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], 
+                               help="faithful: Cambio genere riconoscibile. generative: Arrangiamento nuovo ma strutturato.")
+
+with col2:
+    genre_list = sorted(GENRES.keys())
+    genre = st.selectbox("Genere Musicale", genre_list, index=genre_list.index("techno"))
+    
+    g_defaults = GENRES[genre]
+    
+    col_bpm1, col_bpm2 = st.columns(2)
+    with col_bpm1:
+        use_default_bpm = st.checkbox("BPM Automatico", value=True)
+        bpm = st.number_input("BPM", min_value=40, max_value=300, value=g_defaults['bpm_default'], disabled=use_default_bpm)
+    
+    with col_bpm2:
+        duration_mode = st.radio("Durata traccia", ["Battute", "Minuti:Secondi"], horizontal=True)
+        
+        if duration_mode == "Battute":
+            use_default_bars = st.checkbox("Battute Automatiche", value=True)
+            bars = st.number_input("Battute", min_value=8, max_value=512, value=g_defaults['bars_default'], disabled=use_default_bars)
+            duration_seconds = None
+        else:
+            col_min, col_sec = st.columns(2)
+            with col_min:
+                minutes = st.number_input("Minuti", min_value=0, max_value=30, value=1)
+            with col_sec:
+                seconds = st.number_input("Secondi", min_value=0, max_value=59, value=0)
+            duration_seconds = minutes * 60 + seconds
+            bars = None
+        
+    seed = st.number_input("Seed (per variazioni infinite)", min_value=1, max_value=99999, value=42)
+
+st.markdown("---")
+
+if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
+    if not uploaded_file:
+        st.error("⚠️ Per favore, carica prima un file MIDI!")
+    else:
+        with st.spinner("🎼 Analisi del DNA armonico e generazione in corso..."):
+            try:
+                file_bytes = io.BytesIO(uploaded_file.getvalue())
+                notes_data = extract_notes(file_bytes)
+                
+                if not notes_data:
+                    st.error("Il file MIDI caricato non contiene note valide.")
+                else:
+                    final_bpm = g_defaults['bpm_default'] if use_default_bpm else bpm
+                    
+                    if duration_mode == "Minuti:Secondi" and duration_seconds:
+                        final_bars = int((duration_seconds * final_bpm) / 240)
+                        final_bars = max(8, final_bars)
+                        st.info(f"📏 Durata calcolata: {final_bars} battute ({duration_seconds} secondi a {final_bpm} BPM)")
+                    else:
+                        final_bars = g_defaults['bars_default'] if use_default_bars else bars
+                    
+                    if mode == "minimal":
+                        events, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed)
+                    else:
+                        file_bytes.seek(0)
+                        events, root, scale = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed)
+                    
+                    midi_buffer = build_midi_file(events, final_bpm, mode, submode)
+                    
+                    st.success(f"✅ Generazione completata! (Tonica: {NOTE_NAMES[root]})")
+                    
+                    st.markdown("### 🎧 Anteprima")
+                    render_midi_player(midi_buffer, final_bpm)
+                    
+                    col_dl1, col_dl2 = st.columns(2)
+                    with col_dl1:
+                        st.download_button(
+                            label="📥 Scarica MIDI",
+                            data=midi_buffer,
+                            file_name=f"midi_forge_{genre}_{mode}_{submode}.mid",
+                            mime="audio/midi",
+                            use_container_width=True
+                        )
+                    with col_dl2:
+                        report_text = generate_report(
+                            midi_buffer, genre, mode, submode, final_bpm, final_bars, 
+                            seed, root, scale, duration_mode, duration_seconds, uploaded_file.name
+                        )
+                        st.download_button(
+                            label="📄 Scarica Report TXT",
+                            data=report_text.encode('utf-8'),
+                            file_name=f"report_{genre}_{mode}_{submode}.txt",
+                            mime="text/plain",
+                            use_container_width=True
+                        )
+                    
+                    with st.expander("📋 Visualizza Report Completo"):
+                        st.code(report_text, language=None)
+                        
+            except Exception as e:
+                st.error(f"Si è verificato un errore: {str(e)}")
+
+st.markdown("---")
+st.caption("MIDI Forge Universale | Librerie: Streamlit, Mido, Tone.js | 100% Open Source & Free")
