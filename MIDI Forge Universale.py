@@ -4,7 +4,6 @@ import mido
 import random
 import math
 import io
-import base64
 import json
 from datetime import datetime
 from collections import Counter
@@ -53,11 +52,22 @@ GENRES = {
 NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 TICKS_BEAT = 480
 
-# Canali batteria separati per Logic Pro
-KICK_CH = 9    # Canale 10 (Kick)
-SNARE_CH = 8   # Canale 9 (Snare)
-HAT_CH = 7     # Canale 8 (Hi-Hat)
-CLAP_CH = 6    # Canale 7 (Clap)
+# ================= STANDARD GENERAL MIDI =================
+# Canale 10 (0-indexed = 9) per TUTTA la batteria
+DRUM_CH = 9  # Canale 10 in notazione 1-indexed
+
+# Pitch GM (General MIDI) standard per percussioni
+GM_KICK = 36      # Bass Drum 1
+GM_SNARE = 38     # Acoustic Snare
+GM_CLAP = 39      # Hand Clap
+GM_HAT_CLOSED = 42  # Closed Hi-Hat
+GM_HAT_OPEN = 46    # Open Hi-Hat
+GM_RIDE = 51        # Ride Cymbal 1
+GM_CRASH = 49       # Crash Cymbal 1
+GM_TOM_LOW = 45     # Low Tom
+GM_TOM_MID = 48     # Hi-Mid Tom
+GM_TOM_HIGH = 50    # High Tom
+GM_RIMSHOT = 37     # Side Stick / Rimshot
 
 # ================= FUNZIONI CORE =================
 def extract_notes(mid_file):
@@ -93,9 +103,20 @@ def snap_to_scale(pitch, root, scale):
     return root + (octave * 12) + closest
 
 def generate_minimal(notes_data, g, submode, bars, seed):
+    """Genera eventi per modalità minimal.
+    Ritorna una struttura per TRACCE (non per canali):
+    - tracks['bass'] = eventi basso (canale 0)
+    - tracks['arp'] = eventi arp (canale 1)
+    - tracks['drums'] = eventi batteria (canale 9, pitch GM)
+    """
     random.seed(seed)
     root, scale = extract_dna(notes_data)
-    events = []
+    
+    tracks = {
+        'bass': [],
+        'arp': [],
+        'drums': []
+    }
     
     if submode == 'extract':
         max_tick = max(n['tick'] for n in notes_data)
@@ -120,43 +141,63 @@ def generate_minimal(notes_data, g, submode, bars, seed):
             p_step = s % 16
             swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
             
-            # Batteria su canali separati
+            # BATTERIA - TUTTO SU CANALE 9 (GM Ch 10) con pitch GM
             if g['kick'][p_step]:
-                events.extend([{'tick': tick, 'type': 'on', 'pitch': 36, 'vel': 110, 'channel': KICK_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 36, 'vel': 0, 'channel': KICK_CH}])
+                tracks['drums'].extend([
+                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': 110, 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}
+                ])
             if g.get('snare', [0]*16)[p_step]:
-                events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': 38, 'vel': 100, 'channel': SNARE_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 38, 'vel': 0, 'channel': SNARE_CH}])
+                tracks['drums'].extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': 100, 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}
+                ])
             if g.get('clap', [0]*16)[p_step]:
-                events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': 39, 'vel': 90, 'channel': CLAP_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 39, 'vel': 0, 'channel': CLAP_CH}])
+                tracks['drums'].extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': 90, 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
+                ])
             if g['hat'][p_step]:
-                events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': 42, 'vel': 70 + random.randint(0, 20), 'channel': HAT_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 42, 'vel': 0, 'channel': HAT_CH}])
+                tracks['drums'].extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': 70 + random.randint(0, 20), 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
+                ])
             
+            # BASSO & ARP
             if submode == 'extract' and s in notes_by_step:
                 low_p, high_p = min(notes_by_step[s]), max(notes_by_step[s])
                 if g['bass'][p_step]:
                     pitch = max(28, min(snap_to_scale(low_p, root, scale) - 24, 45))
-                    events.extend([{'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
-                                   {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}])
+                    tracks['bass'].extend([
+                        {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
+                        {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
+                    ])
                 if random.random() < g['arp_density']:
                     pitch = max(60, snap_to_scale(high_p, root, scale))
-                    events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
-                                   {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}])
+                    tracks['arp'].extend([
+                        {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
+                        {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
+                    ])
             else:
                 if g['bass'][p_step]:
                     idx = 0 if random.random() < 0.8 else random.choice([1, len(scale)-1])
                     pitch = max(28, min(root - 24 + scale[idx % len(scale)], 45))
-                    events.extend([{'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
-                                   {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}])
+                    tracks['bass'].extend([
+                        {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
+                        {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
+                    ])
                 if m[s % 8] is not None:
                     pitch = root + 12 + scale[m[s % 8] % len(scale)]
-                    events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
-                                   {'tick': tick + (TICKS_BEAT//4) - 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}])
-    return events, root, scale
+                    tracks['arp'].extend([
+                        {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
+                        {'tick': tick + (TICKS_BEAT//4) - 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
+                    ])
+    return tracks, root, scale
 
 def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
+    """Genera eventi per modalità multitrack.
+    Ritorna una struttura per TRACCE separate.
+    """
     random.seed(seed)
     mid = mido.MidiFile(file=mid_file_bytes)
     
@@ -169,11 +210,18 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
                 all_notes_flat.append({'pitch': msg.note, 'tick': current_tick})
     
     root, scale = extract_dna(all_notes_flat)
-    events = []
+    
+    tracks = {}
     
     if submode == 'faithful':
-        track_channel = 0
+        # Preserva ogni traccia originale come traccia separata
+        track_idx = 0
         for original_track in mid.tracks:
+            # Salta tracce di batteria originali
+            if any(msg.channel == DRUM_CH for msg in original_track if hasattr(msg, 'channel')):
+                continue
+            
+            track_events = []
             current_tick = 0
             for msg in original_track:
                 current_tick += msg.time
@@ -181,12 +229,15 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
                     step = round(current_tick / (TICKS_BEAT // 4))
                     tick = step * (TICKS_BEAT // 4)
                     pitch = snap_to_scale(msg.note, root, scale)
-                    events.extend([
-                        {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': msg.velocity, 'channel': track_channel},
-                        {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': track_channel}
+                    track_events.extend([
+                        {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': msg.velocity, 'channel': track_idx % 16},
+                        {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': track_idx % 16}
                     ])
-            track_channel += 1
+            if track_events:
+                tracks[f'instrument_{track_idx}'] = track_events
+                track_idx += 1
     else:
+        # Modalità generative: 7 ruoli distinti
         roles = [
             ('sub_bass', 0, (24, 36)),
             ('bassline', 1, (36, 48)),
@@ -198,22 +249,27 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
         ]
         
         for role_name, channel, (low_pitch, high_pitch) in roles:
+            track_events = []
             for bar in range(bars):
                 base_tick = bar * 4 * TICKS_BEAT
                 
                 if role_name == 'sub_bass':
                     if bar % 4 == 0:
                         pitch = root - 24 + scale[0]
-                        events.extend([{'tick': base_tick, 'type': 'on', 'pitch': max(24, pitch), 'vel': 100, 'channel': channel},
-                                       {'tick': base_tick + 4 * TICKS_BEAT, 'type': 'off', 'pitch': max(24, pitch), 'vel': 0, 'channel': channel}])
+                        track_events.extend([
+                            {'tick': base_tick, 'type': 'on', 'pitch': max(24, pitch), 'vel': 100, 'channel': channel},
+                            {'tick': base_tick + 4 * TICKS_BEAT, 'type': 'off', 'pitch': max(24, pitch), 'vel': 0, 'channel': channel}
+                        ])
                 elif role_name == 'bassline':
                     for s in range(16):
                         if g['bass'][s]:
                             tick = base_tick + s * (TICKS_BEAT // 4)
                             idx = 0 if random.random() < 0.8 else random.choice([1, len(scale)-1])
                             pitch = root - 12 + scale[idx % len(scale)]
-                            events.extend([{'tick': tick, 'type': 'on', 'pitch': max(30, min(pitch, 48)), 'vel': 95, 'channel': channel},
-                                           {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': max(30, min(pitch, 48)), 'vel': 0, 'channel': channel}])
+                            track_events.extend([
+                                {'tick': tick, 'type': 'on', 'pitch': max(30, min(pitch, 48)), 'vel': 95, 'channel': channel},
+                                {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': max(30, min(pitch, 48)), 'vel': 0, 'channel': channel}
+                            ])
                 elif role_name in ['pad', 'chords']:
                     if random.random() < 0.5:
                         tick = base_tick
@@ -222,8 +278,10 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
                             pitch = random.randint(low_pitch, high_pitch)
                             pitch = snap_to_scale(pitch, root, scale)
                             dur = 4 * TICKS_BEAT if role_name == 'pad' else (TICKS_BEAT // 2)
-                            events.extend([{'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': channel},
-                                           {'tick': tick + dur, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}])
+                            track_events.extend([
+                                {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': channel},
+                                {'tick': tick + dur, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}
+                            ])
                 elif role_name == 'arp':
                     for s in range(16):
                         if random.random() < g['arp_density']:
@@ -231,24 +289,34 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
                             idx = random.randrange(len(scale))
                             pitch = random.randint(low_pitch, high_pitch)
                             pitch = snap_to_scale(pitch, root, scale)
-                            events.extend([{'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 75, 'channel': channel},
-                                           {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}])
+                            track_events.extend([
+                                {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 75, 'channel': channel},
+                                {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}
+                            ])
                 elif role_name == 'lead':
                     if random.random() < 0.3:
                         tick = base_tick + random.choice([0, TICKS_BEAT, 2*TICKS_BEAT, 3*TICKS_BEAT])
                         pitch = random.randint(low_pitch, high_pitch)
                         pitch = snap_to_scale(pitch, root, scale)
-                        events.extend([{'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 85, 'channel': channel},
-                                       {'tick': tick + TICKS_BEAT, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}])
+                        track_events.extend([
+                            {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 85, 'channel': channel},
+                            {'tick': tick + TICKS_BEAT, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}
+                        ])
                 elif role_name == 'fx_perc':
                     for s in range(16):
                         if random.random() < 0.1:
                             tick = base_tick + s * (TICKS_BEAT // 4)
                             pitch = random.randint(80, 95)
-                            events.extend([{'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 50, 'channel': channel},
-                                           {'tick': tick + 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}])
-
-    # Batteria su canali separati
+                            track_events.extend([
+                                {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 50, 'channel': channel},
+                                {'tick': tick + 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}
+                            ])
+            
+            if track_events:
+                tracks[role_name] = track_events
+    
+    # BATTERIA - UNA TRACCIA SEPARATA, CANALE 9 (GM 10), PITCH GM
+    drum_events = []
     for bar in range(bars):
         base_tick = bar * 4 * TICKS_BEAT
         for s in range(16):
@@ -257,67 +325,108 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
             swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
             
             if g['kick'][p_step]:
-                events.extend([{'tick': tick, 'type': 'on', 'pitch': 36, 'vel': 110, 'channel': KICK_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 36, 'vel': 0, 'channel': KICK_CH}])
+                drum_events.extend([
+                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': 110, 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}
+                ])
             if g.get('snare', [0]*16)[p_step]:
-                events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': 38, 'vel': 100, 'channel': SNARE_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 38, 'vel': 0, 'channel': SNARE_CH}])
+                drum_events.extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': 100, 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}
+                ])
             if g.get('clap', [0]*16)[p_step]:
-                events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': 39, 'vel': 90, 'channel': CLAP_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 39, 'vel': 0, 'channel': CLAP_CH}])
+                drum_events.extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': 90, 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
+                ])
             if g['hat'][p_step]:
-                events.extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': 42, 'vel': 75, 'channel': HAT_CH},
-                               {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': 42, 'vel': 0, 'channel': HAT_CH}])
+                drum_events.extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': 75, 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
+                ])
+    
+    if drum_events:
+        tracks['drums'] = drum_events
+    
+    return tracks, root, scale
 
-    return events, root, scale
-
-def build_midi_file(events, bpm, mode, submode):
+def build_midi_file(tracks, bpm, mode, submode):
+    """Costruisce un file MIDI standard-compliant.
+    Ogni chiave di 'tracks' diventa una MIDI track separata.
+    """
     mid = mido.MidiFile(ticks_per_beat=TICKS_BEAT)
+    
+    # Traccia tempo
     t_tempo = mido.MidiTrack()
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
     mid.tracks.append(t_tempo)
     
-    events.sort(key=lambda e: (e['tick'], 0 if e['type'] == 'off' else 1))
-    
-    channels = {}
-    for e in events:
-        ch = e.get('channel', 0)
-        if ch not in channels: channels[ch] = []
-        channels[ch].append(e)
-    
-    track_names = {
-        'minimal': {0: 'Bass', 1: 'Arp/Synth', KICK_CH: 'Kick', SNARE_CH: 'Snare', HAT_CH: 'Hi-Hat', CLAP_CH: 'Clap'},
-        'multitrack': {0: 'Sub Bass', 1: 'Bassline', 2: 'Pad', 3: 'Chords/Stabs', 
-                       4: 'Arpeggio', 5: 'Lead/Melody', 6: 'FX/Percs', KICK_CH: 'Kick', SNARE_CH: 'Snare', HAT_CH: 'Hi-Hat', CLAP_CH: 'Clap'}
+    # Nomi tracce per Logic Pro
+    track_name_map = {
+        'bass': 'Bass',
+        'arp': 'Arp/Synth',
+        'drums': 'Drums',
+        'sub_bass': 'Sub Bass',
+        'bassline': 'Bassline',
+        'pad': 'Pad',
+        'chords': 'Chords/Stabs',
+        'lead': 'Lead/Melody',
+        'fx_perc': 'FX/Percs'
     }
     
-    if mode == 'multitrack' and submode == 'faithful':
-        track_names['multitrack'] = {i: f'Track {i+1}' for i in range(20)}
-        track_names['multitrack'][KICK_CH] = 'Kick'
-        track_names['multitrack'][SNARE_CH] = 'Snare'
-        track_names['multitrack'][HAT_CH] = 'Hi-Hat'
-        track_names['multitrack'][CLAP_CH] = 'Clap'
-    
-    for ch, ch_events in channels.items():
-        track = mido.MidiTrack()
-        mid.tracks.append(track)
-        track_name = track_names.get(mode, {}).get(ch, f'Channel {ch+1}')
-        track.append(mido.MetaMessage('track_name', name=track_name, time=0))
+    # Per ogni traccia logica, crea una MIDI track separata
+    track_idx = 0
+    for track_key, events in tracks.items():
+        if not events:
+            continue
         
+        # Ordina eventi
+        events_sorted = sorted(events, key=lambda e: (e['tick'], 0 if e['type'] == 'off' else 1))
+        
+        # Crea MIDI track
+        midi_track = mido.MidiTrack()
+        mid.tracks.append(midi_track)
+        
+        # Nome traccia
+        if track_key.startswith('instrument_'):
+            track_name = f'Track {track_idx + 1}'
+        else:
+            track_name = track_name_map.get(track_key, f'Track {track_idx + 1}')
+        midi_track.append(mido.MetaMessage('track_name', name=track_name, time=0))
+        
+        # Per la traccia batteria, imposta program change a 0 (Drum Kit)
+        if track_key == 'drums':
+            # Il canale 9 (0-indexed) è riconosciuto come drum channel
+            # Non serve program change, è automatico
+            pass
+        else:
+            # Imposta programma per strumenti melodici (es. 0 = Acoustic Grand Piano come default)
+            ch = events_sorted[0].get('channel', 0) if events_sorted else 0
+            midi_track.append(mido.Message('program_change', program=0, channel=ch, time=0))
+        
+        # Scrivi eventi
         prev_tick = 0
-        for e in ch_events:
+        for e in events_sorted:
             delta = e['tick'] - prev_tick
             msg_type = 'note_on' if e['type'] == 'on' else 'note_off'
             vel = e['vel'] if e['type'] == 'on' else 0
-            track.append(mido.Message(msg_type, note=e['pitch'], velocity=vel, time=delta, channel=ch))
+            midi_track.append(mido.Message(
+                msg_type, 
+                note=e['pitch'], 
+                velocity=vel, 
+                time=delta, 
+                channel=e.get('channel', 0)
+            ))
             prev_tick = e['tick']
-            
+        
+        track_idx += 1
+    
     buf = io.BytesIO()
     mid.save(file=buf)
     buf.seek(0)
     return buf
 
-def generate_report(midi_buffer, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename):
+def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename):
     report = []
     report.append("=" * 60)
     report.append("🎛️ MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE")
@@ -355,69 +464,56 @@ def generate_report(midi_buffer, genre, mode, submode, bpm, bars, seed, root, sc
     
     g = GENRES[genre]
     report.append("🥁 PATTERN RITMICI (1 sedicesimi)")
-    report.append(f"   Kick:  {''.join(['█' if x else '·' for x in g['kick']])}")
-    report.append(f"   Snare: {''.join(['█' if x else '·' for x in g.get('snare', [0]*16)])}")
+    report.append(f"   Kick (GM 36):  {''.join(['█' if x else '·' for x in g['kick']])}")
+    report.append(f"   Snare (GM 38): {''.join(['█' if x else '·' for x in g.get('snare', [0]*16)])}")
     if 'clap' in g:
-        report.append(f"   Clap:  {''.join(['█' if x else '·' for x in g['clap']])}")
-    report.append(f"   Hat:   {''.join(['█' if x else '·' for x in g['hat']])}")
-    report.append(f"   Bass:  {''.join(['█' if x else '·' for x in g['bass']])}")
+        report.append(f"   Clap (GM 39):  {''.join(['█' if x else '·' for x in g['clap']])}")
+    report.append(f"   Hat (GM 42):   {''.join(['█' if x else '·' for x in g['hat']])}")
+    report.append(f"   Bass:          {''.join(['█' if x else '·' for x in g['bass']])}")
     report.append(f"   Swing: {g['swing'] * 100:.0f}%")
     report.append(f"   Densità Arp: {g['arp_density'] * 100:.0f}%")
     report.append("")
     
-    report.append("🎼 TRACCE OUTPUT")
-    if mode == 'minimal':
-        report.append("   1. Bass (Canale 1)")
-        report.append("   2. Arp/Synth (Canale 2)")
-        report.append(f"   3. Kick (Canale {KICK_CH+1})")
-        report.append(f"   4. Snare (Canale {SNARE_CH+1})")
-        report.append(f"   5. Hi-Hat (Canale {HAT_CH+1})")
-        if 'clap' in g:
-            report.append(f"   6. Clap (Canale {CLAP_CH+1})")
-    elif mode == 'multitrack' and submode == 'faithful':
-        report.append("   Tracce originali preservate")
-        report.append(f"   + Kick (Canale {KICK_CH+1})")
-        report.append(f"   + Snare (Canale {SNARE_CH+1})")
-        report.append(f"   + Hi-Hat (Canale {HAT_CH+1})")
-        if 'clap' in g:
-            report.append(f"   + Clap (Canale {CLAP_CH+1})")
-    else:
-        report.append("   1. Sub Bass (Canale 1)")
-        report.append("   2. Bassline (Canale 2)")
-        report.append("   3. Pad (Canale 3)")
-        report.append("   4. Chords/Stabs (Canale 4)")
-        report.append("   5. Arpeggio (Canale 5)")
-        report.append("   6. Lead/Melody (Canale 6)")
-        report.append("   7. FX/Percs (Canale 7)")
-        report.append(f"   8. Kick (Canale {KICK_CH+1})")
-        report.append(f"   9. Snare (Canale {SNARE_CH+1})")
-        report.append(f"   10. Hi-Hat (Canale {HAT_CH+1})")
-        if 'clap' in g:
-            report.append(f"   11. Clap (Canale {CLAP_CH+1})")
+    report.append("🎼 TRACCE OUTPUT (MIDI Tracks)")
+    report.append("   Standard: General MIDI / DAW-compliant")
+    report.append("   Canale batteria: 10 (0-indexed: 9)")
     report.append("")
     
-    midi_buffer.seek(0)
-    mid_out = mido.MidiFile(file=midi_buffer)
+    track_idx = 1
+    for track_key in tracks.keys():
+        if track_key == 'drums':
+            report.append(f"   {track_idx}. Drums (Canale 10 - GM Drum Map)")
+            report.append(f"      Pitch: Kick=36, Snare=38, Clap=39, Hat=42")
+        elif track_key.startswith('instrument_'):
+            report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
+        else:
+            name_map = {
+                'bass': 'Bass', 'arp': 'Arp/Synth',
+                'sub_bass': 'Sub Bass', 'bassline': 'Bassline',
+                'pad': 'Pad', 'chords': 'Chords/Stabs',
+                'lead': 'Lead/Melody', 'fx_perc': 'FX/Percs'
+            }
+            report.append(f"   {track_idx}. {name_map.get(track_key, track_key)} (Canale melodico)")
+        track_idx += 1
+    report.append("")
+    
+    # Statistiche
     total_notes = 0
-    channels_used = set()
-    for track in mid_out.tracks:
-        for msg in track:
-            if msg.type == 'note_on' and msg.velocity > 0:
-                total_notes += 1
-                channels_used.add(msg.channel)
+    for events in tracks.values():
+        total_notes += sum(1 for e in events if e['type'] == 'on')
     
     report.append("📊 STATISTICHE MIDI")
     report.append(f"   Note totali generate: {total_notes}")
-    report.append(f"   Canali MIDI utilizzati: {len(channels_used)}")
-    report.append(f"   Tracce MIDI: {len(mid_out.tracks)}")
-    report.append(f"   Dimensione file: {midi_buffer.getbuffer().nbytes / 1024:.1f} KB")
+    report.append(f"   Tracce MIDI: {len(tracks) + 1} (inclusa tempo)")
     report.append("")
     
-    report.append("💡 NOTE PER LOGIC PRO")
+    report.append("💡 NOTE PER LOGIC PRO / DAW")
     report.append("   - Importa il MIDI trascinandolo nell'Arrange window")
-    report.append("   - I nomi delle tracce sono già impostati")
-    report.append("   - Ogni elemento di batteria ha la sua traccia separata")
-    report.append("   - Assegna i tuoi VST preferiti a ogni traccia")
+    report.append("   - Logic creerà automaticamente una traccia per ogni MIDI track")
+    report.append("   - La traccia 'Drums' verrà riconosciuta come batteria (canale 10)")
+    report.append("   - Logic assegnerà automaticamente Drum Machine Designer")
+    report.append("   - Ogni pitch GM (36, 38, 39, 42) mappa a una cella del drum rack")
+    report.append("   - Le altre tracce sono pronte per VST melodici")
     report.append("")
     
     report.append("=" * 60)
@@ -426,15 +522,20 @@ def generate_report(midi_buffer, genre, mode, submode, bpm, bars, seed, root, sc
     
     return "\n".join(report)
 
-def render_midi_player(events, bpm):
-    """Player MIDI che usa gli eventi già parsati da Python - 100% affidabile"""
+def render_midi_player(tracks, bpm):
+    """Player MIDI che usa gli eventi già parsati da Python"""
+    # Flatten tutti gli eventi per il player
+    all_events = []
+    for events in tracks.values():
+        all_events.extend(events)
+    
     events_json = json.dumps([{
         'tick': e['tick'],
         'type': e['type'],
         'pitch': e['pitch'],
         'vel': e['vel'],
-        'channel': e['channel']
-    } for e in events])
+        'channel': e.get('channel', 0)
+    } for e in all_events])
     
     html_player = f"""
     <!DOCTYPE html>
@@ -460,7 +561,7 @@ def render_midi_player(events, bpm):
                 <button onclick="stop()">⏹ Stop</button>
                 <span class="status" id="status">Pronto - {bpm} BPM</span>
             </div>
-            <div class="info">💡 Riproduzione 100% fedele al MIDI generato</div>
+            <div class="info">💡 Riproduzione 100% fedele - Standard General MIDI</div>
         </div>
         
         <script>
@@ -483,12 +584,13 @@ def render_midi_player(events, bpm):
                     
                     // Crea synth per ogni canale
                     for (let ch = 0; ch < 16; ch++) {{
-                        if (ch === {KICK_CH} || ch === {SNARE_CH} || ch === {HAT_CH} || ch === {CLAP_CH}) {{
-                            // Canali batteria
+                        if (ch === {DRUM_CH}) {{
+                            // Canale 10 (0-indexed 9) = batteria GM
                             synths[ch] = {{
-                                kick: new Tone.MembraneSynth().toDestination(),
+                                kick: new Tone.MembraneSynth({{ pitchDecay: 0.05, octaves: 6, envelope: {{ attack: 0.001, decay: 0.3, sustain: 0, release: 0.1 }} }}).toDestination(),
                                 snare: new Tone.NoiseSynth({{ noise: {{ type: 'white' }}, envelope: {{ attack: 0.001, decay: 0.2, sustain: 0 }} }}).toDestination(),
-                                hat: new Tone.MetalSynth({{ envelope: {{ attack: 0.001, decay: 0.1, release: 0.01 }}, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }}).toDestination()
+                                hat: new Tone.MetalSynth({{ envelope: {{ attack: 0.001, decay: 0.05, release: 0.01 }}, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }}).toDestination(),
+                                clap: new Tone.NoiseSynth({{ noise: {{ type: 'pink' }}, envelope: {{ attack: 0.001, decay: 0.15, sustain: 0 }} }}).toDestination()
                             }};
                         }} else {{
                             synths[ch] = new Tone.PolySynth(Tone.Synth).toDestination();
@@ -504,16 +606,18 @@ def render_midi_player(events, bpm):
                         const timeInSeconds = event.tick / ticksPerSecond;
                         
                         if (event.type === 'on') {{
-                            if (event.channel === {KICK_CH} || event.channel === {SNARE_CH} || event.channel === {HAT_CH} || event.channel === {CLAP_CH}) {{
-                                // Batteria
+                            if (event.channel === {DRUM_CH}) {{
+                                // Batteria GM - discrimina per pitch
                                 scheduledEvents.push(
                                     Tone.getTransport().schedule(time => {{
-                                        if (event.pitch === 36) {{ // Kick
-                                            synths[event.channel].kick.triggerAttackRelease('C1', '8n', time, event.vel / 127);
-                                        }} else if (event.pitch === 38 || event.pitch === 39) {{ // Snare/Clap
-                                            synths[event.channel].snare.triggerAttackRelease('16n', time, event.vel / 127);
-                                        }} else if (event.pitch === 42 || event.pitch === 46) {{ // Hat
-                                            synths[event.channel].hat.triggerAttackRelease('C3', '32n', time, event.vel / 127);
+                                        if (event.pitch === {GM_KICK}) {{
+                                            synths[{DRUM_CH}].kick.triggerAttackRelease('C1', '8n', time, event.vel / 127);
+                                        }} else if (event.pitch === {GM_SNARE}) {{
+                                            synths[{DRUM_CH}].snare.triggerAttackRelease('16n', time, event.vel / 127);
+                                        }} else if (event.pitch === {GM_CLAP}) {{
+                                            synths[{DRUM_CH}].clap.triggerAttackRelease('16n', time, event.vel / 127);
+                                        }} else if (event.pitch === {GM_HAT_CLOSED} || event.pitch === {GM_HAT_OPEN}) {{
+                                            synths[{DRUM_CH}].hat.triggerAttackRelease('C3', '32n', time, event.vel / 127);
                                         }}
                                     }}, timeInSeconds)
                                 );
@@ -545,8 +649,14 @@ def render_midi_player(events, bpm):
                 scheduledEvents.forEach(id => Tone.getTransport().clear(id));
                 scheduledEvents = [];
                 Object.values(synths).forEach(synth => {{
-                    if (synth.kick) synth.kick.releaseAll();
-                    else if (synth.releaseAll) synth.releaseAll();
+                    if (synth.kick) {{
+                        synth.kick.releaseAll();
+                        synth.snare.releaseAll();
+                        synth.hat.releaseAll();
+                        synth.clap.releaseAll();
+                    }} else if (synth.releaseAll) {{
+                        synth.releaseAll();
+                    }}
                 }});
                 isPlaying = false;
                 document.getElementById('playBtn').textContent = '▶ Play';
@@ -560,7 +670,7 @@ def render_midi_player(events, bpm):
 
 # ================= INTERFACCIA STREAMLIT =================
 st.title("🎛️ MIDI Forge Universale")
-st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Carica, ascolta in anteprima e scarica.")
+st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Standard General MIDI / DAW-compliant.")
 
 col1, col2 = st.columns([1, 1])
 
@@ -568,7 +678,7 @@ with col1:
     uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
     
     mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], 
-                        help="Minimal: 3 tracce compatte. Multitrack: Preserva la struttura a più tracce.")
+                        help="Minimal: 3 tracce (Bass, Arp, Drums). Multitrack: Struttura completa multi-traccia.")
     
     if mode == "minimal":
         submode = st.selectbox("Sotto-modalità", ["extract", "generate"], 
@@ -630,17 +740,17 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                         final_bars = g_defaults['bars_default'] if use_default_bars else bars
                     
                     if mode == "minimal":
-                        events, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed)
+                        tracks, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed)
                     else:
                         file_bytes.seek(0)
-                        events, root, scale = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed)
+                        tracks, root, scale = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed)
                     
-                    midi_buffer = build_midi_file(events, final_bpm, mode, submode)
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode)
                     
                     st.success(f"✅ Generazione completata! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm})")
                     
                     st.markdown("### 🎧 Anteprima")
-                    render_midi_player(events, final_bpm)
+                    render_midi_player(tracks, final_bpm)
                     
                     col_dl1, col_dl2 = st.columns(2)
                     with col_dl1:
@@ -653,7 +763,7 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                         )
                     with col_dl2:
                         report_text = generate_report(
-                            midi_buffer, genre, mode, submode, final_bpm, final_bars, 
+                            tracks, genre, mode, submode, final_bpm, final_bars, 
                             seed, root, scale, duration_mode, duration_seconds, uploaded_file.name
                         )
                         st.download_button(
@@ -671,4 +781,4 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                 st.error(f"Si è verificato un errore: {str(e)}")
 
 st.markdown("---")
-st.caption("MIDI Forge Universale | Librerie: Streamlit, Mido, Tone.js | 100% Open Source & Free")
+st.caption("MIDI Forge Universale | Standard General MIDI | Librerie: Streamlit, Mido, Tone.js | 100% Open Source & Free")
