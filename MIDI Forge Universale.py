@@ -1,3 +1,4 @@
+
 import streamlit as st
 import streamlit.components.v1 as components
 import mido
@@ -63,21 +64,17 @@ GM_HAT_OPEN = 46
 
 def get_arrangement_plan(total_bars, genre):
     """
-    Genera la struttura del brano con la sequenza:
-    INTRO ➡️ BREAK 1 ➡️ BUILD-UP ➡️ DROP ➡️ BREAK 2 ➡️ OUTRO
-    
+    Genera la struttura: INTRO ➡️ BREAK 1 ➡️ BUILD-UP ➡️ DROP ➡️ BREAK 2 ️ OUTRO
     INTRO e OUTRO sono sempre drum-only (DJ-friendly).
-    I blocchi centrali si adattano al totale richiesto.
     """
-    # Classifica il genere per adattare le proporzioni
-    club_genres = ['techno', 'minimal_techno', 'deep', 'house', 'trance', 'edm_2000s', 
+    club_genres = ['techno', 'minimal_techno', 'deep', 'trance', 'edm_2000s',
                    'elettronico', 'dub_techno', 'underground', 'acid', 'disco', 'synthpop',
                    'idm', 'industrial', 'breakcore', 'commerciale_90s', 'drum_n_bass']
     urban_genres = ['hip_hop', 'trap', 'r&b', 'soul', 'reggaeton', 'funk']
-    ambient_genres = ['ambient', 'drone', 'lowercase', 'microsound', 'noise', 'harsh_noise', 
+    ambient_genres = ['ambient', 'drone', 'lowercase', 'microsound', 'noise', 'harsh_noise',
                       'glitch', 'sperimentale', 'onkyo', 'armonico']
-    
-    # Calcola INTRO e OUTRO (drum-only)
+
+    # INTRO e OUTRO drum-only
     if total_bars >= 64:
         intro_bars = 8
         outro_bars = 8
@@ -87,87 +84,51 @@ def get_arrangement_plan(total_bars, genre):
     else:
         intro_bars = 4
         outro_bars = 4
-    
-    # Battute disponibili per le sezioni centrali
+
     center_bars = total_bars - intro_bars - outro_bars
     if center_bars < 8:
         center_bars = 8
         total_bars = center_bars + intro_bars + outro_bars
-    
+
     if genre in club_genres:
-        # Club: DROP è la sezione più lunga
-        # BREAK 1: 1/6, BUILD-UP: 1/6, DROP: 2/6, BREAK 2: 1/6, extra: 1/6
         break1 = max(4, round(center_bars * 0.17))
         buildup = max(4, round(center_bars * 0.17))
         drop = max(8, round(center_bars * 0.33))
         break2 = max(4, round(center_bars * 0.17))
-        # Distribuire il resto
         remaining = center_bars - break1 - buildup - drop - break2
         drop += remaining
-        
     elif genre in urban_genres:
-        # Urban: DROP e BREAK più bilanciati
         break1 = max(4, round(center_bars * 0.20))
         buildup = max(4, round(center_bars * 0.15))
         drop = max(8, round(center_bars * 0.35))
         break2 = max(4, round(center_bars * 0.20))
         remaining = center_bars - break1 - buildup - drop - break2
         drop += remaining
-        
-    else:  # ambient/experimental
-        # Ambient: sezioni lunghe, DROP meno aggressivo
+    else:
         break1 = max(8, round(center_bars * 0.20))
         buildup = max(8, round(center_bars * 0.20))
         drop = max(16, round(center_bars * 0.30))
         break2 = max(8, round(center_bars * 0.20))
         remaining = center_bars - break1 - buildup - drop - break2
         drop += remaining
-    
-    # Definizione dei layer per ogni sezione
-    # drum_mode: 'off', 'kick_only', 'kick_hat', 'build', 'full'
-    # layers: quali strumenti melodici sono attivi
-    
-    plan = [
-        {
-            'name': 'INTRO',
-            'bars': intro_bars,
-            'drum_mode': 'kick_hat',  # Solo kick + hat (DJ-friendly)
-            'layers': {'bass': False, 'arp': False, 'pad': False, 'chords': False, 'lead': False, 'fx': False}
-        },
-        {
-            'name': 'BREAK 1',
-            'bars': break1,
-            'drum_mode': 'off' if genre in ambient_genres else 'kick_only',
-            'layers': {'bass': False, 'arp': True, 'pad': True, 'chords': False, 'lead': False, 'fx': True}
-        },
-        {
-            'name': 'BUILD-UP',
-            'bars': buildup,
-            'drum_mode': 'build',  # Kick + hat + snare roll finale
-            'layers': {'bass': True, 'arp': True, 'pad': True, 'chords': True, 'lead': False, 'fx': True}
-        },
-        {
-            'name': 'DROP / MAIN',
-            'bars': drop,
-            'drum_mode': 'full',  # Tutto il kit
-            'layers': {'bass': True, 'arp': True, 'pad': True, 'chords': True, 'lead': True, 'fx': True}
-        },
-        {
-            'name': 'BREAK 2',
-            'bars': break2,
-            'drum_mode': 'off' if genre in ambient_genres else 'kick_only',
-            'layers': {'bass': False, 'arp': True, 'pad': True, 'chords': True, 'lead': True, 'fx': True}
-        },
-        {
-            'name': 'OUTRO',
-            'bars': outro_bars,
-            'drum_mode': 'kick_hat',  # Solo kick + hat (DJ-friendly)
-            'layers': {'bass': False, 'arp': False, 'pad': False, 'chords': False, 'lead': False, 'fx': False}
-        }
-    ]
-    
-    return plan, total_bars
 
+    plan = [
+        {'name': 'INTRO', 'bars': intro_bars, 'drum_mode': 'kick_hat',
+         'layers': {'bass': False, 'arp': False, 'pad': False, 'chords': False, 'lead': False, 'fx': False}},
+        {'name': 'BREAK 1', 'bars': break1,
+         'drum_mode': 'off' if genre in ambient_genres else 'kick_only',
+         'layers': {'bass': False, 'arp': True, 'pad': True, 'chords': False, 'lead': False, 'fx': True}},
+        {'name': 'BUILD-UP', 'bars': buildup, 'drum_mode': 'build',
+         'layers': {'bass': True, 'arp': True, 'pad': True, 'chords': True, 'lead': False, 'fx': True}},
+        {'name': 'DROP', 'bars': drop, 'drum_mode': 'full',
+         'layers': {'bass': True, 'arp': True, 'pad': True, 'chords': True, 'lead': True, 'fx': True}},
+        {'name': 'BREAK 2', 'bars': break2,
+         'drum_mode': 'off' if genre in ambient_genres else 'kick_only',
+         'layers': {'bass': False, 'arp': True, 'pad': True, 'chords': True, 'lead': True, 'fx': True}},
+        {'name': 'OUTRO', 'bars': outro_bars, 'drum_mode': 'kick_hat',
+         'layers': {'bass': False, 'arp': False, 'pad': False, 'chords': False, 'lead': False, 'fx': False}}
+    ]
+    return plan, total_bars
 
 # ================= FUNZIONI AUXILIARIE =================
 
@@ -181,46 +142,34 @@ def _compute_key_signature(root, scale):
     return _root_to_key_name(root, _is_minor_scale(scale))
 
 def _drum_velocities(seed_rng, drum_mode):
-    """Genera velocity dinamiche in base al drum_mode della sezione."""
     kicks, snares, hats, claps = [], [], [], []
     for s in range(16):
         is_accent = (s % 4 == 0)
-        
         if drum_mode == 'kick_hat':
-            # Solo kick e hat, niente snare/clap
             kicks.append(110 + seed_rng.randint(0, 5) if is_accent else 95 + seed_rng.randint(0, 10))
             hats.append(65 + seed_rng.randint(0, 15))
             snares.append(0)
             claps.append(0)
-            
         elif drum_mode == 'kick_only':
-            # Solo kick, hat leggero
             kicks.append(105 + seed_rng.randint(0, 5) if is_accent else 90 + seed_rng.randint(0, 10))
             hats.append(50 + seed_rng.randint(0, 10))
             snares.append(0)
             claps.append(0)
-            
         elif drum_mode == 'build':
-            # Kick + hat + snare crescente (build-up)
             kicks.append(115 + seed_rng.randint(0, 5) if is_accent else 100 + seed_rng.randint(0, 10))
             hats.append(75 + seed_rng.randint(0, 15))
-            # Snare roll: aumenta verso la fine della battuta
             snares.append(60 + seed_rng.randint(0, 20) + (s // 4) * 10)
             claps.append(0)
-            
         elif drum_mode == 'full':
-            # Kit completo
             kicks.append(120 + seed_rng.randint(0, 5) if is_accent else 100 + seed_rng.randint(0, 10))
             hats.append(75 + seed_rng.randint(0, 20))
             snares.append(105 + seed_rng.randint(0, 10))
             claps.append(90 + seed_rng.randint(0, 10))
-            
-        else:  # off
+        else:
             kicks.append(0)
             hats.append(0)
             snares.append(0)
             claps.append(0)
-    
     return {'kick': kicks, 'snare': snares, 'hat': hats, 'clap': claps}
 
 def _compute_note_durations(events):
@@ -234,13 +183,8 @@ def _compute_note_durations(events):
             start = pending[key]['tick']
             dur = e['tick'] - start
             vel = pending[key]['vel']
-            notes.append({
-                'tick': start,
-                'dur': max(1, dur),
-                'pitch': e['pitch'],
-                'vel': vel,
-                'channel': e.get('channel', 0)
-            })
+            notes.append({'tick': start, 'dur': max(1, dur), 'pitch': e['pitch'],
+                          'vel': vel, 'channel': e.get('channel', 0)})
             del pending[key]
     return notes
 
@@ -263,14 +207,17 @@ def extract_dna(notes):
     for n in notes:
         pc = n['pitch'] % 12
         all_pc[pc] += 1
-        if n['pitch'] < 60: low_pc[pc] += 1
+        if n['pitch'] < 60:
+            low_pc[pc] += 1
     root = (low_pc or all_pc).most_common(1)[0][0]
     intervals = sorted({(pc - root) % 12 for pc in all_pc})
     if len(intervals) < 4:
         for i in (3, 5, 7, 10):
-            if i not in intervals: intervals.append(i)
+            if i not in intervals:
+                intervals.append(i)
         intervals = sorted(set(intervals))
-    if 0 not in intervals: intervals.insert(0, 0)
+    if 0 not in intervals:
+        intervals.insert(0, 0)
     return root, intervals
 
 def snap_to_scale(pitch, root, scale):
@@ -280,100 +227,104 @@ def snap_to_scale(pitch, root, scale):
     return root + (octave * 12) + closest
 
 def generate_minimal(notes_data, g, submode, bars, seed):
+    """Modalità Minimal: 3 tracce (Bass, Arp, Drums) con intro/outro drum-only di 4 battute."""
     random.seed(seed)
     root, scale = extract_dna(notes_data)
-    
+
     tracks = {'bass': [], 'arp': [], 'drums': []}
-    
+
     if submode == 'extract':
         notes_by_step = {}
         for n in notes_data:
             step = round(n['tick'] / (TICKS_BEAT // 4))
-            if step not in notes_by_step: notes_by_step[step] = []
+            if step not in notes_by_step:
+                notes_by_step[step] = []
             notes_by_step[step].append(n['pitch'])
-    
-    m = [random.randrange(len(scale)) if random.random() < g['arp_density'] else None for _ in range(8)]
-    
-    # Genera il piano di arrangiamento
-    arrangement_plan, total_bars = get_arrangement_plan(bars, 'techno')  # Default club structure
-    
-    current_bar = 0
-    for section in arrangement_plan:
-        section_bars = section['bars']
-        drum_mode = section['drum_mode']
-        layers = section['layers']
-        drum_vel = _drum_velocities(random.Random(seed + current_bar), drum_mode)
-        
-        for bar in range(section_bars):
-            global_bar = current_bar + bar
-            base_tick = global_bar * 4 * TICKS_BEAT
-            
-            if global_bar % 4 == 0 and global_bar > 0:
-                op = random.choice(['transpose', 'invert', 'drop'])
-                if op == 'transpose': m = [(x + 1) % len(scale) if x is not None else None for x in m]
-                elif op == 'invert': m = list(reversed(m))
-                else: m = [None if random.random() < 0.3 else x for x in m]
 
-            for s in range(16):
-                tick = base_tick + s * (TICKS_BEAT // 4)
-                p_step = s % 16
-                swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
-                
-                # BATTERIA in base al drum_mode
-                if drum_vel['kick'][p_step] > 0:
-                    tracks['drums'].extend([
-                        {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': drum_vel['kick'][p_step], 'channel': DRUM_CH},
-                        {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}
-                    ])
-                if drum_vel['snare'][p_step] > 0 and g.get('snare', [0]*16)[p_step]:
-                    tracks['drums'].extend([
-                        {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': drum_vel['snare'][p_step], 'channel': DRUM_CH},
-                        {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}
-                    ])
-                if drum_vel['clap'][p_step] > 0 and g.get('clap', [0]*16)[p_step]:
-                    tracks['drums'].extend([
-                        {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': drum_vel['clap'][p_step], 'channel': DRUM_CH},
-                        {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
-                    ])
-                if drum_vel['hat'][p_step] > 0 and g['hat'][p_step]:
-                    tracks['drums'].extend([
-                        {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': drum_vel['hat'][p_step], 'channel': DRUM_CH},
-                        {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
-                    ])
-                
-                # BASSO & ARP solo se i layer sono attivi
-                if layers.get('bass') or layers.get('arp'):
-                    if submode == 'extract' and s in notes_by_step:
-                        low_p, high_p = min(notes_by_step[s]), max(notes_by_step[s])
-                        if layers.get('bass') and g['bass'][p_step]:
-                            pitch = max(28, min(snap_to_scale(low_p, root, scale) - 24, 45))
-                            tracks['bass'].extend([
-                                {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
-                                {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
-                            ])
-                        if layers.get('arp') and random.random() < g['arp_density']:
-                            pitch = max(60, snap_to_scale(high_p, root, scale))
-                            tracks['arp'].extend([
-                                {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
-                                {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
-                            ])
-                    else:
-                        if layers.get('bass') and g['bass'][p_step]:
-                            idx = 0 if random.random() < 0.8 else random.choice([1, len(scale)-1])
-                            pitch = max(28, min(root - 24 + scale[idx % len(scale)], 45))
-                            tracks['bass'].extend([
-                                {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
-                                {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
-                            ])
-                        if layers.get('arp') and m[s % 8] is not None:
-                            pitch = root + 12 + scale[m[s % 8] % len(scale)]
-                            tracks['arp'].extend([
-                                {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
-                                {'tick': tick + (TICKS_BEAT//4) - 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
-                            ])
-        
-        current_bar += section_bars
-    
+    m = [random.randrange(len(scale)) if random.random() < g['arp_density'] else None for _ in range(8)]
+
+    # INTRO e OUTRO drum-only (4 battute ciascuno)
+    intro_bars = min(4, bars // 4)
+    outro_bars = min(4, bars // 4)
+
+    for bar in range(bars):
+        base_tick = bar * 4 * TICKS_BEAT
+
+        if bar % 4 == 0 and bar > 0:
+            op = random.choice(['transpose', 'invert', 'drop'])
+            if op == 'transpose':
+                m = [(x + 1) % len(scale) if x is not None else None for x in m]
+            elif op == 'invert':
+                m = list(reversed(m))
+            else:
+                m = [None if random.random() < 0.3 else x for x in m]
+
+        # Determina drum_mode in base alla sezione
+        if bar < intro_bars or bar >= (bars - outro_bars):
+            drum_mode = 'kick_hat'
+        else:
+            drum_mode = 'full'
+
+        drum_vel = _drum_velocities(random.Random(seed + bar), drum_mode)
+
+        for s in range(16):
+            tick = base_tick + s * (TICKS_BEAT // 4)
+            p_step = s % 16
+            swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
+
+            # BATTERIA
+            if drum_vel['kick'][p_step] > 0:
+                tracks['drums'].extend([
+                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': drum_vel['kick'][p_step], 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}
+                ])
+            if drum_vel['snare'][p_step] > 0 and g.get('snare', [0]*16)[p_step]:
+                tracks['drums'].extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': drum_vel['snare'][p_step], 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}
+                ])
+            if drum_vel['clap'][p_step] > 0 and g.get('clap', [0]*16)[p_step]:
+                tracks['drums'].extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': drum_vel['clap'][p_step], 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
+                ])
+            if drum_vel['hat'][p_step] > 0 and g['hat'][p_step]:
+                tracks['drums'].extend([
+                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': drum_vel['hat'][p_step], 'channel': DRUM_CH},
+                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
+                ])
+
+            # BASSO & ARP (sempre presenti nel corpo del brano)
+            if bar >= intro_bars and bar < (bars - outro_bars):
+                if submode == 'extract' and s in notes_by_step:
+                    low_p, high_p = min(notes_by_step[s]), max(notes_by_step[s])
+                    if g['bass'][p_step]:
+                        pitch = max(28, min(snap_to_scale(low_p, root, scale) - 24, 45))
+                        tracks['bass'].extend([
+                            {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
+                            {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
+                        ])
+                    if random.random() < g['arp_density']:
+                        pitch = max(60, snap_to_scale(high_p, root, scale))
+                        tracks['arp'].extend([
+                            {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
+                            {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
+                        ])
+                else:
+                    if g['bass'][p_step]:
+                        idx = 0 if random.random() < 0.8 else random.choice([1, len(scale)-1])
+                        pitch = max(28, min(root - 24 + scale[idx % len(scale)], 45))
+                        tracks['bass'].extend([
+                            {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
+                            {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
+                        ])
+                    if m[s % 8] is not None:
+                        pitch = root + 12 + scale[m[s % 8] % len(scale)]
+                        tracks['arp'].extend([
+                            {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
+                            {'tick': tick + (TICKS_BEAT//4) - 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
+                        ])
+
     return tracks, root, scale
 
 def _extract_instrument_header(track):
@@ -423,9 +374,12 @@ GM_PROGRAM_NAMES = [
 ]
 
 _GM_NAME_HINTS = [
-    (("bass ", "basso ", "contrabb "), 33), (("chitarr ", "guitar "), 25), (("piano ", "pianof "), 0), (("organ ", "organo "), 19),
-    (("string ", "archi ", "violin ", "cello "), 48), (("pad ",), 89), (("lead ",), 80), (("vox ", "voce ", "vocal ", "choir ", "coro "), 52),
-    (("flaut ", "flute "), 73), (("sax ",), 65), (("trump ", "tromba "), 56), (("tromb ",), 57), (("synth ",), 81),
+    (("bass ", "basso ", "contrabb "), 33), (("chitarr ", "guitar "), 25),
+    (("piano ", "pianof "), 0), (("organ ", "organo "), 19),
+    (("string ", "archi ", "violin ", "cello "), 48), (("pad ",), 89),
+    (("lead ",), 80), (("vox ", "voce ", "vocal ", "choir ", "coro "), 52),
+    (("flaut ", "flute "), 73), (("sax ",), 65),
+    (("trump ", "tromba "), 56), (("tromb ",), 57), (("synth ",), 81),
 ]
 
 def _guess_program(name):
@@ -454,6 +408,7 @@ def split_drum_track(tracks):
     return out
 
 def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True):
+    """Modalità Multitrack con struttura DJ-Friendly a sezioni."""
     random.seed(seed)
     mid = mido.MidiFile(file=mid_file_bytes)
     all_notes_flat = []
@@ -463,13 +418,13 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             current_tick += msg.time
             if msg.type == 'note_on' and msg.velocity > 0:
                 all_notes_flat.append({'pitch': msg.note, 'tick': current_tick})
-    
+
     root, scale = extract_dna(all_notes_flat)
     tracks = {}
     headers = {}
     scale_t = TICKS_BEAT / mid.ticks_per_beat
     free_channels = [c for c in range(16) if c != DRUM_CH]
-    
+
     if submode == 'faithful':
         track_idx = 0
         for original_track in mid.tracks:
@@ -478,7 +433,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             original_name = next((m.name for m in original_track if m.type == 'track_name'), None)
             header = _extract_instrument_header(original_track)
             ch = free_channels[track_idx % len(free_channels)]
-            
+
             pending = {}
             pairs = []
             current_tick_raw = 0
@@ -494,20 +449,20 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                         dur_quantized = max(TICKS_BEAT // 16, round(dur_raw * scale_t / (TICKS_BEAT // 16)) * (TICKS_BEAT // 16))
                         pitch = snap_to_scale(msg.note, root, scale)
                         pairs.append({'tick': on_quantized, 'dur': dur_quantized, 'pitch': pitch, 'vel': vel})
-            
+
             for note, (on_raw, vel) in pending.items():
                 on_quantized = round(on_raw * scale_t / (TICKS_BEAT // 16)) * (TICKS_BEAT // 16)
                 dur_quantized = (TICKS_BEAT // 16) * 4
                 pitch = snap_to_scale(note, root, scale)
                 pairs.append({'tick': on_quantized, 'dur': dur_quantized, 'pitch': pitch, 'vel': vel})
-            
+
             track_events = []
             for p in pairs:
                 track_events.extend([
                     {'tick': p['tick'], 'type': 'on', 'pitch': p['pitch'], 'vel': p['vel'], 'channel': ch},
                     {'tick': p['tick'] + p['dur'], 'type': 'off', 'pitch': p['pitch'], 'vel': 0, 'channel': ch}
                 ])
-            
+
             if track_events:
                 track_key = (original_name or '').strip() or f'instrument_{track_idx}'
                 base_key, n = track_key, 2
@@ -528,29 +483,29 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             ('lead', 5, (67, 79)),
             ('fx_perc', 6, (72, 84))
         ]
-        for role_name, channel, (low_pitch, high_pitch) in roles:
+        for role_name, channel, _ in roles:
             tracks[role_name] = []
-    
-    # Genera il piano di arrangiamento
+
+    # Genera piano di arrangiamento
     arrangement_plan, total_bars = get_arrangement_plan(bars, 'techno')
-    
+
     current_bar = 0
     for section in arrangement_plan:
         section_bars = section['bars']
         drum_mode = section['drum_mode']
         layers = section['layers']
         drum_vel = _drum_velocities(random.Random(seed + current_bar), drum_mode)
-        
+
         for bar in range(section_bars):
             global_bar = current_bar + bar
             base_tick = global_bar * 4 * TICKS_BEAT
-            
+
             # BATTERIA
             for s in range(16):
                 tick = base_tick + s * (TICKS_BEAT // 4)
                 p_step = s % 16
                 swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
-                
+
                 if drum_vel['kick'][p_step] > 0:
                     if 'drums' not in tracks:
                         tracks['drums'] = []
@@ -573,13 +528,14 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                         {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': drum_vel['hat'][p_step], 'channel': DRUM_CH},
                         {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}
                     ])
-            
+
             # STRUMENTI MELODICI (solo per generative)
             if submode != 'faithful':
                 for role_name, channel, (low_pitch, high_pitch) in roles:
-                    if not layers.get(role_name if role_name != 'fx_perc' else 'fx'):
+                    layer_key = 'fx' if role_name == 'fx_perc' else role_name
+                    if not layers.get(layer_key):
                         continue
-                    
+
                     if role_name == 'sub_bass':
                         if bar % 4 == 0:
                             pitch = root - 24 + scale[0]
@@ -601,7 +557,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                         if random.random() < 0.5:
                             tick = base_tick
                             for i in range(3):
-                                idx = random.randrange(len(scale))
                                 pitch = random.randint(low_pitch, high_pitch)
                                 pitch = snap_to_scale(pitch, root, scale)
                                 dur = 4 * TICKS_BEAT if role_name == 'pad' else (TICKS_BEAT // 2)
@@ -613,7 +568,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                         for s in range(16):
                             if random.random() < g['arp_density']:
                                 tick = base_tick + s * (TICKS_BEAT // 4)
-                                idx = random.randrange(len(scale))
                                 pitch = random.randint(low_pitch, high_pitch)
                                 pitch = snap_to_scale(pitch, root, scale)
                                 tracks['arp'].extend([
@@ -638,12 +592,12 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                                     {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 50, 'channel': channel},
                                     {'tick': tick + 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}
                                 ])
-        
+
         current_bar += section_bars
-    
+
     if split_drums and 'drums' in tracks:
         tracks = split_drum_track(tracks)
-    
+
     return tracks, root, scale, headers, total_bars
 
 def _events_to_notes(events):
@@ -678,7 +632,7 @@ def _events_to_notes(events):
     cleaned_all.sort(key=lambda x: (x[0], x[2]))
     return cleaned_all
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, root=None, scale=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -686,19 +640,24 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
         notes = _events_to_notes(events)
         if notes:
             notes_by_track[key] = (events[0].get('channel', 0), notes)
-    
+
     mid = mido.MidiFile(type=1, ticks_per_beat=TICKS_BEAT)
     total_end = max((nt[1] for _, notes in notes_by_track.values() for nt in notes), default=0)
-    
+
     t_tempo = mido.MidiTrack()
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
     t_tempo.append(mido.MetaMessage('time_signature', numerator=4, denominator=4, time=0))
+
+    if root is not None and scale is not None:
+        key_sig = _compute_key_signature(root, scale)
+        t_tempo.append(mido.MetaMessage('key_signature', key=key_sig, time=0))
+
     if label:
         text = ("MIDI Forge - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
         t_tempo.append(mido.MetaMessage('marker', text=text, time=0))
     t_tempo.append(mido.MetaMessage('end_of_track', time=total_end))
     mid.tracks.append(t_tempo)
-    
+
     used_names = Counter()
     for key, (ch, notes) in notes_by_track.items():
         is_drums = (ch == DRUM_CH)
@@ -707,7 +666,8 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
             if is_drums:
                 pc = 0
             else:
-                pc = None if faithful else {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117}.get(key)
+                pc = None if faithful else {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38,
+                                            'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117}.get(key)
                 if pc is None:
                     pc = _guess_program(key)
             header.append({'type': 'program_change', 'program': pc})
@@ -725,7 +685,9 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
         elif faithful:
             name = key
         else:
-            name = {'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass', 'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano', 'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drums'}.get(key, key.replace('_', ' ').title())
+            name = {'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass', 'bassline': 'Bass',
+                    'pad': 'Pad', 'chords': 'Piano', 'lead': 'Lead', 'fx_perc': 'Percussion',
+                    'drums': 'Drums'}.get(key, key.replace('_', ' ').title())
         used_names[name] += 1
         if used_names[name] > 1:
             name = f'{name} {used_names[name]}'
@@ -744,11 +706,12 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
         ev.sort(key=lambda x: (x[0], x[1]))
         prev = 0
         for tick, is_on, pitch, vel in ev:
-            midi_track.append(mido.Message('note_on' if is_on else 'note_off', note=pitch, velocity=vel, time=tick - prev, channel=ch))
+            midi_track.append(mido.Message('note_on' if is_on else 'note_off',
+                                           note=pitch, velocity=vel, time=tick - prev, channel=ch))
             prev = tick
         midi_track.append(mido.MetaMessage('end_of_track', time=max(0, total_end - prev)))
         mid.tracks.append(midi_track)
-    
+
     buf = io.BytesIO()
     mid.save(file=buf)
     buf.seek(0)
@@ -757,13 +720,13 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
 def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename):
     report = []
     report.append("=" * 60)
-    report.append("🎛️ MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE")
+    report.append("MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE")
     report.append("=" * 60)
     report.append("")
-    report.append("📅 DATA E ORA")
+    report.append("DATA E ORA")
     report.append(f"   Generato il: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     report.append("")
-    report.append("⚙️ PARAMETRI GENERAZIONE")
+    report.append("PARAMETRI GENERAZIONE")
     report.append(f"   File originale: {original_filename}")
     report.append(f"   Modalità: {mode.upper()}")
     report.append(f"   Sotto-modalità: {submode.upper()}")
@@ -780,16 +743,29 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     secs = int((duration_actual - mins) * 60)
     report.append(f"   Durata effettiva: {mins}:{secs:02d}")
     report.append("")
-    report.append("🎵 ANALISI TONALE")
+    report.append("ANALISI TONALE")
     report.append(f"   Tonica rilevata: {NOTE_NAMES[root]}")
     scale_notes = [NOTE_NAMES[(root + i) % 12] for i in scale]
     report.append(f"   Scala: {' - '.join(scale_notes)}")
     report.append(f"   Intervalli: {scale}")
+    key_sig = _compute_key_signature(root, scale)
+    report.append(f"   Key Signature: {key_sig}")
     report.append("")
-    report.append(" STRUTTURA BRANO (DJ-Friendly)")
-    report.append("   [ INTRO drum-only ] ➡️ [ BREAK 1 ] ➡️ [ BUILD-UP ] ➡️ [ DROP ] ➡️ [ BREAK 2 ] ➡️ [ OUTRO drum-only ]")
+    g = GENRES[genre]
+    report.append("PATTERN RITMICI (1 sedicesimi)")
+    report.append(f"   Kick (GM 36):  {''.join(['#' if x else '.' for x in g['kick']])}")
+    report.append(f"   Snare (GM 38): {''.join(['#' if x else '.' for x in g.get('snare', [0]*16)])}")
+    if 'clap' in g:
+        report.append(f"   Clap (GM 39):  {''.join(['#' if x else '.' for x in g['clap']])}")
+    report.append(f"   Hat (GM 42):   {''.join(['#' if x else '.' for x in g['hat']])}")
+    report.append(f"   Bass:          {''.join(['#' if x else '.' for x in g['bass']])}")
+    report.append(f"   Swing: {g['swing'] * 100:.0f}%")
+    report.append(f"   Densità Arp: {g['arp_density'] * 100:.0f}%")
     report.append("")
-    report.append("🎼 TRACCE OUTPUT")
+    report.append("STRUTTURA BRANO (DJ-Friendly)")
+    report.append("   [ INTRO drum-only ] -> [ BREAK 1 ] -> [ BUILD-UP ] -> [ DROP ] -> [ BREAK 2 ] -> [ OUTRO drum-only ]")
+    report.append("")
+    report.append("TRACCE OUTPUT")
     track_idx = 1
     for track_key in tracks.keys():
         if track_key in DRUM_TRACK_NAMES:
@@ -801,14 +777,15 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
         track_idx += 1
     report.append("")
     total_notes = sum(1 for events in tracks.values() for e in events if e['type'] == 'on')
-    report.append("📊 STATISTICHE MIDI")
+    report.append("STATISTICHE MIDI")
     report.append(f"   Note totali generate: {total_notes}")
     report.append(f"   Tracce MIDI: {len(tracks) + 1}")
     report.append("")
-    report.append("💡 NOTE PER LOGIC PRO")
+    report.append("NOTE PER LOGIC PRO")
     report.append("   - Apri con File > Apri (non Importa)")
     report.append("   - INTRO e OUTRO sono drum-only per beatmatching")
     report.append("   - Ogni traccia ha nome e program change al tick 0")
+    report.append("   - Batteria su canale 10: assegna Drum Kit Designer se necessario")
     report.append("")
     report.append("=" * 60)
     report.append("Generato con MIDI Forge Universale | 100% Free & Open Source")
@@ -816,10 +793,16 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
-    all_events = []
+    all_notes_with_dur = []
     for events in tracks.values():
-        all_events.extend(events)
-    events_json = json.dumps([{'tick': e['tick'], 'type': e['type'], 'pitch': e['pitch'], 'vel': e['vel'], 'channel': e.get('channel', 0)} for e in all_events])
+        notes = _compute_note_durations(events)
+        all_notes_with_dur.extend(notes)
+
+    notes_json = json.dumps([{
+        'tick': n['tick'], 'dur': n['dur'], 'pitch': n['pitch'],
+        'vel': n['vel'], 'channel': n['channel']
+    } for n in all_notes_with_dur])
+
     html_player = f"""
     <!DOCTYPE html>
     <html>
@@ -837,15 +820,15 @@ def render_midi_player(tracks, bpm):
     </head>
     <body>
         <div class="player">
-            <div class="title">🎧 Anteprima MIDI</div>
+            <div class="title">Anteprima MIDI (con durate reali)</div>
             <div class="controls">
-                <button id="playBtn" onclick="togglePlay()">▶ Play</button>
-                <button onclick="stop()">⏹ Stop</button>
+                <button id="playBtn" onclick="togglePlay()">Play</button>
+                <button onclick="stop()">Stop</button>
                 <span class="status" id="status">Pronto - {bpm} BPM</span>
             </div>
         </div>
         <script>
-            const events = {events_json};
+            const notes = {notes_json};
             let isPlaying = false;
             let synths = {{}};
             let scheduledEvents = [];
@@ -867,31 +850,30 @@ def render_midi_player(tracks, bpm):
                             synths[ch].set({{ oscillator: {{ type: 'triangle' }}, envelope: {{ attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.5 }} }});
                         }}
                     }}
-                    events.forEach(event => {{
-                        const timeInSeconds = event.tick / ticksPerSecond;
-                        if (event.type === 'on') {{
-                            if (event.channel === {DRUM_CH}) {{
-                                scheduledEvents.push(
-                                    Tone.getTransport().schedule(time => {{
-                                        if (event.pitch === {GM_KICK}) synths[{DRUM_CH}].kick.triggerAttackRelease('C1', '8n', time, event.vel / 127);
-                                        else if (event.pitch === {GM_SNARE}) synths[{DRUM_CH}].snare.triggerAttackRelease('16n', time, event.vel / 127);
-                                        else if (event.pitch === {GM_CLAP}) synths[{DRUM_CH}].clap.triggerAttackRelease('16n', time, event.vel / 127);
-                                        else if (event.pitch === {GM_HAT_CLOSED} || event.pitch === {GM_HAT_OPEN}) synths[{DRUM_CH}].hat.triggerAttackRelease('C3', '32n', time, event.vel / 127);
-                                    }}, timeInSeconds)
-                                );
-                            }} else {{
-                                const noteName = Tone.Frequency(event.pitch, 'midi').toNote();
-                                scheduledEvents.push(
-                                    Tone.getTransport().schedule(time => {{
-                                        synths[event.channel].triggerAttackRelease(noteName, '8n', time, event.vel / 127);
-                                    }}, timeInSeconds)
-                                );
-                            }}
+                    notes.forEach(note => {{
+                        const timeInSeconds = note.tick / ticksPerSecond;
+                        const durInSeconds = note.dur / ticksPerSecond;
+                        if (note.channel === {DRUM_CH}) {{
+                            scheduledEvents.push(
+                                Tone.getTransport().schedule(time => {{
+                                    if (note.pitch === {GM_KICK}) synths[{DRUM_CH}].kick.triggerAttackRelease('C1', durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_SNARE}) synths[{DRUM_CH}].snare.triggerAttackRelease(durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_CLAP}) synths[{DRUM_CH}].clap.triggerAttackRelease(durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_HAT_CLOSED} || note.pitch === {GM_HAT_OPEN}) synths[{DRUM_CH}].hat.triggerAttackRelease('C3', durInSeconds, time, note.vel / 127);
+                                }}, timeInSeconds)
+                            );
+                        }} else {{
+                            const noteName = Tone.Frequency(note.pitch, 'midi').toNote();
+                            scheduledEvents.push(
+                                Tone.getTransport().schedule(time => {{
+                                    synths[note.channel].triggerAttackRelease(noteName, durInSeconds, time, note.vel / 127);
+                                }}, timeInSeconds)
+                            );
                         }}
                     }});
                     Tone.getTransport().start();
                     isPlaying = true;
-                    document.getElementById('playBtn').textContent = '⏸ Pause';
+                    document.getElementById('playBtn').textContent = 'Pause';
                     document.getElementById('status').textContent = 'In riproduzione...';
                 }} catch (e) {{
                     document.getElementById('status').textContent = 'Errore: ' + e.message;
@@ -902,7 +884,7 @@ def render_midi_player(tracks, bpm):
                 scheduledEvents.forEach(id => Tone.getTransport().clear(id));
                 scheduledEvents = [];
                 isPlaying = false;
-                document.getElementById('playBtn').textContent = '▶ Play';
+                document.getElementById('playBtn').textContent = 'Play';
                 document.getElementById('status').textContent = 'Pronto - {bpm} BPM';
             }}
         </script>
@@ -911,13 +893,13 @@ def render_midi_player(tracks, bpm):
     """
     components.html(html_player, height=150)
 
-# ================= INTERFACCIA STREAMLIT =================
+# ================= INTERFACCIA STREAMLIT CON SESSION STATE =================
 
 if 'generated' not in st.session_state:
     st.session_state.generated = None
 
-st.title("🎛️ MIDI Forge Universale")
-st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Struttura DJ-Friendly: INTRO ➡️ BREAK ➡️ BUILD ➡️ DROP ➡️ BREAK ➡️ OUTRO")
+st.title("MIDI Forge Universale")
+st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Struttura DJ-Friendly: INTRO -> BREAK -> BUILD -> DROP -> BREAK -> OUTRO")
 
 col1, col2 = st.columns([1, 1])
 
@@ -928,7 +910,7 @@ with col1:
         submode = st.selectbox("Sotto-modalità", ["extract", "generate"])
     else:
         submode = st.selectbox("Sotto-modalità", ["faithful", "generative"])
-        split_drums = st.checkbox("🥁 Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True)
+        split_drums = st.checkbox("Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True)
 
 with col2:
     genre_list = sorted(GENRES.keys())
@@ -956,11 +938,11 @@ with col2:
 
 st.markdown("---")
 
-if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
+if st.button("Genera MIDI", type="primary", use_container_width=True):
     if not uploaded_file:
-        st.error("⚠️ Carica prima un file MIDI!")
+        st.error("Carica prima un file MIDI!")
     else:
-        with st.spinner("🎼 Generazione in corso..."):
+        with st.spinner("Generazione in corso..."):
             try:
                 file_bytes = io.BytesIO(uploaded_file.getvalue())
                 notes_data = extract_notes(file_bytes)
@@ -971,65 +953,68 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
                         final_bars = int((duration_seconds * final_bpm) / 240)
                         final_bars = max(16, final_bars)
-                        st.info(f"📏 Durata calcolata: {final_bars} battute")
+                        st.info(f"Durata calcolata: {final_bars} battute")
                     else:
                         final_bars = g_defaults['bars_default'] if use_default_bars else bars
-                    
+
                     if mode == "minimal":
                         tracks, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed)
                         headers = {}
                     else:
                         file_bytes.seek(0)
-                        tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed, split_drums)
-                    
+                        requested_bars = final_bars
+                        tracks, root, scale, headers, final_bars = generate_multitrack(
+                            file_bytes, g_defaults, submode, final_bars, seed, split_drums)
+                        if final_bars != requested_bars:
+                            st.info(f"Durata allineata: {final_bars} battute (richieste: {requested_bars})")
+
                     label = f"{genre} - {mode}/{submode}"
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label)
-                    
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode,
+                                                  headers, label=label, root=root, scale=scale)
+
+                    report_text = generate_report(
+                        tracks, genre, mode, submode, final_bpm, final_bars,
+                        seed, root, scale, duration_mode, duration_seconds, uploaded_file.name)
+
                     st.session_state.generated = {
-                        'tracks': tracks,
-                        'root': root,
-                        'scale': scale,
-                        'headers': headers,
-                        'bars': final_bars,
-                        'bpm': final_bpm,
-                        'midi_bytes': midi_buffer.getvalue(),
-                        'label': label,
-                        'mode': mode,
-                        'submode': submode,
-                        'genre': genre
+                        'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
+                        'bars': final_bars, 'bpm': final_bpm,
+                        'midi_bytes': midi_buffer.getvalue(), 'report_text': report_text,
+                        'label': label, 'mode': mode, 'submode': submode, 'genre': genre
                     }
-                    
-                    st.success(f"✅ Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm}, {final_bars} battute)")
+
+                    key_sig = _compute_key_signature(root, scale)
+                    st.success(f"Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm}, Key: {key_sig})")
             except Exception as e:
                 st.error(f"Errore: {str(e)}")
 
+# Mostra risultati da session state (persistono dopo rerun)
 if st.session_state.generated:
     g = st.session_state.generated
-    
-    st.markdown("###  Anteprima")
+
+    st.markdown("### Anteprima")
     render_midi_player(g['tracks'], g['bpm'])
-    
+
     col_dl1, col_dl2 = st.columns(2)
     with col_dl1:
         st.download_button(
-            label="📥 Scarica MIDI",
+            label="Scarica MIDI",
             data=g['midi_bytes'],
             file_name=f"midi_forge_{g['genre']}_{g['mode']}_{g['submode']}.mid",
             mime="audio/midi",
             use_container_width=True
         )
     with col_dl2:
-        report_text = generate_report(g['tracks'], g['genre'], g['mode'], g['submode'], g['bpm'], g['bars'], 42, g['root'], g['scale'], "Battute", None, "uploaded.mid")
         st.download_button(
-            label="📄 Scarica Report TXT",
-            data=report_text.encode('utf-8'),
+            label="Scarica Report TXT",
+            data=g['report_text'].encode('utf-8'),
             file_name=f"report_{g['genre']}_{g['mode']}_{g['submode']}.txt",
             mime="text/plain",
             use_container_width=True
         )
-    
-    with st.expander("📋 Visualizza Report"):
-        st.code(report_text, language=None)
+
+    with st.expander("Visualizza Report"):
+        st.code(g['report_text'], language=None)
 
 st.markdown("---")
 st.caption("MIDI Forge Universale | Standard General MIDI | Struttura DJ-Friendly | 100% Open Source & Free")
