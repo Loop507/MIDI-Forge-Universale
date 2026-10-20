@@ -53,21 +53,14 @@ NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
 TICKS_BEAT = 480
 
 # ================= STANDARD GENERAL MIDI =================
-# Canale 10 (0-indexed = 9) per TUTTA la batteria
-DRUM_CH = 9  # Canale 10 in notazione 1-indexed
+DRUM_CH = 9  # Canale 10 (0-indexed = 9)
 
-# Pitch GM (General MIDI) standard per percussioni
-GM_KICK = 36      # Bass Drum 1
-GM_SNARE = 38     # Acoustic Snare
-GM_CLAP = 39      # Hand Clap
-GM_HAT_CLOSED = 42  # Closed Hi-Hat
-GM_HAT_OPEN = 46    # Open Hi-Hat
-GM_RIDE = 51        # Ride Cymbal 1
-GM_CRASH = 49       # Crash Cymbal 1
-GM_TOM_LOW = 45     # Low Tom
-GM_TOM_MID = 48     # Hi-Mid Tom
-GM_TOM_HIGH = 50    # High Tom
-GM_RIMSHOT = 37     # Side Stick / Rimshot
+# Pitch GM standard per percussioni
+GM_KICK = 36
+GM_SNARE = 38
+GM_CLAP = 39
+GM_HAT_CLOSED = 42
+GM_HAT_OPEN = 46
 
 # ================= FUNZIONI CORE =================
 def extract_notes(mid_file):
@@ -103,12 +96,6 @@ def snap_to_scale(pitch, root, scale):
     return root + (octave * 12) + closest
 
 def generate_minimal(notes_data, g, submode, bars, seed):
-    """Genera eventi per modalità minimal.
-    Ritorna una struttura per TRACCE (non per canali):
-    - tracks['bass'] = eventi basso (canale 0)
-    - tracks['arp'] = eventi arp (canale 1)
-    - tracks['drums'] = eventi batteria (canale 9, pitch GM)
-    """
     random.seed(seed)
     root, scale = extract_dna(notes_data)
     
@@ -141,7 +128,7 @@ def generate_minimal(notes_data, g, submode, bars, seed):
             p_step = s % 16
             swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
             
-            # BATTERIA - TUTTO SU CANALE 9 (GM Ch 10) con pitch GM
+            # BATTERIA - CANALE 9 (GM 10), PITCH GM
             if g['kick'][p_step]:
                 tracks['drums'].extend([
                     {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': 110, 'channel': DRUM_CH},
@@ -195,9 +182,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
     return tracks, root, scale
 
 def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
-    """Genera eventi per modalità multitrack.
-    Ritorna una struttura per TRACCE separate.
-    """
     random.seed(seed)
     mid = mido.MidiFile(file=mid_file_bytes)
     
@@ -214,12 +198,16 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
     tracks = {}
     
     if submode == 'faithful':
-        # Preserva ogni traccia originale come traccia separata
         track_idx = 0
         for original_track in mid.tracks:
-            # Salta tracce di batteria originali
             if any(msg.channel == DRUM_CH for msg in original_track if hasattr(msg, 'channel')):
                 continue
+            
+            original_name = None
+            for msg in original_track:
+                if msg.type == 'track_name':
+                    original_name = msg.name
+                    break
             
             track_events = []
             current_tick = 0
@@ -233,11 +221,12 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
                         {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': msg.velocity, 'channel': track_idx % 16},
                         {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': track_idx % 16}
                     ])
+            
             if track_events:
-                tracks[f'instrument_{track_idx}'] = track_events
+                track_key = original_name if original_name else f'instrument_{track_idx}'
+                tracks[track_key] = track_events
                 track_idx += 1
     else:
-        # Modalità generative: 7 ruoli distinti
         roles = [
             ('sub_bass', 0, (24, 36)),
             ('bassline', 1, (36, 48)),
@@ -315,7 +304,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
             if track_events:
                 tracks[role_name] = track_events
     
-    # BATTERIA - UNA TRACCIA SEPARATA, CANALE 9 (GM 10), PITCH GM
+    # BATTERIA
     drum_events = []
     for bar in range(bars):
         base_tick = bar * 4 * TICKS_BEAT
@@ -351,71 +340,56 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed):
     return tracks, root, scale
 
 def build_midi_file(tracks, bpm, mode, submode):
-    """Costruisce un file MIDI standard-compliant.
-    Ogni chiave di 'tracks' diventa una MIDI track separata.
-    """
+    """Costruisce un file MIDI con Program Change GM per Logic Pro."""
     mid = mido.MidiFile(ticks_per_beat=TICKS_BEAT)
     
-    # Traccia tempo
     t_tempo = mido.MidiTrack()
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
     mid.tracks.append(t_tempo)
     
-    # Nomi tracce per Logic Pro
-    track_name_map = {
-        'bass': 'Bass',
-        'arp': 'Arp/Synth',
-        'drums': 'Drums',
-        'sub_bass': 'Sub Bass',
-        'bassline': 'Bassline',
-        'pad': 'Pad',
-        'chords': 'Chords/Stabs',
-        'lead': 'Lead/Melody',
-        'fx_perc': 'FX/Percs'
+    # Program Change GM per Logic Pro
+    gm_programs = {
+        'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38,
+        'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'drums': 0
     }
     
-    # Per ogni traccia logica, crea una MIDI track separata
+    # Nomi tracce per Logic Pro
+    logic_names = {
+        'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass',
+        'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano',
+        'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drum Kit'
+    }
+    
     track_idx = 0
     for track_key, events in tracks.items():
         if not events:
             continue
         
-        # Ordina eventi
         events_sorted = sorted(events, key=lambda e: (e['tick'], 0 if e['type'] == 'off' else 1))
         
-        # Crea MIDI track
         midi_track = mido.MidiTrack()
         mid.tracks.append(midi_track)
         
-        # Nome traccia
         if track_key.startswith('instrument_'):
-            track_name = f'Track {track_idx + 1}'
+            track_name = f'Instrument {track_idx + 1}'
         else:
-            track_name = track_name_map.get(track_key, f'Track {track_idx + 1}')
+            track_name = logic_names.get(track_key, f'Track {track_idx + 1}')
+        
         midi_track.append(mido.MetaMessage('track_name', name=track_name, time=0))
         
-        # Per la traccia batteria, imposta program change a 0 (Drum Kit)
-        if track_key == 'drums':
-            # Il canale 9 (0-indexed) è riconosciuto come drum channel
-            # Non serve program change, è automatico
-            pass
-        else:
-            # Imposta programma per strumenti melodici (es. 0 = Acoustic Grand Piano come default)
-            ch = events_sorted[0].get('channel', 0) if events_sorted else 0
-            midi_track.append(mido.Message('program_change', program=0, channel=ch, time=0))
+        ch = events_sorted[0].get('channel', 0)
         
-        # Scrivi eventi
+        if track_key != 'drums':
+            pc = gm_programs.get(track_key, 0)
+            midi_track.append(mido.Message('program_change', program=pc, channel=ch, time=0))
+        
         prev_tick = 0
         for e in events_sorted:
             delta = e['tick'] - prev_tick
             msg_type = 'note_on' if e['type'] == 'on' else 'note_off'
             vel = e['vel'] if e['type'] == 'on' else 0
             midi_track.append(mido.Message(
-                msg_type, 
-                note=e['pitch'], 
-                velocity=vel, 
-                time=delta, 
-                channel=e.get('channel', 0)
+                msg_type, note=e['pitch'], velocity=vel, time=delta, channel=ch
             ))
             prev_tick = e['tick']
         
@@ -474,46 +448,29 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     report.append(f"   Densità Arp: {g['arp_density'] * 100:.0f}%")
     report.append("")
     
-    report.append("🎼 TRACCE OUTPUT (MIDI Tracks)")
-    report.append("   Standard: General MIDI / DAW-compliant")
-    report.append("   Canale batteria: 10 (0-indexed: 9)")
-    report.append("")
-    
+    report.append("🎼 TRACCE OUTPUT")
     track_idx = 1
     for track_key in tracks.keys():
         if track_key == 'drums':
             report.append(f"   {track_idx}. Drums (Canale 10 - GM Drum Map)")
-            report.append(f"      Pitch: Kick=36, Snare=38, Clap=39, Hat=42")
         elif track_key.startswith('instrument_'):
-            report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
+            report.append(f"   {track_idx}. {track_key} (Canale melodico)")
         else:
-            name_map = {
-                'bass': 'Bass', 'arp': 'Arp/Synth',
-                'sub_bass': 'Sub Bass', 'bassline': 'Bassline',
-                'pad': 'Pad', 'chords': 'Chords/Stabs',
-                'lead': 'Lead/Melody', 'fx_perc': 'FX/Percs'
-            }
-            report.append(f"   {track_idx}. {name_map.get(track_key, track_key)} (Canale melodico)")
+            report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
         track_idx += 1
     report.append("")
     
-    # Statistiche
-    total_notes = 0
-    for events in tracks.values():
-        total_notes += sum(1 for e in events if e['type'] == 'on')
+    total_notes = sum(1 for events in tracks.values() for e in events if e['type'] == 'on')
     
     report.append("📊 STATISTICHE MIDI")
     report.append(f"   Note totali generate: {total_notes}")
-    report.append(f"   Tracce MIDI: {len(tracks) + 1} (inclusa tempo)")
+    report.append(f"   Tracce MIDI: {len(tracks) + 1}")
     report.append("")
     
-    report.append("💡 NOTE PER LOGIC PRO / DAW")
+    report.append("💡 NOTE PER LOGIC PRO")
     report.append("   - Importa il MIDI trascinandolo nell'Arrange window")
-    report.append("   - Logic creerà automaticamente una traccia per ogni MIDI track")
-    report.append("   - La traccia 'Drums' verrà riconosciuta come batteria (canale 10)")
-    report.append("   - Logic assegnerà automaticamente Drum Machine Designer")
-    report.append("   - Ogni pitch GM (36, 38, 39, 42) mappa a una cella del drum rack")
-    report.append("   - Le altre tracce sono pronte per VST melodici")
+    report.append("   - Logic caricherà automaticamente gli strumenti")
+    report.append("   - La traccia Drums usa Drum Machine Designer")
     report.append("")
     
     report.append("=" * 60)
@@ -523,18 +480,13 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
-    """Player MIDI che usa gli eventi già parsati da Python"""
-    # Flatten tutti gli eventi per il player
     all_events = []
     for events in tracks.values():
         all_events.extend(events)
     
     events_json = json.dumps([{
-        'tick': e['tick'],
-        'type': e['type'],
-        'pitch': e['pitch'],
-        'vel': e['vel'],
-        'channel': e.get('channel', 0)
+        'tick': e['tick'], 'type': e['type'], 'pitch': e['pitch'],
+        'vel': e['vel'], 'channel': e.get('channel', 0)
     } for e in all_events])
     
     html_player = f"""
@@ -545,23 +497,21 @@ def render_midi_player(tracks, bpm):
         <style>
             body {{ font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 15px; background: #0e1117; color: #fafafa; }}
             .player {{ background: #1a1d23; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }}
-            .title {{ font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #fafafa; }}
+            .title {{ font-size: 14px; font-weight: 600; margin-bottom: 12px; }}
             .controls {{ display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }}
-            button {{ background: #ff4b4b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }}
-            button:hover {{ background: #ff6b6b; transform: translateY(-1px); }}
+            button {{ background: #ff4b4b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }}
+            button:hover {{ background: #ff6b6b; }}
             .status {{ font-size: 13px; color: #aaa; }}
-            .info {{ font-size: 12px; color: #888; margin-top: 8px; }}
         </style>
     </head>
     <body>
         <div class="player">
-            <div class="title">🎧 Anteprima MIDI (suona nel browser)</div>
+            <div class="title">🎧 Anteprima MIDI</div>
             <div class="controls">
                 <button id="playBtn" onclick="togglePlay()">▶ Play</button>
                 <button onclick="stop()">⏹ Stop</button>
                 <span class="status" id="status">Pronto - {bpm} BPM</span>
             </div>
-            <div class="info">💡 Riproduzione 100% fedele - Standard General MIDI</div>
         </div>
         
         <script>
@@ -571,58 +521,41 @@ def render_midi_player(tracks, bpm):
             let scheduledEvents = [];
             
             async function togglePlay() {{
-                if (isPlaying) {{
-                    stop();
-                    return;
-                }}
+                if (isPlaying) {{ stop(); return; }}
                 
                 await Tone.start();
-                document.getElementById('status').textContent = 'Caricamento...';
                 
                 try {{
                     const ticksPerSecond = ({TICKS_BEAT} * {bpm}) / 60;
                     
-                    // Crea synth per ogni canale
                     for (let ch = 0; ch < 16; ch++) {{
                         if (ch === {DRUM_CH}) {{
-                            // Canale 10 (0-indexed 9) = batteria GM
                             synths[ch] = {{
-                                kick: new Tone.MembraneSynth({{ pitchDecay: 0.05, octaves: 6, envelope: {{ attack: 0.001, decay: 0.3, sustain: 0, release: 0.1 }} }}).toDestination(),
+                                kick: new Tone.MembraneSynth().toDestination(),
                                 snare: new Tone.NoiseSynth({{ noise: {{ type: 'white' }}, envelope: {{ attack: 0.001, decay: 0.2, sustain: 0 }} }}).toDestination(),
                                 hat: new Tone.MetalSynth({{ envelope: {{ attack: 0.001, decay: 0.05, release: 0.01 }}, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }}).toDestination(),
                                 clap: new Tone.NoiseSynth({{ noise: {{ type: 'pink' }}, envelope: {{ attack: 0.001, decay: 0.15, sustain: 0 }} }}).toDestination()
                             }};
                         }} else {{
                             synths[ch] = new Tone.PolySynth(Tone.Synth).toDestination();
-                            synths[ch].set({{
-                                oscillator: {{ type: 'triangle' }},
-                                envelope: {{ attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.5 }}
-                            }});
+                            synths[ch].set({{ oscillator: {{ type: 'triangle' }}, envelope: {{ attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.5 }} }});
                         }}
                     }}
                     
-                    // Schedula tutte le note
                     events.forEach(event => {{
                         const timeInSeconds = event.tick / ticksPerSecond;
                         
                         if (event.type === 'on') {{
                             if (event.channel === {DRUM_CH}) {{
-                                // Batteria GM - discrimina per pitch
                                 scheduledEvents.push(
                                     Tone.getTransport().schedule(time => {{
-                                        if (event.pitch === {GM_KICK}) {{
-                                            synths[{DRUM_CH}].kick.triggerAttackRelease('C1', '8n', time, event.vel / 127);
-                                        }} else if (event.pitch === {GM_SNARE}) {{
-                                            synths[{DRUM_CH}].snare.triggerAttackRelease('16n', time, event.vel / 127);
-                                        }} else if (event.pitch === {GM_CLAP}) {{
-                                            synths[{DRUM_CH}].clap.triggerAttackRelease('16n', time, event.vel / 127);
-                                        }} else if (event.pitch === {GM_HAT_CLOSED} || event.pitch === {GM_HAT_OPEN}) {{
-                                            synths[{DRUM_CH}].hat.triggerAttackRelease('C3', '32n', time, event.vel / 127);
-                                        }}
+                                        if (event.pitch === {GM_KICK}) synths[{DRUM_CH}].kick.triggerAttackRelease('C1', '8n', time, event.vel / 127);
+                                        else if (event.pitch === {GM_SNARE}) synths[{DRUM_CH}].snare.triggerAttackRelease('16n', time, event.vel / 127);
+                                        else if (event.pitch === {GM_CLAP}) synths[{DRUM_CH}].clap.triggerAttackRelease('16n', time, event.vel / 127);
+                                        else if (event.pitch === {GM_HAT_CLOSED} || event.pitch === {GM_HAT_OPEN}) synths[{DRUM_CH}].hat.triggerAttackRelease('C3', '32n', time, event.vel / 127);
                                     }}, timeInSeconds)
                                 );
                             }} else {{
-                                // Melodia
                                 const noteName = Tone.Frequency(event.pitch, 'midi').toNote();
                                 scheduledEvents.push(
                                     Tone.getTransport().schedule(time => {{
@@ -640,7 +573,6 @@ def render_midi_player(tracks, bpm):
                     
                 }} catch (e) {{
                     document.getElementById('status').textContent = 'Errore: ' + e.message;
-                    console.error(e);
                 }}
             }}
             
@@ -648,16 +580,6 @@ def render_midi_player(tracks, bpm):
                 Tone.getTransport().stop();
                 scheduledEvents.forEach(id => Tone.getTransport().clear(id));
                 scheduledEvents = [];
-                Object.values(synths).forEach(synth => {{
-                    if (synth.kick) {{
-                        synth.kick.releaseAll();
-                        synth.snare.releaseAll();
-                        synth.hat.releaseAll();
-                        synth.clap.releaseAll();
-                    }} else if (synth.releaseAll) {{
-                        synth.releaseAll();
-                    }}
-                }});
                 isPlaying = false;
                 document.getElementById('playBtn').textContent = '▶ Play';
                 document.getElementById('status').textContent = 'Pronto - {bpm} BPM';
@@ -666,7 +588,7 @@ def render_midi_player(tracks, bpm):
     </body>
     </html>
     """
-    components.html(html_player, height=180)
+    components.html(html_player, height=150)
 
 # ================= INTERFACCIA STREAMLIT =================
 st.title("🎛️ MIDI Forge Universale")
@@ -677,15 +599,12 @@ col1, col2 = st.columns([1, 1])
 with col1:
     uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
     
-    mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], 
-                        help="Minimal: 3 tracce (Bass, Arp, Drums). Multitrack: Struttura completa multi-traccia.")
+    mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"])
     
     if mode == "minimal":
-        submode = st.selectbox("Sotto-modalità", ["extract", "generate"], 
-                               help="extract: Usa le note originali. generate: Crea melodie nuove da zero.")
+        submode = st.selectbox("Sotto-modalità", ["extract", "generate"])
     else:
-        submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], 
-                               help="faithful: Cambio genere riconoscibile. generative: Arrangiamento nuovo ma strutturato.")
+        submode = st.selectbox("Sotto-modalità", ["faithful", "generative"])
 
 with col2:
     genre_list = sorted(GENRES.keys())
@@ -714,28 +633,28 @@ with col2:
             duration_seconds = minutes * 60 + seconds
             bars = None
         
-    seed = st.number_input("Seed (per variazioni infinite)", min_value=1, max_value=99999, value=42)
+    seed = st.number_input("Seed", min_value=1, max_value=99999, value=42)
 
 st.markdown("---")
 
 if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
     if not uploaded_file:
-        st.error("⚠️ Per favore, carica prima un file MIDI!")
+        st.error("⚠️ Carica prima un file MIDI!")
     else:
-        with st.spinner("🎼 Analisi del DNA armonico e generazione in corso..."):
+        with st.spinner("🎼 Generazione in corso..."):
             try:
                 file_bytes = io.BytesIO(uploaded_file.getvalue())
                 notes_data = extract_notes(file_bytes)
                 
                 if not notes_data:
-                    st.error("Il file MIDI caricato non contiene note valide.")
+                    st.error("Il file MIDI non contiene note valide.")
                 else:
                     final_bpm = g_defaults['bpm_default'] if use_default_bpm else bpm
                     
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
                         final_bars = int((duration_seconds * final_bpm) / 240)
                         final_bars = max(8, final_bars)
-                        st.info(f"📏 Durata calcolata: {final_bars} battute ({duration_seconds} secondi a {final_bpm} BPM)")
+                        st.info(f"📏 Durata calcolata: {final_bars} battute")
                     else:
                         final_bars = g_defaults['bars_default'] if use_default_bars else bars
                     
@@ -747,7 +666,7 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                     
                     midi_buffer = build_midi_file(tracks, final_bpm, mode, submode)
                     
-                    st.success(f"✅ Generazione completata! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm})")
+                    st.success(f"✅ Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm})")
                     
                     st.markdown("### 🎧 Anteprima")
                     render_midi_player(tracks, final_bpm)
@@ -774,11 +693,11 @@ if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
                             use_container_width=True
                         )
                     
-                    with st.expander("📋 Visualizza Report Completo"):
+                    with st.expander("📋 Visualizza Report"):
                         st.code(report_text, language=None)
                         
             except Exception as e:
-                st.error(f"Si è verificato un errore: {str(e)}")
+                st.error(f"Errore: {str(e)}")
 
 st.markdown("---")
-st.caption("MIDI Forge Universale | Standard General MIDI | Librerie: Streamlit, Mido, Tone.js | 100% Open Source & Free")
+st.caption("MIDI Forge Universale | Standard General MIDI | 100% Open Source & Free")
