@@ -8,9 +8,9 @@ from datetime import datetime
 from collections import Counter
 
 # ================= CONFIGURAZIONE PAGINA =================
-st.set_page_config(page_title="MIDI Forge Universale", page_icon="️", layout="wide")
+st.set_page_config(page_title="MIDI Forge Universale", page_icon="🎛️", layout="wide")
 
-# ================= DATABASE DEI GENERI (CORRETTO) =================
+# ================= DATABASE DEI GENERI =================
 GENRES = {
     'acid': {'bpm_default': 135, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
     'ambient': {'bpm_default': 80, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0},
@@ -62,19 +62,15 @@ GM_HAT_OPEN = 46
 # ================= FUNZIONI AUXILIARIE =================
 
 def _root_to_key_name(root, is_minor):
-    """Converte root (0-11) + modalità in stringa key signature (es. 'Gm', 'C')."""
     return NOTE_NAMES[root] + ('m' if is_minor else '')
 
 def _is_minor_scale(scale):
-    """Determina se la scala è minore (contiene terza minore = intervallo 3)."""
     return 3 in scale
 
 def _compute_key_signature(root, scale):
-    """Calcola la key signature dal root e dalla scala."""
     return _root_to_key_name(root, _is_minor_scale(scale))
 
 def _drum_velocities(seed_rng):
-    """Genera velocity dinamiche per batteria con accenti sul battere."""
     kicks, snares, hats, claps = [], [], [], []
     for s in range(16):
         is_accent = (s % 4 == 0)
@@ -85,7 +81,6 @@ def _drum_velocities(seed_rng):
     return {'kick': kicks, 'snare': snares, 'hat': hats, 'clap': claps}
 
 def _compute_note_durations(events):
-    """Converte eventi on/off in liste di note con durata reale."""
     pending = {}
     notes = []
     for e in sorted(events, key=lambda x: x['tick']):
@@ -221,6 +216,83 @@ def generate_minimal(notes_data, g, submode, bars, seed):
                     ])
     return tracks, root, scale
 
+def _extract_instrument_header(track):
+    header = []
+    for msg in track:
+        if msg.type in ('note_on', 'note_off'):
+            break
+        if msg.type == 'program_change':
+            header.append({'type': 'program_change', 'program': msg.program})
+        elif msg.type == 'control_change' and msg.control in (0, 32, 7, 10, 11, 91, 93):
+            header.append({'type': 'control_change', 'control': msg.control, 'value': msg.value})
+    return header
+
+GM_PROGRAM_NAMES = [
+    'Acoustic Grand Piano', 'Bright Acoustic Piano', 'Electric Grand Piano', 'Honky-tonk Piano',
+    'Electric Piano 1', 'Electric Piano 2', 'Harpsichord', 'Clavinet',
+    'Celesta', 'Glockenspiel', 'Music Box', 'Vibraphone',
+    'Marimba', 'Xylophone', 'Tubular Bells', 'Dulcimer',
+    'Drawbar Organ', 'Percussive Organ', 'Rock Organ', 'Church Organ',
+    'Reed Organ', 'Accordion', 'Harmonica', 'Tango Accordion',
+    'Acoustic Guitar (nylon)', 'Acoustic Guitar (steel)', 'Electric Guitar (jazz)', 'Electric Guitar (clean)',
+    'Electric Guitar (muted)', 'Overdriven Guitar', 'Distortion Guitar', 'Guitar Harmonics',
+    'Acoustic Bass', 'Electric Bass (finger)', 'Electric Bass (pick)', 'Fretless Bass',
+    'Slap Bass 1', 'Slap Bass 2', 'Synth Bass 1', 'Synth Bass 2',
+    'Violin', 'Viola', 'Cello', 'Contrabass',
+    'Tremolo Strings', 'Pizzicato Strings', 'Orchestral Harp', 'Timpani',
+    'String Ensemble 1', 'String Ensemble 2', 'Synth Strings 1', 'Synth Strings 2',
+    'Choir Aahs', 'Voice Oohs', 'Synth Voice', 'Orchestra Hit',
+    'Trumpet', 'Trombone', 'Tuba', 'Muted Trumpet',
+    'French Horn', 'Brass Section', 'Synth Brass 1', 'Synth Brass 2',
+    'Soprano Sax', 'Alto Sax', 'Tenor Sax', 'Baritone Sax',
+    'Oboe', 'English Horn', 'Bassoon', 'Clarinet',
+    'Piccolo', 'Flute', 'Recorder', 'Pan Flute',
+    'Blown Bottle', 'Shakuhachi', 'Whistle', 'Ocarina',
+    'Lead 1 (square)', 'Lead 2 (sawtooth)', 'Lead 3 (calliope)', 'Lead 4 (chiff)',
+    'Lead 5 (charang)', 'Lead 6 (voice)', 'Lead 7 (fifths)', 'Lead 8 (bass + lead)',
+    'Pad 1 (new age)', 'Pad 2 (warm)', 'Pad 3 (polysynth)', 'Pad 4 (choir)',
+    'Pad 5 (bowed)', 'Pad 6 (metallic)', 'Pad 7 (halo)', 'Pad 8 (sweep)',
+    'FX 1 (rain)', 'FX 2 (soundtrack)', 'FX 3 (crystal)', 'FX 4 (atmosphere)',
+    'FX 5 (brightness)', 'FX 6 (goblins)', 'FX 7 (echoes)', 'FX 8 (sci-fi)',
+    'Sitar', 'Banjo', 'Shamisen', 'Koto',
+    'Kalimba', 'Bag pipe', 'Fiddle', 'Shanai',
+    'Tinkle Bell', 'Agogo', 'Steel Drums', 'Woodblock',
+    'Taiko Drum', 'Melodic Tom', 'Synth Drum', 'Reverse Cymbal',
+    'Guitar Fret Noise', 'Breath Noise', 'Seashore', 'Bird Tweet',
+    'Telephone Ring', 'Helicopter', 'Applause', 'Gunshot',
+]
+
+_GM_NAME_HINTS = [
+    (("bass ", "basso ", "contrabb "), 33), (("chitarr ", "guitar "), 25), (("piano ", "pianof "), 0), (("organ ", "organo "), 19),
+    (("string ", "archi ", "violin ", "cello "), 48), (("pad ",), 89), (("lead ",), 80), (("vox ", "voce ", "vocal ", "choir ", "coro "), 52),
+    (("flaut ", "flute "), 73), (("sax ",), 65), (("trump ", "tromba "), 56), (("tromb ",), 57), (("synth ",), 81),
+]
+
+def _guess_program(name):
+    low = (name or "").lower()
+    for keys, prog in _GM_NAME_HINTS:
+        if any(k in low for k in keys):
+            return prog
+    return 0
+
+DRUM_PIECES = [(GM_KICK, 'drum_kick'), (GM_SNARE, 'drum_snare'), (GM_HAT_CLOSED, 'drum_hat'), (GM_CLAP, 'drum_clap')]
+DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap'}
+
+def split_drum_track(tracks):
+    events = tracks.get('drums')
+    if not events:
+        return tracks
+    out = {k: v for k, v in tracks.items() if k != 'drums'}
+    known = {p for p, _k in DRUM_PIECES}
+    for pitch, key in DRUM_PIECES:
+        ev = [e for e in events if e['pitch'] == pitch]
+        if ev:
+            out[key] = ev
+    rest = [e for e in events if e['pitch'] not in known]
+    if rest:
+        out['drums'] = rest
+    return out
+
 def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True):
     random.seed(seed)
     mid = mido.MidiFile(file=mid_file_bytes)
@@ -239,7 +311,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
     free_channels = [c for c in range(16) if c != DRUM_CH]
     
     if submode == 'faithful':
-        # GRIGLIA FINE: 64esimi per preservare sincopi e micro-timing
         GRID = TICKS_BEAT // 16
         track_idx = 0
         for original_track in mid.tracks:
@@ -249,7 +320,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             header = _extract_instrument_header(original_track)
             ch = free_channels[track_idx % len(free_channels)]
             
-            # Estrai coppie note con durata vera
             pending = {}
             pairs = []
             current_tick_raw = 0
@@ -260,15 +330,12 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
                 elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
                     if msg.note in pending:
                         on_raw, vel = pending.pop(msg.note)
-                        # Quantizza SOLO l'attacco alla griglia fine
                         on_quantized = round(on_raw * scale_t / GRID) * GRID
-                        # Durata vera quantizzata
                         dur_raw = current_tick_raw - on_raw
                         dur_quantized = max(GRID, round(dur_raw * scale_t / GRID) * GRID)
                         pitch = snap_to_scale(msg.note, root, scale)
                         pairs.append({'tick': on_quantized, 'dur': dur_quantized, 'pitch': pitch, 'vel': vel})
             
-            # Chiudi note pendenti
             for note, (on_raw, vel) in pending.items():
                 on_quantized = round(on_raw * scale_t / GRID) * GRID
                 dur_quantized = GRID * 4
@@ -371,7 +438,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
         last_tick = max(e['tick'] for ev in tracks.values() for e in ev)
         bars = max(bars, -(-last_tick // (4 * TICKS_BEAT)))
     
-    # BATTERIA con velocity dinamiche
     drum_vel = _drum_velocities(random.Random(seed + 2))
     drum_events = []
     for bar in range(bars):
@@ -407,85 +473,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
             tracks = split_drum_track(tracks)
     
     return tracks, root, scale, headers, bars
-
-GM_PROGRAM_NAMES = [
-    'Acoustic Grand Piano', 'Bright Acoustic Piano', 'Electric Grand Piano', 'Honky-tonk Piano',
-    'Electric Piano 1', 'Electric Piano 2', 'Harpsichord', 'Clavinet',
-    'Celesta', 'Glockenspiel', 'Music Box', 'Vibraphone',
-    'Marimba', 'Xylophone', 'Tubular Bells', 'Dulcimer',
-    'Drawbar Organ', 'Percussive Organ', 'Rock Organ', 'Church Organ',
-    'Reed Organ', 'Accordion', 'Harmonica', 'Tango Accordion',
-    'Acoustic Guitar (nylon)', 'Acoustic Guitar (steel)', 'Electric Guitar (jazz)', 'Electric Guitar (clean)',
-    'Electric Guitar (muted)', 'Overdriven Guitar', 'Distortion Guitar', 'Guitar Harmonics',
-    'Acoustic Bass', 'Electric Bass (finger)', 'Electric Bass (pick)', 'Fretless Bass',
-    'Slap Bass 1', 'Slap Bass 2', 'Synth Bass 1', 'Synth Bass 2',
-    'Violin', 'Viola', 'Cello', 'Contrabass',
-    'Tremolo Strings', 'Pizzicato Strings', 'Orchestral Harp', 'Timpani',
-    'String Ensemble 1', 'String Ensemble 2', 'Synth Strings 1', 'Synth Strings 2',
-    'Choir Aahs', 'Voice Oohs', 'Synth Voice', 'Orchestra Hit',
-    'Trumpet', 'Trombone', 'Tuba', 'Muted Trumpet',
-    'French Horn', 'Brass Section', 'Synth Brass 1', 'Synth Brass 2',
-    'Soprano Sax', 'Alto Sax', 'Tenor Sax', 'Baritone Sax',
-    'Oboe', 'English Horn', 'Bassoon', 'Clarinet',
-    'Piccolo', 'Flute', 'Recorder', 'Pan Flute',
-    'Blown Bottle', 'Shakuhachi', 'Whistle', 'Ocarina',
-    'Lead 1 (square)', 'Lead 2 (sawtooth)', 'Lead 3 (calliope)', 'Lead 4 (chiff)',
-    'Lead 5 (charang)', 'Lead 6 (voice)', 'Lead 7 (fifths)', 'Lead 8 (bass + lead)',
-    'Pad 1 (new age)', 'Pad 2 (warm)', 'Pad 3 (polysynth)', 'Pad 4 (choir)',
-    'Pad 5 (bowed)', 'Pad 6 (metallic)', 'Pad 7 (halo)', 'Pad 8 (sweep)',
-    'FX 1 (rain)', 'FX 2 (soundtrack)', 'FX 3 (crystal)', 'FX 4 (atmosphere)',
-    'FX 5 (brightness)', 'FX 6 (goblins)', 'FX 7 (echoes)', 'FX 8 (sci-fi)',
-    'Sitar', 'Banjo', 'Shamisen', 'Koto',
-    'Kalimba', 'Bag pipe', 'Fiddle', 'Shanai',
-    'Tinkle Bell', 'Agogo', 'Steel Drums', 'Woodblock',
-    'Taiko Drum', 'Melodic Tom', 'Synth Drum', 'Reverse Cymbal',
-    'Guitar Fret Noise', 'Breath Noise', 'Seashore', 'Bird Tweet',
-    'Telephone Ring', 'Helicopter', 'Applause', 'Gunshot',
-]
-
-_GM_NAME_HINTS = [
-    (("bass ", "basso ", "contrabb "), 33), (("chitarr ", "guitar "), 25), (("piano ", "pianof "), 0), (("organ ", "organo "), 19),
-    (("string ", "archi ", "violin ", "cello "), 48), (("pad ",), 89), (("lead ",), 80), (("vox ", "voce ", "vocal ", "choir ", "coro "), 52),
-    (("flaut ", "flute "), 73), (("sax ",), 65), (("trump ", "tromba "), 56), (("tromb ",), 57), (("synth ",), 81),
-]
-
-_MIX_CCS = (7, 10, 11, 91, 93)
-
-def _guess_program(name):
-    low = (name or "").lower()
-    for keys, prog in _GM_NAME_HINTS:
-        if any(k in low for k in keys):
-            return prog
-    return 0
-
-def _extract_instrument_header(track):
-    header = []
-    for msg in track:
-        if msg.type in ('note_on', 'note_off'):
-            break
-        if msg.type == 'program_change':
-            header.append({'type': 'program_change', 'program': msg.program})
-        elif msg.type == 'control_change' and (msg.control in (0, 32) or msg.control in _MIX_CCS):
-            header.append({'type': 'control_change', 'control': msg.control, 'value': msg.value})
-    return header
-
-DRUM_PIECES = [(GM_KICK, 'drum_kick'), (GM_SNARE, 'drum_snare'), (GM_HAT_CLOSED, 'drum_hat'), (GM_CLAP, 'drum_clap')]
-DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap'}
-
-def split_drum_track(tracks):
-    events = tracks.get('drums')
-    if not events:
-        return tracks
-    out = {k: v for k, v in tracks.items() if k != 'drums'}
-    known = {p for p, _k in DRUM_PIECES}
-    for pitch, key in DRUM_PIECES:
-        ev = [e for e in events if e['pitch'] == pitch]
-        if ev:
-            out[key] = ev
-    rest = [e for e in events if e['pitch'] not in known]
-    if rest:
-        out['drums'] = rest
-    return out
 
 GM_ROLE_PROGRAMS = {
     'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38,
@@ -545,7 +532,6 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, root=N
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
     t_tempo.append(mido.MetaMessage('time_signature', numerator=4, denominator=4, time=0))
     
-    # KEY SIGNATURE
     if root is not None and scale is not None:
         key_sig = _compute_key_signature(root, scale)
         t_tempo.append(mido.MetaMessage('key_signature', key=key_sig, time=0))
@@ -684,7 +670,6 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
-    # Calcola durate reali per ogni traccia
     all_notes_with_dur = []
     for events in tracks.values():
         notes = _compute_note_durations(events)
@@ -830,11 +815,11 @@ with col2:
 
 st.markdown("---")
 
-if st.button(" Genera MIDI", type="primary", use_container_width=True):
+if st.button("🚀 Genera MIDI", type="primary", use_container_width=True):
     if not uploaded_file:
         st.error("⚠️ Carica prima un file MIDI!")
     else:
-        with st.spinner(" Generazione in corso..."):
+        with st.spinner("🎼 Generazione in corso..."):
             try:
                 file_bytes = io.BytesIO(uploaded_file.getvalue())
                 notes_data = extract_notes(file_bytes)
@@ -883,7 +868,10 @@ if st.button(" Genera MIDI", type="primary", use_container_width=True):
                     }
                     
                     st.success(f"✅ Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm}, Key: {_compute_key_signature(root, scale)})")
+            except Exception as e:
+                st.error(f"Errore: {str(e)}")
 
+# Mostra risultati da session state (persistono dopo rerun)
 if st.session_state.generated:
     g = st.session_state.generated
     
@@ -901,7 +889,7 @@ if st.session_state.generated:
         )
     with col_dl2:
         st.download_button(
-            label=" Scarica Report TXT",
+            label="📄 Scarica Report TXT",
             data=g['report_text'].encode('utf-8'),
             file_name=f"report_{g['genre']}_{g['mode']}_{g['submode']}.txt",
             mime="text/plain",
