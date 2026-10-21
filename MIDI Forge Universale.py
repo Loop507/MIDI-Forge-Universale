@@ -123,7 +123,6 @@ def snap_to_scale(pitch, root, scale):
 # ================= GENERAZIONE MINIMAL (TECHNO PRO) =================
 
 def generate_minimal(notes_data, g, submode, bars, seed):
-    """Modalità Minimal: 3 tracce (Bass, Arp, Drums) con variazioni Techno reali."""
     random.seed(seed)
     root, scale = extract_dna(notes_data)
     tracks = {'bass': [], 'arp': [], 'drums': []}
@@ -153,7 +152,6 @@ def generate_minimal(notes_data, g, submode, bars, seed):
         is_fill_bar = (bar % 8 == 7)
         is_open_hat_bar = (bar % 4 == 2)
 
-        # Simuliamo le velocity in base alla sezione
         drum_mode = 'kick_hat' if is_intro_outro else 'full'
         kicks, snares, hats, claps = [], [], [], []
         for s in range(16):
@@ -195,7 +193,7 @@ def generate_minimal(notes_data, g, submode, bars, seed):
                         {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
                     ])
                 
-                # Fill di snare/tom alla fine delle frasi (es. rullata di 4 sedicesimi)
+                # Fill di snare/tom alla fine delle frasi
                 if is_fill_bar and p_step >= 12:
                     fill_vel = 70 + (p_step - 12) * 15
                     perc = GM_SNARE if p_step % 2 == 0 else GM_TOM_HIGH
@@ -351,7 +349,6 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
         roles = [('sub_bass', 0, (24, 36)), ('bassline', 1, (36, 48)), ('pad', 2, (48, 60)), ('chords', 3, (55, 67)), ('arp', 4, (60, 72)), ('lead', 5, (67, 79)), ('fx_perc', 6, (72, 84))]
         for role_name, channel, _ in roles: tracks[role_name] = []
         
-        # Semplificazione per multitrack generative: usa la stessa logica base
         for bar in range(bars):
             base_tick = bar * 4 * TICKS_BEAT
             for s in range(16):
@@ -497,9 +494,102 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
 
 def render_midi_player(tracks, bpm):
     all_notes_with_dur = []
-    for events in tracks.values(): all_notes_with_dur.extend(_compute_note_durations(events))
+    for events in tracks.values(): 
+        all_notes_with_dur.extend(_compute_note_durations(events))
+    
     notes_json = json.dumps([{'tick': n['tick'], 'dur': n['dur'], 'pitch': n['pitch'], 'vel': n['vel'], 'channel': n['channel']} for n in all_notes_with_dur])
-    html_player = f"""<!DOCTYPE html><html><head><script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script><style>body{{font-family:-apple-system,BlinkMacSystemFont,sans-serif;margin:0;padding:15px;background:#0e1117;color:#fafafa}}.player{{background:#1a1d23;border-radius:12px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.3)}}.title{{font-size:14px;font-weight:600;margin-bottom:12px}}.controls{{display:flex;gap:10px;align-items:center;margin-bottom:15px}}button{{background:#ff4b4b;color:white;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:600}}button:hover{{background:#ff6b6b}}.status{{font-size:13px;color:#aaa}}</style></head><body><div class="player"><div class="title">Anteprima MIDI (con durate reali)</div><div class="controls"><button id="playBtn" onclick="togglePlay()">Play</button><button onclick="stop()">Stop</button><span class="status" id="status">Pronto - {bpm} BPM</span></div></div><script>const notes={notes_json};let isPlaying=false,synths={{}},scheduledEvents=[];async function togglePlay(){{if(isPlaying){{stop();return}}await Tone.start();try{{const ticksPerSecond=({TICKS_BEAT}*{bpm})/60;for(let ch=0;ch<16;ch++){{if(ch==={DRUM_CH}){{synths[ch]={{kick:new Tone.MembraneSynth().toDestination(),snare:new Tone.NoiseSynth({{noise:{{type:'white'}},envelope:{{attack:0.001,decay:0.2,sustain:0}}}}).toDestination(),hat:new Tone.MetalSynth({{envelope:{{attack:0.001,decay:0.05,release:0.01}},harmonicity:5.1,modulationIndex:32,resonance:4000,octaves:1.5}}).toDestination(),clap:new Tone.NoiseSynth({{noise:{{type:'pink'}},envelope:{{attack:0.001,decay:0.15,sustain:0}}}}).toDestination()}}}}else{{synths[ch]=new Tone.PolySynth(Tone.Synth).toDestination();synths[ch].set({{oscillator:{{type:'triangle'}},envelope:{{attack:0.02,decay:0.3,sustain:0.2,release:0.5}}}})}}}}notes.forEach(note=>{{const timeInSeconds=note.tick/ticksPerSecond,durInSeconds=note.dur/ticksPerSecond;if(note.channel==={DRUM_CH}){{scheduledEvents.push(Tone.getTransport().schedule(time=>{{if(note.pitch==={GM_KICK})synths[{DRUM_CH}].kick.triggerAttackRelease('C1',durInSeconds,time,note.vel/127);else if(note.pitch==={GM_SNARE})synths[{DRUM_CH}].snare.triggerAttackRelease(durInSeconds,time,note.vel/127);else if(note.pitch==={GM_CLAP})synths[{DRUM_CH}].clap.triggerAttackRelease(durInSeconds,time,note.vel/127);else if(note.pitch==={GM_HAT_CLOSED}||note.pitch==={GM_HAT_OPEN})synths[{DRUM_CH}].hat.triggerAttackRelease('C3',durInSeconds,time,note.vel/127)}}},timeInSeconds)))}}else{{const noteName=Tone.Frequency(note.pitch,'midi').toNote();scheduledEvents.push(Tone.getTransport().schedule(time=>{{synths[note.channel].triggerAttackRelease(noteName,durInSeconds,time,note.vel/127)}}},timeInSeconds)))}}}});Tone.getTransport().start();isPlaying=true;document.getElementById('playBtn').textContent='Pause';document.getElementById('status').textContent='In riproduzione...'}}catch(e){{document.getElementById('status').textContent='Errore: '+e.message}}}}function stop(){{Tone.getTransport().stop();scheduledEvents.forEach(id=>Tone.getTransport().clear(id));scheduledEvents=[];isPlaying=false;document.getElementById('playBtn').textContent='Play';document.getElementById('status').textContent='Pronto - {bpm} BPM'}}</script></body></html>"""
+    
+    # F-string con parentesi graffe correttamente raddoppiate per JS/CSS
+    html_player = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+        <style>
+            body {{ font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 15px; background: #0e1117; color: #fafafa; }}
+            .player {{ background: #1a1d23; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }}
+            .title {{ font-size: 14px; font-weight: 600; margin-bottom: 12px; }}
+            .controls {{ display: flex; gap: 10px; align-items: center; margin-bottom: 15px; }}
+            button {{ background: #ff4b4b; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }}
+            button:hover {{ background: #ff6b6b; }}
+            .status {{ font-size: 13px; color: #aaa; }}
+        </style>
+    </head>
+    <body>
+        <div class="player">
+            <div class="title">Anteprima MIDI (con durate reali)</div>
+            <div class="controls">
+                <button id="playBtn" onclick="togglePlay()">Play</button>
+                <button onclick="stop()">Stop</button>
+                <span class="status" id="status">Pronto - {bpm} BPM</span>
+            </div>
+        </div>
+        <script>
+            const notes = {notes_json};
+            let isPlaying = false;
+            let synths = {{}};
+            let scheduledEvents = [];
+            
+            async function togglePlay() {{
+                if (isPlaying) {{ stop(); return; }}
+                await Tone.start();
+                try {{
+                    const ticksPerSecond = ({TICKS_BEAT} * {bpm}) / 60;
+                    for (let ch = 0; ch < 16; ch++) {{
+                        if (ch === {DRUM_CH}) {{
+                            synths[ch] = {{
+                                kick: new Tone.MembraneSynth().toDestination(),
+                                snare: new Tone.NoiseSynth({{ noise: {{ type: 'white' }}, envelope: {{ attack: 0.001, decay: 0.2, sustain: 0 }} }}).toDestination(),
+                                hat: new Tone.MetalSynth({{ envelope: {{ attack: 0.001, decay: 0.05, release: 0.01 }}, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }}).toDestination(),
+                                clap: new Tone.NoiseSynth({{ noise: {{ type: 'pink' }}, envelope: {{ attack: 0.001, decay: 0.15, sustain: 0 }} }}).toDestination()
+                            }};
+                        }} else {{
+                            synths[ch] = new Tone.PolySynth(Tone.Synth).toDestination();
+                            synths[ch].set({{ oscillator: {{ type: 'triangle' }}, envelope: {{ attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.5 }} }});
+                        }}
+                    }}
+                    notes.forEach(note => {{
+                        const timeInSeconds = note.tick / ticksPerSecond;
+                        const durInSeconds = note.dur / ticksPerSecond;
+                        if (note.channel === {DRUM_CH}) {{
+                            scheduledEvents.push(
+                                Tone.getTransport().schedule(time => {{
+                                    if (note.pitch === {GM_KICK}) synths[{DRUM_CH}].kick.triggerAttackRelease('C1', durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_SNARE}) synths[{DRUM_CH}].snare.triggerAttackRelease(durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_CLAP}) synths[{DRUM_CH}].clap.triggerAttackRelease(durInSeconds, time, note.vel / 127);
+                                    else if (note.pitch === {GM_HAT_CLOSED} || note.pitch === {GM_HAT_OPEN}) synths[{DRUM_CH}].hat.triggerAttackRelease('C3', durInSeconds, time, note.vel / 127);
+                                }}, timeInSeconds)
+                            );
+                        }} else {{
+                            const noteName = Tone.Frequency(note.pitch, 'midi').toNote();
+                            scheduledEvents.push(
+                                Tone.getTransport().schedule(time => {{
+                                    synths[note.channel].triggerAttackRelease(noteName, durInSeconds, time, note.vel / 127);
+                                }}, timeInSeconds)
+                            );
+                        }}
+                    }});
+                    Tone.getTransport().start();
+                    isPlaying = true;
+                    document.getElementById('playBtn').textContent = 'Pause';
+                    document.getElementById('status').textContent = 'In riproduzione...';
+                }} catch (e) {{
+                    document.getElementById('status').textContent = 'Errore: ' + e.message;
+                }}
+            }}
+            
+            function stop() {{
+                Tone.getTransport().stop();
+                scheduledEvents.forEach(id => Tone.getTransport().clear(id));
+                scheduledEvents = [];
+                isPlaying = false;
+                document.getElementById('playBtn').textContent = 'Play';
+                document.getElementById('status').textContent = 'Pronto - {bpm} BPM';
+            }}
+        </script>
+    </body>
+    </html>
+    """
     components.html(html_player, height=150)
 
 # ================= INTERFACCIA STREAMLIT =================
@@ -540,7 +630,7 @@ with col2:
             with col_min:
                 minutes = st.number_input("Minuti", min_value=0, max_value=30, value=3)
             with col_sec:
-                seconds = st.number_input("Secondi", min_value=0, max_value=59, value=0) # Step rimosso come richiesto
+                seconds = st.number_input("Secondi", min_value=0, max_value=59, value=0)
             duration_seconds = (minutes * 60) + seconds
             bars = None
     seed = st.number_input("Seed", min_value=1, max_value=99999, value=42)
@@ -561,7 +651,7 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                     final_bpm = g_defaults['bpm_default'] if use_default_bpm else bpm
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
                         raw_bars = (duration_seconds * final_bpm) / 240
-                        final_bars = int(round(raw_bars / 4) * 4) # Arrotonda al multiplo di 4
+                        final_bars = int(round(raw_bars / 4) * 4)  # Arrotonda al multiplo di 4
                         final_bars = max(16, final_bars)
                         st.info(f"Durata calcolata: {final_bars} battute (per coprire ~{duration_seconds} secondi a {final_bpm} BPM)")
                     else:
