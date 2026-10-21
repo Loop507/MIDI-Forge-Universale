@@ -15,7 +15,7 @@ GENRES = {
     'acid': {'bpm_default': 135, 'bars_default': 96, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0, 'struct': (16, 8, 8, 32, 16)},
     'ambient': {'bpm_default': 80, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0, 'struct': (16, 16, 16, 48, 16)},
     'armonico': {'bpm_default': 100, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.7, 'swing': 0.1, 'struct': (8, 8, 8, 24, 8)},
-    'breakcore': {'bpm_default': 200, 'bars_default': 56, 'kick': [1,0,0,1, 0,1,0,0, 1,0,1,0, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,1,0,0, 1,0,0,1], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,1], 'arp_density': 0.8, 'swing': 0.05, 'struct': (8, 8, 8, 16, 8)},
+    'breakcore': {'bpm_default': 200, 'bars_default': 56, 'kick': [1,0,0,1, 0,1,0,0, 1,0,1,0, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,1,0,0, 1,0,0,1], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,1], 'arp_density': 0.8, 'swing': 0.05, 'meter': ['7/8', '7/8', '4/4', '13/8'], 'struct': (8, 8, 8, 16, 8)},
     'commerciale_90s': {'bpm_default': 120, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'arp_density': 0.6, 'swing': 0.08, 'struct': (8, 16, 8, 16, 8)},
     'deep': {'bpm_default': 124, 'bars_default': 96, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.15, 'struct': (16, 8, 8, 32, 16)},
     'disco': {'bpm_default': 122, 'bars_default': 80, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.2, 'struct': (16, 16, 8, 16, 8)},
@@ -26,20 +26,20 @@ GENRES = {
     'elettronico': {'bpm_default': 130, 'bars_default': 88, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0, 'struct': (16, 8, 8, 32, 8)},
     'funk': {'bpm_default': 112, 'bars_default': 60, 'kick': [1,0,0,1, 0,0,0,0, 1,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [2,1,1,1, 2,1,1,1, 2,1,1,1, 2,1,1,1], 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,1,0,0], 'ghost': [0,0,0,1, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.05, 'struct': (8, 16, 4, 16, 8)},
     'glitch': {'bpm_default': 128, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,1, 0,0,0,0, 1,0,0,0], 'arp_density': 0.95, 'swing': 0.1, 'struct': (8, 8, 8, 24, 8)},
-    'harsh_noise': {'bpm_default': 100, 'bars_default': 72, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 1.0, 'swing': 0.0, 'struct': (8, 8, 8, 32, 8)},
+    'harsh_noise': {'bpm_default': 100, 'bars_default': 72, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 1.0, 'swing': 0.0, 'meter': ['7/8', '9/8', '4/4'], 'struct': (8, 8, 8, 32, 8)},
     'hip_hop': {'bpm_default': 92, 'bars_default': 80, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.3, 'swing': 0.2, 'lazy': 0.12, 'struct': (8, 16, 8, 32, 8)},
     'idm': {'bpm_default': 135, 'bars_default': 76, 'kick': [1,0,0,1, 0,1,0,1, 0,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,0,1,0, 1,0,1,0], 'hat': [1]*16, 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.85, 'swing': 0.1, 'struct': (8, 12, 8, 28, 12)},
     'industrial': {'bpm_default': 135, 'bars_default': 80, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.7, 'swing': 0.0, 'struct': (8, 16, 8, 32, 8)},
-    'lowercase': {'bpm_default': 104, 'bars_default': 120, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.05, 'swing': 0.0, 'struct': (16, 24, 8, 40, 16)},
+    'lowercase': {'bpm_default': 104, 'bars_default': 120, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.05, 'swing': 0.0, 'meter': ['17/8'], 'struct': (16, 24, 8, 40, 16)},
     'microsound': {'bpm_default': 90, 'bars_default': 96, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.1, 'swing': 0.0, 'struct': (8, 16, 8, 40, 16)},
     'minimal': {'bpm_default': 126, 'bars_default': 72, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.3, 'swing': 0.0, 'struct': (8, 8, 8, 32, 8)},
     'minimal_techno': {'bpm_default': 130, 'bars_default': 96, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.5, 'swing': 0.0, 'struct': (16, 8, 8, 32, 16)},
-    'minimalismo_ritmico': {'bpm_default': 115, 'bars_default': 96, 'kick': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.05, 'struct': (16, 12, 8, 32, 12)},
-    'noise': {'bpm_default': 120, 'bars_default': 80, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 0.9, 'swing': 0.0, 'struct': (8, 8, 8, 40, 8)},
+    'minimalismo_ritmico': {'bpm_default': 115, 'bars_default': 96, 'kick': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.05, 'meter': ['11/8', '11/8', '15/8', '15/8'], 'struct': (16, 12, 8, 32, 12)},
+    'noise': {'bpm_default': 120, 'bars_default': 80, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 0.9, 'swing': 0.0, 'meter': ['29/16', '4/4'], 'struct': (8, 8, 8, 40, 8)},
     'onkyo': {'bpm_default': 50, 'bars_default': 128, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.02, 'swing': 0.0, 'struct': (16, 24, 8, 40, 24)},
     'r&b': {'bpm_default': 95, 'bars_default': 80, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'arp_density': 0.55, 'swing': 0.2, 'lazy': 0.12, 'struct': (12, 16, 8, 24, 8)},
     'reggaeton': {'bpm_default': 95, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,1,0, 0,1,0,0, 0,0,1,0, 0,1,0,0], 'clap': [0]*16, 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.0, 'struct': (8, 8, 8, 24, 8)},
-    'sperimentale': {'bpm_default': 100, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.7, 'swing': 0.1, 'struct': (8, 16, 8, 24, 12)},
+    'sperimentale': {'bpm_default': 100, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.7, 'swing': 0.1, 'meter': ['5/16', '7/16', '4/4'], 'struct': (8, 16, 8, 24, 12)},
     'soul': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.25, 'lazy': 0.08, 'struct': (4, 16, 8, 16, 12)},
     'synthpop': {'bpm_default': 120, 'bars_default': 64, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.75, 'swing': 0.0, 'struct': (8, 16, 8, 16, 8)},
     'techno': {'bpm_default': 132, 'bars_default': 152, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0, 'struct': (32, 16, 8, 48, 16)},
@@ -176,6 +176,48 @@ def compute_structure(bars, struct=None):
     sections.append(('outro', pos, bars - pos))
     return bars, sections
 
+# ================= METRI (battuta = N sedicesimi raggruppati) =================
+# chiave -> ((numeratore, denominatore) MIDI, raggruppamento in sedicesimi). Il pattern a 16 step del genere viene
+# "piegato" sul raggruppamento: ogni gruppo prende i 4 step di un battito del 4/4 (+ i primi step del battito dopo).
+METERS = {
+    '4/4':   ((4, 4),   [4, 4, 4, 4]),
+    '5/16':  ((5, 16),  [3, 2]),
+    '7/16':  ((7, 16),  [4, 3]),
+    '7/8':   ((7, 8),   [4, 4, 6]),
+    '9/8':   ((9, 8),   [4, 4, 4, 6]),
+    '11/8':  ((11, 8),  [6, 6, 6, 4]),
+    '13/8':  ((13, 8),  [6, 6, 6, 4, 4]),
+    '15/8':  ((15, 8),  [6, 6, 6, 6, 6]),
+    '17/8':  ((17, 8),  [6, 6, 6, 6, 10]),     # 3+3+3+3+5 (ottavi)
+    '29/16': ((29, 16), [5, 6, 6, 6, 6]),
+}
+
+def plan_meter(g, bars, odd=True):
+    """Una voce per battuta: start (tick), L (sedicesimi), idx (step -> indice nel pattern a 16), gstarts, ends, sig, key.
+    odd=False forza il 4/4 (usato quando si riarrangia un MIDI esistente, che e' in 4/4)."""
+    keys = g.get('meter', ['4/4']) if odd else ['4/4']
+    q, plan, pos = TICKS_BEAT // 4, [], 0
+    for b in range(bars):
+        key = keys[b % len(keys)]
+        sig, groups = METERS[key]
+        idx, gstarts, ends, c = [], [], [], 0
+        for gi, gs in enumerate(groups):
+            gstarts.append(c)
+            idx += [(gi * 4 + j) % 16 for j in range(gs)]
+            c += gs; ends.append(c)
+        plan.append({'start': pos, 'L': c, 'idx': idx, 'gstarts': gstarts, 'ends': ends, 'sig': sig, 'key': key})
+        pos += c * q
+    return plan
+
+def uses_odd_meter(mode, submode, has_notes):
+    """Metri dispari solo dove la musica e' generata: non nel Remix (extract) ne' in Faithful, che seguono le battute del MIDI originale (4/4)."""
+    if mode == 'minimal': return not (submode == 'extract' and has_notes)
+    return submode == 'generative'
+
+def avg_bar_sixteenths(g, odd=True):
+    keys = g.get('meter', ['4/4']) if odd else ['4/4']
+    return sum(sum(METERS[k][1]) for k in keys) / len(keys)
+
 def section_map(sections, bars):
     """Per ogni battuta: (sezione, indice nella sezione, lunghezza sezione)."""
     return [(name, i, length) for name, _s, length in sections for i in range(length)][:bars]
@@ -218,15 +260,18 @@ def _fold(p, lo=60, hi=83):
 
 # ================= BATTERIA (condivisa) =================
 
-def build_drum_events(g, secmap):
+def build_drum_events(g, secmap, bm=None):
     """Il ritmo non si ferma mai. INTRO/OUTRO/BREAK: kick + hat (nei break la melodia entra sopra il groove, senza snare/clap).
     BUILD-UP: kick + rullata di snare crescente. DROP: kit completo, open-hat, fill ogni 8 battute, percussioni."""
     if is_drumless(g): return []
     ev, q, R = [], TICKS_BEAT // 4, random.randint
+    bm = bm or plan_meter(g, len(secmap), False)
     snare_p, clap_p = g.get('snare', [0] * 16), g.get('clap', [0] * 16)
     ghost_p, lazy = g.get('ghost', [0] * 16), int(g.get('lazy', 0) * (TICKS_BEAT // 4))   # snare dietro la griglia (hip hop, R&B, soul)
     for bar, (sec, idx, length) in enumerate(secmap):
-        base = bar * 4 * TICKS_BEAT
+        m = bm[bar]; base, L, pi, gst = m['start'], m['L'], m['idx'], set(m['gstarts'])
+        strong = {0, 8} if L == 16 else {0}
+        open_steps = {e - 2 for e in m['ends'][1::2]}
         edge = sec in ('intro', 'outro')
         drop = sec == 'drop'
         fill_bar = drop and idx % 8 == 7
@@ -235,40 +280,41 @@ def build_drum_events(g, secmap):
         in_roll = sec == 'build' and idx >= length - roll_bars
         rr = idx - (length - roll_bars)
         roll_skip = [4, 2, 2, 1][-roll_bars:][rr] if in_roll else 0
-        for s in range(16):
+        for s in range(L):
+            p = pi[s]
             tick = base + s * q
             sw = int(g['swing'] * q) if s % 2 == 1 else 0
             # KICK (solo dove il pattern del genere lo prevede)
-            if g['kick'][s]:
-                if sec not in ('build', 'drop'): vel = (110 + R(0, 5)) if s % 4 == 0 else (95 + R(0, 10))
-                else:    vel = (120 + R(0, 5)) if s % 4 == 0 else (100 + R(0, 10))
-                if s in (0, 8): vel += 10
+            if g['kick'][p]:
+                if sec not in ('build', 'drop'): vel = (110 + R(0, 5)) if s in gst else (95 + R(0, 10))
+                else:    vel = (120 + R(0, 5)) if s in gst else (100 + R(0, 10))
+                if s in strong: vel += 10
                 _note(ev, tick, q // 2, GM_KICK, vel, DRUM_CH)
             # HI-HAT (open-hat sui levare nel drop per dare respiro)
-            if g['hat'][s]:
+            if g['hat'][p]:
                 if edge: hv = 65 + R(0, 15)
                 elif sec in ('build', 'drop'): hv = 75 + R(0, 20)
                 else: hv = 58 + R(0, 14)
-                hv += {2: 18, 3: -28}.get(g['hat'][s], 0)    # 2 = accento, 3 = ghost
+                hv += {2: 18, 3: -28}.get(g['hat'][p], 0)    # 2 = accento, 3 = ghost
                 if hv:
-                    op = open_bar and s in (6, 14)
+                    op = open_bar and s in open_steps
                     _note(ev, tick + sw, (TICKS_BEAT // 2) if op else q // 2,
                           GM_HAT_OPEN if op else GM_HAT_CLOSED, hv + (15 if op else 0), DRUM_CH)
             # SNARE / CLAP / FILL / PERCUSSIONI
             if drop:
-                if fill_bar and s >= 12:
-                    _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - 12) * 15, DRUM_CH)
+                if fill_bar and s >= L - 4:
+                    _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - (L - 4)) * 15, DRUM_CH)
                 else:
-                    if snare_p[s]: _note(ev, tick + sw + lazy, q // 2, GM_SNARE, 105 + R(0, 10), DRUM_CH)
-                    elif ghost_p[s] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 28 + R(0, 16), DRUM_CH)
-                    if clap_p[s]:  _note(ev, tick + sw + lazy, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
+                    if snare_p[p]: _note(ev, tick + sw + lazy, q // 2, GM_SNARE, 105 + R(0, 10), DRUM_CH)
+                    elif ghost_p[p] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 28 + R(0, 16), DRUM_CH)
+                    if clap_p[p]:  _note(ev, tick + sw + lazy, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
                     if s % 2 == 1 and random.random() < 0.15:
                         _note(ev, tick + sw, q // 2, GM_RIMSHOT if random.random() < 0.5 else GM_TOM_HIGH, 50 + R(0, 40), DRUM_CH)
             elif sec == 'build':
                 if in_roll:
                     if s % roll_skip == 0:
-                        _note(ev, tick, q // 2, GM_SNARE, 55 + int(70 * (rr * 16 + s) / (roll_bars * 16)), DRUM_CH)
-                elif snare_p[s]:
+                        _note(ev, tick, q // 2, GM_SNARE, 55 + int(70 * (rr * L + s) / (roll_bars * L)), DRUM_CH)
+                elif snare_p[p]:
                     _note(ev, tick + sw, q // 2, GM_SNARE, 80 + R(0, 10), DRUM_CH)
             elif not edge and idx >= length // 2 and s % 2 == 1 and random.random() < 0.10:
                 _note(ev, tick + sw, q // 2, GM_RIMSHOT, 45 + R(0, 20), DRUM_CH)
@@ -306,9 +352,10 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
     q, bt = TICKS_BEAT // 4, 4 * TICKS_BEAT
     root, scale = dna or extract_dna(notes_data)
     n = len(scale)
-    tracks = {'bass': [], 'arp': [], 'drums': build_drum_events(g, secmap)}
-    bass_gap = _gaps([s for s in range(16) if g['bass'][s]]) if any(g['bass']) else {}
     remix = (submode == 'extract') and bool(notes_data)
+    bm = plan_meter(g, bars, not remix)
+    tracks = {'bass': [], 'arp': [], 'drums': build_drum_events(g, secmap, bm)}
+    bass_gap = _gaps([s for s in range(16) if g['bass'][s]]) if any(g['bass']) else {}
 
     if remix:
         pools, first_b, last_b = _bar_pools(notes_data)
@@ -328,7 +375,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
     for bar, (sec, idx, length) in enumerate(secmap):
         mel = eff_section(sec, drumless)
         if mel in ('intro', 'outro'): continue
-        base = bar * bt
+        m = bm[bar]; base, L, pi, gst = m['start'], m['L'], m['idx'], set(m['gstarts'])
         ramp = idx / max(1, length - 1)
         factor = {'break1': 0.5, 'break2': 0.5, 'build': 0.85, 'drop': 1.0}[mel]
         arp_vel = {'break1': 55, 'break2': 55, 'build': 62 + int(18 * ramp), 'drop': 72}[mel]
@@ -342,19 +389,21 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
             elif op == 'invert': motif = list(reversed(motif)); m_cur = motif
             else: m_cur = [None if random.random() < 0.3 else x for x in motif]
 
-        for s in range(16):
+        for s in range(L):
+            p = pi[s]
             tick = base + s * q
             sw = int(g['swing'] * q) if s % 2 == 1 else 0
             t_abs = (ob * bt + s * q) if remix else 0
 
             # BASSO (build-up: solo sui battiti; drop: pattern completo del genere)
-            if mel in ('build', 'drop') and g['bass'][s] and (mel == 'drop' or s % 4 == 0):
+            if mel in ('build', 'drop') and g['bass'][p] and (mel == 'drop' or s in gst):
                 if remix:
                     snd = [p for st, en, p in pool if st <= t_abs < en] or [p for _s, _e, p in pool]
                     pc = min(snd) % 12
                 else:
                     pc = (root + scale[(bass_prog[bar % 4] if random.random() < 0.8 else pick()) % n]) % 12
-                _note(tracks['bass'], tick, bass_gap[s] * q - 15, _bass_pitch(pc), 95 + (5 if s % 4 == 0 else 0), 0)
+                gap = bass_gap[p] if L == 16 else min(bass_gap[p], L - s)
+                _note(tracks['bass'], tick, gap * q - 15, _bass_pitch(pc), 95 + (5 if s in gst else 0), 0)
 
             # SYNTH / ARP
             av = arp_vel + random.randint(0, 8)
@@ -365,8 +414,8 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
                 elif tones and random.random() < g['arp_density'] * 0.5 * factor:
                     _note(tracks['arp'], tick + sw, q - 15, tones[arp_counter % len(tones)], av, 1)
                     arp_counter += 1
-            elif m_cur[s] is not None and random.random() < factor:
-                _note(tracks['arp'], tick + sw, q - 20, _pc_pitch((root + scale[m_cur[s] % n]) % 12, 60), av, 1)
+            elif m_cur[p] is not None and random.random() < factor:
+                _note(tracks['arp'], tick + sw, q - 20, _pc_pitch((root + scale[m_cur[p] % n]) % 12, 60), av, 1)
 
     return {k: v for k, v in tracks.items() if v}, root, scale
 
@@ -478,10 +527,11 @@ def _tame_scale(scale):
     sel = [i for i in ideal if i in scale]
     return sel if len(sel) >= 5 else ideal
 
-def _arrange_generative(g, root, scale, secmap, tracks):
+def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     """GENERATIVE: ignora le note originali, usa solo tonalità/scala (DNA). 7 ruoli + batteria,
     ognuno attivo solo nelle sezioni dove ha senso."""
-    q, bt = TICKS_BEAT // 4, 4 * TICKS_BEAT
+    q = TICKS_BEAT // 4
+    bm = bm or plan_meter(g, len(secmap), False)
     drumless = is_drumless(g)
     scale = _tame_scale(scale)
     n = len(scale)
@@ -498,7 +548,8 @@ def _arrange_generative(g, root, scale, secmap, tracks):
     for bar, (sec, idx, length) in enumerate(secmap):
         mel = eff_section(sec, drumless)
         if mel in ('intro', 'outro'): continue
-        base = bar * bt
+        m = bm[bar]; base, L, pi, gstarts = m['start'], m['L'], m['idx'], m['gstarts']
+        gst, bt = set(gstarts), L * q
         if bar % 4 == 0:
             arp_mode = random.choice(['up', 'updown', 'rand'])
             if bar > 0:
@@ -516,19 +567,21 @@ def _arrange_generative(g, root, scale, secmap, tracks):
         if mel == 'drop' or (mel == 'build' and half):
             _note(tracks['sub_bass'], base, bt - 20, _pc_pitch(rpc, 24), 100, 0)
             # BASSLINE: pattern del genere (build: solo sui battiti)
-            for s in bass_steps:
-                if mel == 'build' and s % 4: continue
+            for s in range(L):
+                if not g['bass'][pi[s]]: continue
+                if mel == 'build' and s not in gst: continue
                 pc = rpc if random.random() < 0.8 else random.choice(cpcs[1:])
-                _note(tracks['bassline'], base + s * q, bass_gap[s] * q - 15, _pc_pitch(pc, 36), 95 + (5 if s % 4 == 0 else 0), 1)
+                gap = bass_gap[pi[s]] if L == 16 else min(bass_gap[pi[s]], L - s)
+                _note(tracks['bassline'], base + s * q, gap * q - 15, _pc_pitch(pc, 36), 95 + (5 if s in gst else 0), 1)
 
         # PAD: accordo lungo in tutte le sezioni melodiche
         pad_vel = {'break1': 50, 'break2': 55, 'build': 55 + int(15 * ramp), 'drop': 62}[mel]
         for pc in cpcs: _note(tracks['pad'], base, bt - 10, _pc_pitch(pc, 48), pad_vel, 2)
 
         # CHORDS: stab sui levare (drop), sui battiti (build), accordi lunghi (break 2)
-        if mel == 'drop': c_steps, c_dur, c_vel = [2, 6, 10, 14], q + q // 2, 80
-        elif mel == 'build': c_steps, c_dur, c_vel = [0, 4, 8, 12], q * 2, 65 + int(25 * ramp)
-        elif mel == 'break2': c_steps, c_dur, c_vel = [0, 8], 2 * TICKS_BEAT - 20, 58
+        if mel == 'drop': c_steps, c_dur, c_vel = [x + 2 for x in gstarts if x + 2 < L], q + q // 2, 80
+        elif mel == 'build': c_steps, c_dur, c_vel = list(gstarts), q * 2, 65 + int(25 * ramp)
+        elif mel == 'break2': c_steps, c_dur, c_vel = [gstarts[0], gstarts[len(gstarts) // 2]], 2 * TICKS_BEAT - 20, 58
         else: c_steps, c_dur, c_vel = [], 0, 0
         for s in c_steps:
             if mel == 'drop' and random.random() > 0.85: continue
@@ -538,13 +591,13 @@ def _arrange_generative(g, root, scale, secmap, tracks):
         tones = sorted(_pc_pitch(pc, 60) + 12 * k for pc in cpcs for k in (0, 1))
         factor = {'break1': 0.5, 'break2': 0.5, 'build': 0.85 + 0.15 * ramp, 'drop': 1.0}[mel]
         a_vel = {'break1': 52, 'break2': 52, 'build': 58 + int(20 * ramp), 'drop': 72}[mel]
-        L = len(tones)
-        for s in range(16):
+        NT = len(tones)
+        for s in range(L):
             if random.random() < min(1.0, g['arp_density'] * factor):
-                if arp_mode == 'up': i = s % L
+                if arp_mode == 'up': i = s % NT
                 elif arp_mode == 'updown':
-                    k = s % (2 * (L - 1)); i = k if k < L else 2 * (L - 1) - k
-                else: i = random.randrange(L)
+                    k = s % (2 * (NT - 1)); i = k if k < NT else 2 * (NT - 1) - k
+                else: i = random.randrange(NT)
                 sw = int(g['swing'] * q) if s % 2 == 1 else 0
                 _note(tracks['arp'], base + s * q + sw, q - 10, tones[i], a_vel + R(0, 8), 4)
 
@@ -552,10 +605,13 @@ def _arrange_generative(g, root, scale, secmap, tracks):
         l_steps = [s for s, v in enumerate(lead) if v is not None]
         if mel in ('drop', 'break2') and l_steps:
             gaps = _gaps(l_steps)
-            for s in l_steps:
-                if mel == 'break2' and s % 4: continue
-                du = gaps[s] * q - 10 if mel == 'drop' else 2 * TICKS_BEAT - 10
-                _note(tracks['lead'], base + s * q, du, _pc_pitch(pc_of(lead[s]), 67), 88 if mel == 'drop' else 70, 5)
+            for s in range(L):
+                lp = pi[s]
+                if lead[lp] is None: continue
+                if mel == 'break2' and s not in gst: continue
+                gp = gaps[lp] if L == 16 else min(gaps[lp], L - s)
+                du = gp * q - 10 if mel == 'drop' else 2 * TICKS_BEAT - 10
+                _note(tracks['lead'], base + s * q, du, _pc_pitch(pc_of(lead[lp]), 67), 88 if mel == 'drop' else 70, 5)
 
         # FX: impatto a inizio sezione + riser nelle ultime 2 battute del build-up
         if idx == 0:
@@ -563,7 +619,7 @@ def _arrange_generative(g, root, scale, secmap, tracks):
         riser = min(2, length)
         if mel == 'build' and idx >= length - riser:
             k0 = (idx - (length - riser)) * 8
-            for k, s in enumerate(range(0, 16, 2)):
+            for k, s in enumerate([int(x * L / 8) for x in range(8)]):
                 j = k0 + k
                 _note(tracks['fx_perc'], base + s * q, q * 2 - 10,
                       _pc_pitch(root, 60) + scale[j % n] + 12 * (j // n), 60 + int(50 * (j + 1) / (riser * 8)), 6)
@@ -572,6 +628,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
     random.seed(seed)
     bars, sections = compute_structure(bars, g.get('struct'))
     secmap = section_map(sections, bars)
+    bm = plan_meter(g, bars, submode != 'faithful')
     mid = mido.MidiFile(file=mid_file_bytes)
     all_notes = notes_from_midi(mid)
     if not all_notes:
@@ -581,8 +638,8 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
     if submode == 'faithful':
         _arrange_faithful(mid, all_notes, g, secmap, tracks, headers, root, scale)
     else:
-        _arrange_generative(g, root, scale, secmap, tracks)
-    drums = build_drum_events(g, secmap)
+        _arrange_generative(g, root, scale, secmap, tracks, bm)
+    drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
     if split_drums and 'drums' in tracks:
@@ -596,8 +653,9 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     bars, sections = compute_structure(bars, g.get('struct'))
     secmap = section_map(sections, bars)
     tracks, headers = {}, {}
-    _arrange_generative(g, root, scale, secmap, tracks)
-    drums = build_drum_events(g, secmap)
+    bm = plan_meter(g, bars, True)
+    _arrange_generative(g, root, scale, secmap, tracks, bm)
+    drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
     if split_drums and 'drums' in tracks: tracks = split_drum_track(tracks)
@@ -631,7 +689,7 @@ def _events_to_notes(events):
     cleaned_all.sort(key=lambda x: (x[0], x[2]))
     return cleaned_all
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None):
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -643,14 +701,21 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
     total_end = max((nt[1] for _, notes in notes_by_track.values() for nt in notes), default=0)
     t_tempo = mido.MidiTrack()
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
-    t_tempo.append(mido.MetaMessage('time_signature', numerator=4, denominator=4, time=0))
+    ts_changes, prev_sig = [], None
+    for m in (meter_plan or []):
+        if m['sig'] != prev_sig: ts_changes.append((m['start'], m['sig'])); prev_sig = m['sig']
+    if not ts_changes: ts_changes = [(0, (4, 4))]
+    t_tempo.append(mido.MetaMessage('time_signature', numerator=ts_changes[0][1][0], denominator=ts_changes[0][1][1], time=0))
     if key_name:
         try: t_tempo.append(mido.MetaMessage('key_signature', key=key_name, time=0))
         except ValueError: pass
     if label:
         text = ("MIDI Forge - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
         t_tempo.append(mido.MetaMessage('marker', text=text, time=0))
-    t_tempo.append(mido.MetaMessage('end_of_track', time=total_end))
+    last = 0
+    for tk, (nu, de) in ts_changes[1:]:
+        t_tempo.append(mido.MetaMessage('time_signature', numerator=nu, denominator=de, time=tk - last)); last = tk
+    t_tempo.append(mido.MetaMessage('end_of_track', time=max(0, total_end - last)))
     mid.tracks.append(t_tempo)
 
     used_names = Counter()
@@ -699,14 +764,21 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
     buf.seek(0)
     return buf
 
-def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename):
+def _meter_line(meter_plan):
+    if not meter_plan: return "   4/4 (tutto il brano)"
+    c = Counter(m['key'] for m in meter_plan)
+    if len(c) == 1: return f"   {next(iter(c))} (tutto il brano)"
+    return "   Ciclo: " + " | ".join(f"{k} x{n}" for k, n in c.items()) + "  (cambi di time signature scritti nel MIDI)"
+
+def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename, meter_plan=None):
     report = ["=" * 60, "MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE", "=" * 60, "", "DATA E ORA", f"   Generato il: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", "", "PARAMETRI GENERAZIONE", f"   File originale: {original_filename}", f"   Modalità: {mode.upper()}", f"   Sotto-modalità: {submode.upper()}", f"   Genere: {genre.upper()}", f"   Seed: {seed}", f"   BPM: {bpm}", f"   Battute: {bars}"]
     if duration_mode == "Minuti:Secondi" and duration_seconds:
         report.append(f"   Durata target: {duration_seconds // 60}:{duration_seconds % 60:02d}")
-    duration_actual = (bars * 4 * 60) / bpm
-    report.extend([f"   Durata effettiva: {int(duration_actual)}:{int((duration_actual - int(duration_actual)) * 60):02d}", "", "ANALISI TONALE", f"   Tonica rilevata: {NOTE_NAMES[root]}", f"   Scala: {' - '.join([NOTE_NAMES[(root + i) % 12] for i in scale])}", f"   Intervalli: {scale}", ""])
+    total_q = sum(m['L'] for m in meter_plan) if meter_plan else bars * 16
+    duration_actual = (total_q / 4 * 60) / bpm
+    report.extend([f"   Durata effettiva: {int(duration_actual)}:{int((duration_actual - int(duration_actual)) * 60):02d}", "", "METRO", _meter_line(meter_plan), "", "ANALISI TONALE", f"   Tonica rilevata: {NOTE_NAMES[root]}", f"   Scala: {' - '.join([NOTE_NAMES[(root + i) % 12] for i in scale])}", f"   Intervalli: {scale}", ""])
     g = GENRES[genre]
-    report.extend(["PATTERN RITMICI (1 sedicesimi)", f"   Kick (GM 36):  {''.join(['#' if x else '.' for x in g['kick']])}", f"   Snare (GM 38): {''.join(['#' if x else '.' for x in g.get('snare', [0]*16)])}"])
+    report.extend(["PATTERN RITMICI (16 step, adattati ai gruppi del metro)", f"   Kick (GM 36):  {''.join(['#' if x else '.' for x in g['kick']])}", f"   Snare (GM 38): {''.join(['#' if x else '.' for x in g.get('snare', [0]*16)])}"])
     if 'clap' in g: report.append(f"   Clap (GM 39):  {''.join(['#' if x else '.' for x in g['clap']])}")
     report.extend([f"   Hat (GM 42):   {''.join('.' if not x else ('+' if x == 3 else '#') for x in g['hat'])}  (+ = ghost)", f"   Bass:          {''.join(['#' if x else '.' for x in g['bass']])}", f"   Ghost snare: {''.join(['#' if x else '.' for x in g.get('ghost', [0]*16)])}", f"   Swing: {g['swing'] * 100:.0f}%", f"   Densità Arp: {g['arp_density'] * 100:.0f}%", "", "STRUTTURA BRANO (DJ-Friendly)", _structure_line(bars, g.get('struct')), "", "TRACCE OUTPUT"])
     track_idx = 1
@@ -852,6 +924,8 @@ with col2:
     genre = st.selectbox("Genere Musicale", genre_list, index=genre_list.index("techno"))
     g_defaults = GENRES[genre]
     st.caption('Struttura tipica:' + _structure_line(g_defaults['bars_default'], g_defaults.get('struct')))
+    if g_defaults.get('meter'):
+        st.caption('Metro: ' + ' | '.join(g_defaults['meter']) + ' (ciclo per battuta). Con Remix/Faithful resta 4/4, come il MIDI originale.')
     col_bpm1, col_bpm2 = st.columns(2)
     with col_bpm1:
         use_default_bpm = st.checkbox("BPM Automatico", value=True)
@@ -896,7 +970,8 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                 else:
                     final_bpm = g_defaults['bpm_default'] if use_default_bpm else bpm
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
-                        raw_bars = (duration_seconds * final_bpm) / 240
+                        odd_ok = uses_odd_meter(mode, submode, bool(notes_data))
+                        raw_bars = (duration_seconds * final_bpm) / 60 * 4 / avg_bar_sixteenths(g_defaults, odd_ok)
                         final_bars = int(round(raw_bars / 4) * 4)  # Arrotonda al multiplo di 4
                         final_bars = max(16, final_bars)
                         st.info(f"Durata calcolata: {final_bars} battute (per coprire ~{duration_seconds} secondi a {final_bpm} BPM)")
@@ -922,8 +997,9 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                             st.info(f"Durata allineata: {final_bars} battute (richieste: {requested_bars})")
 
                     label = f"{genre} - {mode}/{submode}"
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale))
-                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name)
+                    meter_plan = plan_meter(g_defaults, final_bars, uses_odd_meter(mode, submode, bool(notes_data)))
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan)
+                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan)
 
                     st.session_state.generated = {
                         'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
