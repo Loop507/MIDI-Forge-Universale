@@ -49,6 +49,8 @@ GENRES = {
 }
 
 NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+SCALES = {'Minore naturale': [0,2,3,5,7,8,10], 'Maggiore': [0,2,4,5,7,9,11], 'Dorico': [0,2,3,5,7,9,10], 'Frigio': [0,1,3,5,7,8,10],
+          'Misolidio': [0,2,4,5,7,9,10], 'Minore armonica': [0,2,3,5,7,8,11], 'Pentatonica minore': [0,3,5,7,10]}
 TICKS_BEAT = 480
 
 # ================= STANDARD GENERAL MIDI =================
@@ -209,7 +211,7 @@ def _fold(p, lo=60, hi=83):
 # ================= BATTERIA (condivisa) =================
 
 def build_drum_events(g, secmap):
-    """INTRO/OUTRO: kick + hat. BREAK: niente kick/snare, hat leggeri nella 2a metà.
+    """Il ritmo non si ferma mai. INTRO/OUTRO/BREAK: kick + hat (nei break la melodia entra sopra il groove, senza snare/clap).
     BUILD-UP: kick + rullata di snare crescente. DROP: kit completo, open-hat, fill ogni 8 battute, percussioni."""
     if is_drumless(g): return []
     ev, q, R = [], TICKS_BEAT // 4, random.randint
@@ -228,8 +230,8 @@ def build_drum_events(g, secmap):
             tick = base + s * q
             sw = int(g['swing'] * q) if s % 2 == 1 else 0
             # KICK (solo dove il pattern del genere lo prevede)
-            if g['kick'][s] and (edge or sec in ('build', 'drop')):
-                if edge: vel = (110 + R(0, 5)) if s % 4 == 0 else (95 + R(0, 10))
+            if g['kick'][s]:
+                if sec not in ('build', 'drop'): vel = (110 + R(0, 5)) if s % 4 == 0 else (95 + R(0, 10))
                 else:    vel = (120 + R(0, 5)) if s % 4 == 0 else (100 + R(0, 10))
                 if s in (0, 8): vel += 10
                 _note(ev, tick, q // 2, GM_KICK, vel, DRUM_CH)
@@ -237,8 +239,7 @@ def build_drum_events(g, secmap):
             if g['hat'][s]:
                 if edge: hv = 65 + R(0, 15)
                 elif sec in ('build', 'drop'): hv = 75 + R(0, 20)
-                elif idx >= length // 2: hv = 42 + R(0, 12)
-                else: hv = 0
+                else: hv = 58 + R(0, 14)
                 if hv:
                     op = open_bar and s in (6, 14)
                     _note(ev, tick + sw, (TICKS_BEAT // 2) if op else q // 2,
@@ -283,7 +284,7 @@ def _pool_at(pools, first, last, ob):
         b = b - 1 if b > first else last
     return ob, []
 
-def generate_minimal(notes_data, g, submode, bars, seed):
+def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
     """extract  = REMIX: riarrangia il MIDI originale (stesse armonie/melodia) sul groove del genere.
        generate = NUOVO TEMA: compone basso e motivo nuovi usando le note (pesate) del MIDI originale.
        Sempre 3 tracce: bass, arp (Synth), drums."""
@@ -292,11 +293,11 @@ def generate_minimal(notes_data, g, submode, bars, seed):
     secmap = section_map(sections, bars)
     drumless = is_drumless(g)
     q, bt = TICKS_BEAT // 4, 4 * TICKS_BEAT
-    root, scale = extract_dna(notes_data)
+    root, scale = dna or extract_dna(notes_data)
     n = len(scale)
     tracks = {'bass': [], 'arp': [], 'drums': build_drum_events(g, secmap)}
     bass_gap = _gaps([s for s in range(16) if g['bass'][s]]) if any(g['bass']) else {}
-    remix = (submode == 'extract')
+    remix = (submode == 'extract') and bool(notes_data)
 
     if remix:
         pools, first_b, last_b = _bar_pools(notes_data)
@@ -304,6 +305,7 @@ def generate_minimal(notes_data, g, submode, bars, seed):
     else:
         counts = Counter(p['pitch'] % 12 for p in notes_data)
         w = [counts.get((root + i) % 12, 0) + 0.5 for i in scale]
+        if not notes_data: w[0] += 2      # da zero: la tonica pesa di più
         pick = lambda: random.choices(range(n), weights=w)[0]
         motif = [pick() if random.random() < g['arp_density'] else None for _ in range(16)]
         while sum(x is not None for x in motif) < 3:      # generi quasi senza densità: il tema deve avere note
@@ -576,6 +578,20 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
         tracks = split_drum_track(tracks)
     return tracks, root, scale, headers, bars
 
+def generate_from_scratch(g, dna, bars, seed, split_drums=True):
+    """Multitraccia generativa senza MIDI originale: tonalità e scala scelte (o random)."""
+    random.seed(seed)
+    root, scale = dna
+    bars, sections = compute_structure(bars)
+    secmap = section_map(sections, bars)
+    tracks, headers = {}, {}
+    _arrange_generative(g, root, scale, secmap, tracks)
+    drums = build_drum_events(g, secmap)
+    if drums: tracks['drums'] = drums
+    tracks = {k: v for k, v in tracks.items() if v}
+    if split_drums and 'drums' in tracks: tracks = split_drum_track(tracks)
+    return tracks, root, scale, headers, bars
+
 def _events_to_notes(events):
     notes = []
     i, n = 0, len(events)
@@ -802,12 +818,22 @@ st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Struttura DJ-
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
-    mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"])
-    if mode == "minimal":
-        submode = st.selectbox("Sotto-modalità", ["extract", "generate"], format_func=lambda x: {"extract": "Remix (riarrangia le note originali)", "generate": "Nuovo tema (dalle note originali)"}[x])
+    source = st.radio("Sorgente", ["Da un MIDI caricato", "Da zero (senza MIDI)"], horizontal=True)
+    scratch = source.startswith("Da zero")
+    if scratch:
+        uploaded_file = None
+        key_choice = st.selectbox("Tonalità", ["Random"] + NOTE_NAMES)
+        scale_choice = st.selectbox("Scala", ["Random"] + list(SCALES.keys()))
+        mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], format_func=lambda x: {"minimal": "Minimal (3 tracce)", "multitrack": "Multitraccia (7+ tracce)"}[x])
+        submode = "generate" if mode == "minimal" else "generative"
     else:
-        submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], format_func=lambda x: {"faithful": "Faithful (fedele all'originale)", "generative": "Generative (solo tonalità, da zero)"}[x])
+        uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
+        mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"])
+        if mode == "minimal":
+            submode = st.selectbox("Sotto-modalità", ["extract", "generate"], format_func=lambda x: {"extract": "Remix (riarrangia le note originali)", "generate": "Nuovo tema (dalle note originali)"}[x])
+        else:
+            submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], format_func=lambda x: {"faithful": "Faithful (fedele all'originale)", "generative": "Generative (solo tonalità, da zero)"}[x])
+    if mode == "multitrack":
         split_drums = st.checkbox("Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True)
 
 with col2:
@@ -837,14 +863,23 @@ with col2:
 st.markdown("---")
 
 if st.button("Genera MIDI", type="primary", use_container_width=True):
-    if not uploaded_file:
+    if not scratch and not uploaded_file:
         st.error("Carica prima un file MIDI!")
     else:
         with st.spinner("Generazione in corso..."):
             try:
-                file_bytes = io.BytesIO(uploaded_file.getvalue())
-                notes_data = extract_notes(file_bytes)
-                if not notes_data:
+                if scratch:
+                    rng = random.Random(seed)
+                    s_root = rng.randrange(12) if key_choice == "Random" else NOTE_NAMES.index(key_choice)
+                    s_name = rng.choice(list(SCALES)) if scale_choice == "Random" else scale_choice
+                    dna, file_bytes, notes_data = (s_root, SCALES[s_name]), None, []
+                    src_name = f"da zero ({NOTE_NAMES[s_root]} {s_name})"
+                else:
+                    dna = None
+                    file_bytes = io.BytesIO(uploaded_file.getvalue())
+                    notes_data = extract_notes(file_bytes)
+                    src_name = uploaded_file.name
+                if not scratch and not notes_data:
                     st.error("Il file MIDI non contiene note melodiche (i canali batteria vengono ignorati).")
                 else:
                     final_bpm = g_defaults['bpm_default'] if use_default_bpm else bpm
@@ -862,25 +897,28 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                         final_bars = norm_bars
 
                     if mode == "minimal":
-                        tracks, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed)
+                        tracks, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed, dna=dna)
                         headers = {}
                     else:
-                        file_bytes.seek(0)
                         requested_bars = final_bars
-                        tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed, split_drums)
+                        if scratch:
+                            tracks, root, scale, headers, final_bars = generate_from_scratch(g_defaults, dna, final_bars, seed, split_drums)
+                        else:
+                            file_bytes.seek(0)
+                            tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed, split_drums)
                         if final_bars != requested_bars:
                             st.info(f"Durata allineata: {final_bars} battute (richieste: {requested_bars})")
 
                     label = f"{genre} - {mode}/{submode}"
                     midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale))
-                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, uploaded_file.name)
+                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name)
 
                     st.session_state.generated = {
                         'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
                         'bars': final_bars, 'bpm': final_bpm, 'midi_bytes': midi_buffer.getvalue(),
                         'report_text': report_text, 'label': label, 'mode': mode,
                         'submode': submode, 'genre': genre, 'duration_mode': duration_mode,
-                        'duration_seconds': duration_seconds, 'original_filename': uploaded_file.name
+                        'duration_seconds': duration_seconds, 'original_filename': src_name
                     }
                     st.success(f"Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm})")
             except Exception as e:
