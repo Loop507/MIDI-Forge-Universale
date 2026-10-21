@@ -69,8 +69,12 @@ def _root_to_key_name(root, is_minor):
 def _is_minor_scale(scale):
     return 3 in scale
 
+_KEY_MAJOR = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B']
+_KEY_MINOR = ['Cm', 'C#m', 'Dm', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'Bbm', 'Bm']
+
 def _compute_key_signature(root, scale):
-    return _root_to_key_name(root, _is_minor_scale(scale))
+    # nomi validi per il meta-evento key_signature di mido
+    return (_KEY_MINOR if _is_minor_scale(scale) else _KEY_MAJOR)[root % 12]
 
 def _compute_note_durations(events):
     pending = {}
@@ -87,17 +91,34 @@ def _compute_note_durations(events):
             del pending[key]
     return notes
 
-def extract_notes(mid_file):
-    notes = []
-    mid = mido.MidiFile(file=mid_file)
+def notes_from_midi(mid):
+    """Note melodiche (canale batteria escluso) con durata; tick scalati a TICKS_BEAT."""
     scale_t = TICKS_BEAT / mid.ticks_per_beat
-    for track in mid.tracks:
-        current_tick = 0
+    out = []
+    for ti, track in enumerate(mid.tracks):
+        t, pending = 0, {}
+
+        def close(key, end):
+            st, vel = pending.pop(key)
+            out.append({'pitch': key[1], 'tick': int(round(st * scale_t)),
+                        'dur': max(1, int(round((end - st) * scale_t))), 'vel': vel, 'track': ti})
+
         for msg in track:
-            current_tick += msg.time
+            t += msg.time
+            if msg.type not in ('note_on', 'note_off') or msg.channel == DRUM_CH:
+                continue
+            key = (msg.channel, msg.note)
             if msg.type == 'note_on' and msg.velocity > 0:
-                notes.append({'pitch': msg.note, 'tick': int(round(current_tick * scale_t)), 'vel': msg.velocity})
-    return notes
+                if key in pending: close(key, t)
+                pending[key] = (t, msg.velocity)
+            elif key in pending:
+                close(key, t)
+        for key in list(pending):
+            close(key, pending[key][0] + mid.ticks_per_beat // 4)
+    return out
+
+def extract_notes(mid_file):
+    return notes_from_midi(mido.MidiFile(file=mid_file))
 
 def extract_dna(notes):
     all_pc, low_pc = Counter(), Counter()
@@ -120,139 +141,221 @@ def snap_to_scale(pitch, root, scale):
     closest = min(scale, key=lambda x: abs(x - note_in_octave))
     return root + (octave * 12) + closest
 
-# ================= GENERAZIONE MINIMAL (TECHNO PRO) =================
+# ================= STRUTTURA DJ-FRIENDLY (condivisa da tutte le modalità) =================
+
+SECTION_LABELS = {'intro': 'INTRO', 'break1': 'BREAK 1', 'build': 'BUILD-UP', 'drop': 'DROP', 'break2': 'BREAK 2', 'outro': 'OUTRO'}
+
+def compute_structure(bars):
+    """Divide il brano in INTRO / BREAK 1 / BUILD-UP / DROP / BREAK 2 / OUTRO (sempre multipli di 4 battute).
+    INTRO e OUTRO sono solo batteria: 8 battute (4 se il brano è molto corto)."""
+    bars = max(16, (int(bars) // 4) * 4)
+    edge = 8 if bars >= 40 else 4
+    units = (bars - 2 * edge) // 4
+    order = ['break1', 'build', 'drop', 'break2']
+    weights = {'break1': 0.17, 'build': 0.17, 'drop': 0.50, 'break2': 0.16}
+    alloc = {k: 0 for k in order}
+    for k in ['drop', 'build', 'break1', 'break2'][:units]:
+        alloc[k] = 1
+    for _ in range(units - sum(alloc.values())):
+        k = max(order, key=lambda x: weights[x] * units - alloc[x])
+        alloc[k] += 1
+    sections, pos = [('intro', 0, edge)], edge
+    for k in order:
+        if alloc[k]:
+            sections.append((k, pos, alloc[k] * 4)); pos += alloc[k] * 4
+    sections.append(('outro', pos, bars - pos))
+    return bars, sections
+
+def section_map(sections, bars):
+    """Per ogni battuta: (sezione, indice nella sezione, lunghezza sezione)."""
+    return [(name, i, length) for name, _s, length in sections for i in range(length)][:bars]
+
+def _structure_line(bars):
+    _, sections = compute_structure(bars)
+    return "   " + " -> ".join(f"[ {SECTION_LABELS[n]} {l} batt. ]" for n, _s, l in sections)
+
+def is_drumless(g):
+    return not (any(g['kick']) or any(g['hat']) or any(g.get('snare', [0] * 16)))
+
+def eff_section(name, drumless):
+    # generi senza batteria (ambient, drone...): intro/outro suonano pad/arp invece del solo drum
+    return 'break1' if drumless and name in ('intro', 'outro') else name
+
+def _note(ev, tick, dur, pitch, vel, ch):
+    pitch = max(0, min(127, int(pitch)))
+    ev.append({'tick': int(tick), 'type': 'on', 'pitch': pitch, 'vel': max(1, min(127, int(vel))), 'channel': ch})
+    ev.append({'tick': int(tick + max(1, int(dur))), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': ch})
+
+def _gaps(steps, size=16, cap=4):
+    steps = sorted(steps)
+    out = {}
+    for i, s in enumerate(steps):
+        gap = (steps[(i + 1) % len(steps)] - s) % size or size
+        out[s] = min(gap, cap)
+    return out
+
+def _pc_pitch(pc, lo):
+    return lo + ((pc - lo) % 12)
+
+def _bass_pitch(pc, lo=28, hi=45):
+    p = _pc_pitch(pc, lo)
+    return p if p <= hi else p - 12
+
+def _fold(p, lo=60, hi=83):
+    while p < lo: p += 12
+    while p > hi: p -= 12
+    return p
+
+# ================= BATTERIA (condivisa) =================
+
+def build_drum_events(g, secmap):
+    """INTRO/OUTRO: kick + hat. BREAK: niente kick/snare, hat leggeri nella 2a metà.
+    BUILD-UP: kick + rullata di snare crescente. DROP: kit completo, open-hat, fill ogni 8 battute, percussioni."""
+    if is_drumless(g): return []
+    ev, q, R = [], TICKS_BEAT // 4, random.randint
+    snare_p, clap_p = g.get('snare', [0] * 16), g.get('clap', [0] * 16)
+    for bar, (sec, idx, length) in enumerate(secmap):
+        base = bar * 4 * TICKS_BEAT
+        edge = sec in ('intro', 'outro')
+        drop = sec == 'drop'
+        fill_bar = drop and idx % 8 == 7
+        open_bar = drop and idx % 4 == 2
+        roll_bars = min(4, length)
+        in_roll = sec == 'build' and idx >= length - roll_bars
+        rr = idx - (length - roll_bars)
+        roll_skip = [4, 2, 2, 1][-roll_bars:][rr] if in_roll else 0
+        for s in range(16):
+            tick = base + s * q
+            sw = int(g['swing'] * q) if s % 2 == 1 else 0
+            # KICK (solo dove il pattern del genere lo prevede)
+            if g['kick'][s] and (edge or sec in ('build', 'drop')):
+                if edge: vel = (110 + R(0, 5)) if s % 4 == 0 else (95 + R(0, 10))
+                else:    vel = (120 + R(0, 5)) if s % 4 == 0 else (100 + R(0, 10))
+                if s in (0, 8): vel += 10
+                _note(ev, tick, q // 2, GM_KICK, vel, DRUM_CH)
+            # HI-HAT (open-hat sui levare nel drop per dare respiro)
+            if g['hat'][s]:
+                if edge: hv = 65 + R(0, 15)
+                elif sec in ('build', 'drop'): hv = 75 + R(0, 20)
+                elif idx >= length // 2: hv = 42 + R(0, 12)
+                else: hv = 0
+                if hv:
+                    op = open_bar and s in (6, 14)
+                    _note(ev, tick + sw, (TICKS_BEAT // 2) if op else q // 2,
+                          GM_HAT_OPEN if op else GM_HAT_CLOSED, hv + (15 if op else 0), DRUM_CH)
+            # SNARE / CLAP / FILL / PERCUSSIONI
+            if drop:
+                if fill_bar and s >= 12:
+                    _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - 12) * 15, DRUM_CH)
+                else:
+                    if snare_p[s]: _note(ev, tick + sw, q // 2, GM_SNARE, 105 + R(0, 10), DRUM_CH)
+                    if clap_p[s]:  _note(ev, tick + sw, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
+                    if s % 2 == 1 and random.random() < 0.15:
+                        _note(ev, tick + sw, q // 2, GM_RIMSHOT if random.random() < 0.5 else GM_TOM_HIGH, 50 + R(0, 40), DRUM_CH)
+            elif sec == 'build':
+                if in_roll:
+                    if s % roll_skip == 0:
+                        _note(ev, tick, q // 2, GM_SNARE, 55 + int(70 * (rr * 16 + s) / (roll_bars * 16)), DRUM_CH)
+                elif snare_p[s]:
+                    _note(ev, tick + sw, q // 2, GM_SNARE, 80 + R(0, 10), DRUM_CH)
+            elif not edge and idx >= length // 2 and s % 2 == 1 and random.random() < 0.10:
+                _note(ev, tick + sw, q // 2, GM_RIMSHOT, 45 + R(0, 20), DRUM_CH)
+    return ev
+
+# ================= GENERAZIONE MINIMAL (3 TRACCE: Bass / Synth / Drums) =================
+
+def _bar_pools(notes):
+    """Note del MIDI originale raggruppate per battuta (incluse quelle che ci passano sopra)."""
+    q, bt = TICKS_BEAT // 4, 4 * TICKS_BEAT
+    pools = {}
+    for n in notes:
+        st = int(round(n['tick'] / q)) * q
+        en = st + max(q, int(round(n['dur'] / q)) * q)
+        b0 = st // bt
+        for b in range(b0, min((en - 1) // bt, b0 + 7) + 1):
+            pools.setdefault(b, []).append((st, en, n['pitch']))
+    return pools, min(pools), max(pools)
+
+def _pool_at(pools, first, last, ob):
+    b = ob
+    for _ in range(last - first + 1):
+        if pools.get(b): return b, pools[b]
+        b = b - 1 if b > first else last
+    return ob, []
 
 def generate_minimal(notes_data, g, submode, bars, seed):
+    """extract  = REMIX: riarrangia il MIDI originale (stesse armonie/melodia) sul groove del genere.
+       generate = NUOVO TEMA: compone basso e motivo nuovi usando le note (pesate) del MIDI originale.
+       Sempre 3 tracce: bass, arp (Synth), drums."""
     random.seed(seed)
+    bars, sections = compute_structure(bars)
+    secmap = section_map(sections, bars)
+    drumless = is_drumless(g)
+    q, bt = TICKS_BEAT // 4, 4 * TICKS_BEAT
     root, scale = extract_dna(notes_data)
-    tracks = {'bass': [], 'arp': [], 'drums': []}
-    
-    if submode == 'extract':
-        notes_by_step = {}
-        for n in notes_data:
-            step = round(n['tick'] / (TICKS_BEAT // 4))
-            if step not in notes_by_step: notes_by_step[step] = []
-            notes_by_step[step].append(n['pitch'])
-    
-    m = [random.randrange(len(scale)) if random.random() < g['arp_density'] else None for _ in range(8)]
-    
-    intro_bars = min(4, max(4, bars // 8))
-    outro_bars = min(4, max(4, bars // 8))
+    n = len(scale)
+    tracks = {'bass': [], 'arp': [], 'drums': build_drum_events(g, secmap)}
+    bass_gap = _gaps([s for s in range(16) if g['bass'][s]]) if any(g['bass']) else {}
+    remix = (submode == 'extract')
 
-    for bar in range(bars):
-        base_tick = bar * 4 * TICKS_BEAT
-        
-        if bar % 4 == 0 and bar > 0:
+    if remix:
+        pools, first_b, last_b = _bar_pools(notes_data)
+        loop_bars = last_b - first_b + 1
+    else:
+        counts = Counter(p['pitch'] % 12 for p in notes_data)
+        w = [counts.get((root + i) % 12, 0) + 0.5 for i in scale]
+        pick = lambda: random.choices(range(n), weights=w)[0]
+        motif = [pick() if random.random() < g['arp_density'] else None for _ in range(16)]
+        while sum(x is not None for x in motif) < 3:      # generi quasi senza densità: il tema deve avere note
+            motif[random.randrange(16)] = pick()
+        m_cur = motif
+        bass_prog = [0, 0, pick(), pick()]
+    arp_counter = 0
+
+    for bar, (sec, idx, length) in enumerate(secmap):
+        mel = eff_section(sec, drumless)
+        if mel in ('intro', 'outro'): continue
+        base = bar * bt
+        ramp = idx / max(1, length - 1)
+        factor = {'break1': 0.5, 'break2': 0.5, 'build': 0.85, 'drop': 1.0}[mel]
+        arp_vel = {'break1': 55, 'break2': 55, 'build': 62 + int(18 * ramp), 'drop': 72}[mel]
+        if remix:
+            ob, pool = _pool_at(pools, first_b, last_b, first_b + idx % loop_bars)
+            bar_tones = sorted({_pc_pitch(p % 12, 60) for _s, _e, p in pool})
+            tones = bar_tones + [t + 12 for t in bar_tones]
+        elif bar % 4 == 0 and bar > 0:
             op = random.choice(['transpose', 'invert', 'drop'])
-            if op == 'transpose': m = [(x + 1) % len(scale) if x is not None else None for x in m]
-            elif op == 'invert': m = list(reversed(m))
-            else: m = [None if random.random() < 0.3 else x for x in m]
-
-        is_intro_outro = (bar < intro_bars or bar >= (bars - outro_bars))
-        is_fill_bar = (bar % 8 == 7)
-        is_open_hat_bar = (bar % 4 == 2)
-
-        drum_mode = 'kick_hat' if is_intro_outro else 'full'
-        kicks, snares, hats, claps = [], [], [], []
-        for s in range(16):
-            is_accent = (s % 4 == 0)
-            if drum_mode == 'kick_hat':
-                kicks.append(110 + random.randint(0, 5) if is_accent else 95 + random.randint(0, 10))
-                hats.append(65 + random.randint(0, 15))
-                snares.append(0); claps.append(0)
-            else:
-                kicks.append(120 + random.randint(0, 5) if is_accent else 100 + random.randint(0, 10))
-                hats.append(75 + random.randint(0, 20))
-                snares.append(105 + random.randint(0, 10))
-                claps.append(90 + random.randint(0, 10))
-        drum_vel = {'kick': kicks, 'snare': snares, 'hat': hats, 'clap': claps}
+            if op == 'transpose': motif = [(x + 1) % n if x is not None else None for x in motif]; m_cur = motif
+            elif op == 'invert': motif = list(reversed(motif)); m_cur = motif
+            else: m_cur = [None if random.random() < 0.3 else x for x in motif]
 
         for s in range(16):
-            tick = base_tick + s * (TICKS_BEAT // 4)
-            p_step = s % 16
-            swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
+            tick = base + s * q
+            sw = int(g['swing'] * q) if s % 2 == 1 else 0
+            t_abs = (ob * bt + s * q) if remix else 0
 
-            # 1. KICK (Accento più forte sul battere 1 e 3 per dare "punch")
-            if drum_vel['kick'][p_step] > 0:
-                vel = drum_vel['kick'][p_step] + 10 if p_step in [0, 8] else drum_vel['kick'][p_step]
-                tracks['drums'].extend([
-                    {'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': min(127, vel), 'channel': DRUM_CH},
-                    {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}
-                ])
-            
-            # 2. SNARE / CLAP (Solo nel corpo del brano)
-            if not is_intro_outro:
-                if drum_vel['snare'][p_step] > 0 and g.get('snare', [0]*16)[p_step]:
-                    tracks['drums'].extend([
-                        {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': drum_vel['snare'][p_step], 'channel': DRUM_CH},
-                        {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}
-                    ])
-                if drum_vel['clap'][p_step] > 0 and g.get('clap', [0]*16)[p_step]:
-                    tracks['drums'].extend([
-                        {'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': drum_vel['clap'][p_step], 'channel': DRUM_CH},
-                        {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}
-                    ])
-                
-                # Fill di snare/tom alla fine delle frasi
-                if is_fill_bar and p_step >= 12:
-                    fill_vel = 70 + (p_step - 12) * 15
-                    perc = GM_SNARE if p_step % 2 == 0 else GM_TOM_HIGH
-                    tracks['drums'].extend([
-                        {'tick': tick, 'type': 'on', 'pitch': perc, 'vel': min(127, fill_vel), 'channel': DRUM_CH},
-                        {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': perc, 'vel': 0, 'channel': DRUM_CH}
-                    ])
-
-            # 3. HI-HAT (con variazione Open/Closed per dare respiro e groove)
-            if drum_vel['hat'][p_step] > 0 and g['hat'][p_step]:
-                hat_pitch = GM_HAT_OPEN if (is_open_hat_bar and p_step in [6, 14]) else GM_HAT_CLOSED
-                hat_vel = drum_vel['hat'][p_step] + 15 if hat_pitch == GM_HAT_OPEN else drum_vel['hat'][p_step]
-                hat_dur = (TICKS_BEAT//2) if hat_pitch == GM_HAT_OPEN else (TICKS_BEAT//4)//2
-                
-                tracks['drums'].extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': hat_pitch, 'vel': min(127, hat_vel), 'channel': DRUM_CH},
-                    {'tick': tick + swing_offset + hat_dur, 'type': 'off', 'pitch': hat_pitch, 'vel': 0, 'channel': DRUM_CH}
-                ])
-                
-            # 4. PERCUSSIONI AGGIUNTIVE (Groove Techno)
-            if not is_intro_outro and p_step % 2 == 1 and random.random() < 0.15:
-                perc_pitch = GM_RIMSHOT if random.random() < 0.5 else GM_TOM_HIGH
-                tracks['drums'].extend([
-                    {'tick': tick + swing_offset, 'type': 'on', 'pitch': perc_pitch, 'vel': 50 + random.randint(0, 40), 'channel': DRUM_CH},
-                    {'tick': tick + swing_offset + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': perc_pitch, 'vel': 0, 'channel': DRUM_CH}
-                ])
-
-            # 5. BASSO & ARP (presenti nel corpo del brano)
-            if not is_intro_outro:
-                if submode == 'extract' and s in notes_by_step:
-                    low_p, high_p = min(notes_by_step[s]), max(notes_by_step[s])
-                    if g['bass'][p_step]:
-                        pitch = max(28, min(snap_to_scale(low_p, root, scale) - 24, 45))
-                        tracks['bass'].extend([
-                            {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
-                            {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
-                        ])
-                    if random.random() < g['arp_density']:
-                        pitch = max(60, snap_to_scale(high_p, root, scale))
-                        tracks['arp'].extend([
-                            {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
-                            {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
-                        ])
+            # BASSO (build-up: solo sui battiti; drop: pattern completo del genere)
+            if mel in ('build', 'drop') and g['bass'][s] and (mel == 'drop' or s % 4 == 0):
+                if remix:
+                    snd = [p for st, en, p in pool if st <= t_abs < en] or [p for _s, _e, p in pool]
+                    pc = min(snd) % 12
                 else:
-                    if g['bass'][p_step]:
-                        idx = 0 if random.random() < 0.8 else random.choice([1, len(scale)-1])
-                        pitch = max(28, min(root - 24 + scale[idx % len(scale)], 45))
-                        tracks['bass'].extend([
-                            {'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 95, 'channel': 0},
-                            {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 0}
-                        ])
-                    if m[s % 8] is not None:
-                        pitch = root + 12 + scale[m[s % 8] % len(scale)]
-                        tracks['arp'].extend([
-                            {'tick': tick + swing_offset, 'type': 'on', 'pitch': pitch, 'vel': 70, 'channel': 1},
-                            {'tick': tick + (TICKS_BEAT//4) - 20, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': 1}
-                        ])
-                        
-    return tracks, root, scale
+                    pc = (root + scale[(bass_prog[bar % 4] if random.random() < 0.8 else pick()) % n]) % 12
+                _note(tracks['bass'], tick, bass_gap[s] * q - 15, _bass_pitch(pc), 95 + (5 if s % 4 == 0 else 0), 0)
+
+            # SYNTH / ARP
+            av = arp_vel + random.randint(0, 8)
+            if remix:
+                onsets = [p for st, en, p in pool if st == t_abs]
+                if onsets and random.random() < (1.0 if mel in ('build', 'drop') else 0.6):
+                    _note(tracks['arp'], tick + sw, q - 15, _fold(max(onsets)), av, 1)
+                elif tones and random.random() < g['arp_density'] * 0.5 * factor:
+                    _note(tracks['arp'], tick + sw, q - 15, tones[arp_counter % len(tones)], av, 1)
+                    arp_counter += 1
+            elif m_cur[s] is not None and random.random() < factor:
+                _note(tracks['arp'], tick + sw, q - 20, _pc_pitch((root + scale[m_cur[s] % n]) % 12, 60), av, 1)
+
+    return {k: v for k, v in tracks.items() if v}, root, scale
 
 # ================= GENERAZIONE MULTITRACK =================
 
@@ -276,106 +379,199 @@ def _guess_program(name):
         if any(k in low for k in keys): return prog
     return 0
 
-DRUM_PIECES = [(GM_KICK, 'drum_kick'), (GM_SNARE, 'drum_snare'), (GM_HAT_CLOSED, 'drum_hat'), (GM_CLAP, 'drum_clap')]
-DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap'}
+DRUM_GROUPS = [('drum_kick', {GM_KICK}), ('drum_snare', {GM_SNARE}), ('drum_hat', {GM_HAT_CLOSED, GM_HAT_OPEN}),
+               ('drum_clap', {GM_CLAP}), ('drum_perc', {GM_RIMSHOT, GM_TOM_HIGH})]
+DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap', 'drum_perc': 'Perc'}
 
 def split_drum_track(tracks):
     events = tracks.get('drums')
     if not events: return tracks
     out = {k: v for k, v in tracks.items() if k != 'drums'}
-    known = {p for p, _k in DRUM_PIECES}
-    for pitch, key in DRUM_PIECES:
-        ev = [e for e in events if e['pitch'] == pitch]
+    known = set()
+    for key, pitches in DRUM_GROUPS:
+        known |= pitches
+        ev = [e for e in events if e['pitch'] in pitches]
         if ev: out[key] = ev
     rest = [e for e in events if e['pitch'] not in known]
     if rest: out['drums'] = rest
     return out
 
+def _arrange_faithful(mid, all_notes, g, secmap, tracks, headers, root, scale):
+    """FAITHFUL: le tracce melodiche originali vengono ri-arrangiate nella struttura DJ
+    (niente note in intro/outro, solo batteria) con swing del genere; la batteria è del nuovo genere."""
+    q, bt, grid = TICKS_BEAT // 4, 4 * TICKS_BEAT, TICKS_BEAT // 16
+    drumless = is_drumless(g)
+    free_channels = [c for c in range(16) if c != DRUM_CH]
+    by_track = {}
+    for nt in all_notes: by_track.setdefault(nt['track'], []).append(nt)
+    prepared = {}
+    for ti, lst in by_track.items():
+        prepared[ti] = [(int(round(nt['tick'] / grid)) * grid, max(grid, int(round(nt['dur'] / grid)) * grid),
+                         snap_to_scale(nt['pitch'], root, scale), nt['vel']) for nt in lst]
+    first_bar = min(st for arr in prepared.values() for st, _d, _p, _v in arr) // bt
+    end = max(st + du for arr in prepared.values() for st, du, _p, _v in arr)
+    loop_bars = max(1, -(-(end - first_bar * bt) // bt))
+    buckets = {ti: {} for ti in prepared}
+    for ti, arr in prepared.items():
+        for st, du, p, v in arr:
+            buckets[ti].setdefault(st // bt - first_bar, []).append((st % bt, du, p, v))
+
+    avg = {ti: sum(p for _s, _d, p, _v in arr) / len(arr) for ti, arr in prepared.items()}
+    bass_t = {ti for ti, a in avg.items() if a < 52}
+    lead_t = ({max(avg, key=avg.get)} - bass_t) if len(avg) >= 3 else set()
+    all_t = set(prepared)
+
+    def active(mel, idx, length):
+        non_bass = all_t - bass_t
+        if mel == 'drop': res = all_t
+        elif mel == 'build': res = non_bass | (bass_t if idx >= length // 2 else set())
+        elif mel == 'break2': res = non_bass
+        else: res = (non_bass - lead_t) or non_bass
+        return res or all_t
+
+    keys = {}
+    for track_idx, ti in enumerate(sorted(prepared)):
+        mt = mid.tracks[ti]
+        name = next((m.name for m in mt if m.type == 'track_name'), None)
+        track_key = (name or '').strip() or f'instrument_{track_idx}'
+        base_key, k = track_key, 2
+        while track_key in tracks or track_key in DRUM_TRACK_NAMES:
+            track_key = f'{base_key} {k}'; k += 1
+        tracks[track_key] = []
+        hd = _extract_instrument_header(mt)
+        if hd: headers[track_key] = hd
+        keys[ti] = (track_key, free_channels[track_idx % len(free_channels)])
+
+    swing = g['swing']
+    for bar, (sec, idx, length) in enumerate(secmap):
+        mel = eff_section(sec, drumless)
+        if mel in ('intro', 'outro'): continue
+        base = bar * bt
+        sec_end = base + (length - idx) * bt
+        ob = idx % loop_bars
+        vf = {'break1': 0.8, 'break2': 0.8, 'build': 0.75 + 0.25 * idx / max(1, length - 1), 'drop': 1.0}[mel]
+        for ti in active(mel, idx, length):
+            key, ch = keys[ti]
+            for rel, du, pitch, vel in buckets[ti].get(ob, ()):
+                st = base + rel
+                if swing and abs(rel % (2 * q) - q) <= grid // 2: st += int(swing * q)
+                du = min(du, sec_end - st)
+                if du > 0: _note(tracks[key], st, du, pitch, vel * vf, ch)
+
+def _tame_scale(scale):
+    """Se il DNA ha troppe note (MIDI cromatico) usa una scala a 7 note vicina a quella rilevata."""
+    if len(scale) <= 8: return scale
+    ideal = [0, 2, 3, 5, 7, 8, 10] if _is_minor_scale(scale) else [0, 2, 4, 5, 7, 9, 11]
+    sel = [i for i in ideal if i in scale]
+    return sel if len(sel) >= 5 else ideal
+
+def _arrange_generative(g, root, scale, secmap, tracks):
+    """GENERATIVE: ignora le note originali, usa solo tonalità/scala (DNA). 7 ruoli + batteria,
+    ognuno attivo solo nelle sezioni dove ha senso."""
+    q, bt = TICKS_BEAT // 4, 4 * TICKS_BEAT
+    drumless = is_drumless(g)
+    scale = _tame_scale(scale)
+    n = len(scale)
+    pc_of = lambda d: (root + scale[d % n]) % 12
+    for role in ('sub_bass', 'bassline', 'pad', 'chords', 'arp', 'lead', 'fx_perc'): tracks[role] = []
+    progs = [[0, 0, 3, 4], [0, 5, 3, 4], [0, 3, 5, 4], [0, 2, 3, 4], [0, 4, 5, 3]]
+    prog_a, prog_b = random.sample(progs, 2)
+    bass_steps = [s for s in range(16) if g['bass'][s]]
+    bass_gap = _gaps(bass_steps) if bass_steps else {}
+    lead_base = [random.randrange(n) if random.random() < 0.45 else None for _ in range(16)]
+    lead = lead_base
+    arp_mode, R = 'up', random.randint
+
+    for bar, (sec, idx, length) in enumerate(secmap):
+        mel = eff_section(sec, drumless)
+        if mel in ('intro', 'outro'): continue
+        base = bar * bt
+        if bar % 4 == 0:
+            arp_mode = random.choice(['up', 'updown', 'rand'])
+            if bar > 0:
+                op = random.choice(['transpose', 'invert', 'drop'])
+                if op == 'transpose': lead_base = [(x + 1) % n if x is not None else None for x in lead_base]; lead = lead_base
+                elif op == 'invert': lead_base = list(reversed(lead_base)); lead = lead_base
+                else: lead = [None if random.random() < 0.3 else x for x in lead_base]
+        d = (prog_a if (bar // 4) % 2 == 0 else prog_b)[bar % 4]
+        cpcs = [pc_of(d), pc_of(d + 2), pc_of(d + 4)]
+        rpc = cpcs[0]
+        ramp = idx / max(1, length - 1)
+        half = idx >= length // 2
+
+        # SUB BASS: una nota lunga per battuta (build 2a metà, drop)
+        if mel == 'drop' or (mel == 'build' and half):
+            _note(tracks['sub_bass'], base, bt - 20, _pc_pitch(rpc, 24), 100, 0)
+            # BASSLINE: pattern del genere (build: solo sui battiti)
+            for s in bass_steps:
+                if mel == 'build' and s % 4: continue
+                pc = rpc if random.random() < 0.8 else random.choice(cpcs[1:])
+                _note(tracks['bassline'], base + s * q, bass_gap[s] * q - 15, _pc_pitch(pc, 36), 95 + (5 if s % 4 == 0 else 0), 1)
+
+        # PAD: accordo lungo in tutte le sezioni melodiche
+        pad_vel = {'break1': 50, 'break2': 55, 'build': 55 + int(15 * ramp), 'drop': 62}[mel]
+        for pc in cpcs: _note(tracks['pad'], base, bt - 10, _pc_pitch(pc, 48), pad_vel, 2)
+
+        # CHORDS: stab sui levare (drop), sui battiti (build), accordi lunghi (break 2)
+        if mel == 'drop': c_steps, c_dur, c_vel = [2, 6, 10, 14], q + q // 2, 80
+        elif mel == 'build': c_steps, c_dur, c_vel = [0, 4, 8, 12], q * 2, 65 + int(25 * ramp)
+        elif mel == 'break2': c_steps, c_dur, c_vel = [0, 8], 2 * TICKS_BEAT - 20, 58
+        else: c_steps, c_dur, c_vel = [], 0, 0
+        for s in c_steps:
+            if mel == 'drop' and random.random() > 0.85: continue
+            for pc in cpcs: _note(tracks['chords'], base + s * q, c_dur, _pc_pitch(pc, 55), c_vel + R(0, 8), 3)
+
+        # ARP sulle note dell'accordo (densità del genere, ridotta nei break)
+        tones = sorted(_pc_pitch(pc, 60) + 12 * k for pc in cpcs for k in (0, 1))
+        factor = {'break1': 0.5, 'break2': 0.5, 'build': 0.85 + 0.15 * ramp, 'drop': 1.0}[mel]
+        a_vel = {'break1': 52, 'break2': 52, 'build': 58 + int(20 * ramp), 'drop': 72}[mel]
+        L = len(tones)
+        for s in range(16):
+            if random.random() < min(1.0, g['arp_density'] * factor):
+                if arp_mode == 'up': i = s % L
+                elif arp_mode == 'updown':
+                    k = s % (2 * (L - 1)); i = k if k < L else 2 * (L - 1) - k
+                else: i = random.randrange(L)
+                sw = int(g['swing'] * q) if s % 2 == 1 else 0
+                _note(tracks['arp'], base + s * q + sw, q - 10, tones[i], a_vel + R(0, 8), 4)
+
+        # LEAD: motivo nel drop, versione rada nel break 2
+        l_steps = [s for s, v in enumerate(lead) if v is not None]
+        if mel in ('drop', 'break2') and l_steps:
+            gaps = _gaps(l_steps)
+            for s in l_steps:
+                if mel == 'break2' and s % 4: continue
+                du = gaps[s] * q - 10 if mel == 'drop' else 2 * TICKS_BEAT - 10
+                _note(tracks['lead'], base + s * q, du, _pc_pitch(pc_of(lead[s]), 67), 88 if mel == 'drop' else 70, 5)
+
+        # FX: impatto a inizio sezione + riser nelle ultime 2 battute del build-up
+        if idx == 0:
+            _note(tracks['fx_perc'], base, bt - 10, _pc_pitch(rpc, 72), 110 if mel == 'drop' else 80, 6)
+        riser = min(2, length)
+        if mel == 'build' and idx >= length - riser:
+            k0 = (idx - (length - riser)) * 8
+            for k, s in enumerate(range(0, 16, 2)):
+                j = k0 + k
+                _note(tracks['fx_perc'], base + s * q, q * 2 - 10,
+                      _pc_pitch(root, 60) + scale[j % n] + 12 * (j // n), 60 + int(50 * (j + 1) / (riser * 8)), 6)
+
 def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True):
     random.seed(seed)
+    bars, sections = compute_structure(bars)
+    secmap = section_map(sections, bars)
     mid = mido.MidiFile(file=mid_file_bytes)
-    all_notes_flat = []
-    for track in mid.tracks:
-        current_tick = 0
-        for msg in track:
-            current_tick += msg.time
-            if msg.type == 'note_on' and msg.velocity > 0:
-                all_notes_flat.append({'pitch': msg.note, 'tick': current_tick})
-
-    root, scale = extract_dna(all_notes_flat)
-    tracks = {}
-    headers = {}
-    scale_t = TICKS_BEAT / mid.ticks_per_beat
-    free_channels = [c for c in range(16) if c != DRUM_CH]
-
+    all_notes = notes_from_midi(mid)
+    if not all_notes:
+        raise ValueError("Il file MIDI non contiene note melodiche (i canali batteria vengono ignorati).")
+    root, scale = extract_dna(all_notes)
+    tracks, headers = {}, {}
     if submode == 'faithful':
-        track_idx = 0
-        for original_track in mid.tracks:
-            if any(msg.channel == DRUM_CH for msg in original_track if hasattr(msg, 'channel')): continue
-            original_name = next((m.name for m in original_track if m.type == 'track_name'), None)
-            header = _extract_instrument_header(original_track)
-            ch = free_channels[track_idx % len(free_channels)]
-            pending, pairs, current_tick_raw = {}, [], 0
-            for msg in original_track:
-                current_tick_raw += msg.time
-                if msg.type == 'note_on' and msg.velocity > 0:
-                    pending[msg.note] = (current_tick_raw, msg.velocity)
-                elif msg.type == 'note_off' or (msg.type == 'note_on' and msg.velocity == 0):
-                    if msg.note in pending:
-                        on_raw, vel = pending.pop(msg.note)
-                        on_quantized = round(on_raw * scale_t / (TICKS_BEAT // 16)) * (TICKS_BEAT // 16)
-                        dur_raw = current_tick_raw - on_raw
-                        dur_quantized = max(TICKS_BEAT // 16, round(dur_raw * scale_t / (TICKS_BEAT // 16)) * (TICKS_BEAT // 16))
-                        pitch = snap_to_scale(msg.note, root, scale)
-                        pairs.append({'tick': on_quantized, 'dur': dur_quantized, 'pitch': pitch, 'vel': vel})
-            for note, (on_raw, vel) in pending.items():
-                on_quantized = round(on_raw * scale_t / (TICKS_BEAT // 16)) * (TICKS_BEAT // 16)
-                dur_quantized = (TICKS_BEAT // 16) * 4
-                pitch = snap_to_scale(note, root, scale)
-                pairs.append({'tick': on_quantized, 'dur': dur_quantized, 'pitch': pitch, 'vel': vel})
-            
-            track_events = []
-            for p in pairs:
-                track_events.extend([{'tick': p['tick'], 'type': 'on', 'pitch': p['pitch'], 'vel': p['vel'], 'channel': ch}, {'tick': p['tick'] + p['dur'], 'type': 'off', 'pitch': p['pitch'], 'vel': 0, 'channel': ch}])
-            if track_events:
-                track_key = (original_name or '').strip() or f'instrument_{track_idx}'
-                base_key, n = track_key, 2
-                while track_key in tracks or track_key in DRUM_TRACK_NAMES:
-                    track_key = f'{base_key} {n}'; n += 1
-                tracks[track_key] = track_events
-                if header: headers[track_key] = header
-                track_idx += 1
+        _arrange_faithful(mid, all_notes, g, secmap, tracks, headers, root, scale)
     else:
-        roles = [('sub_bass', 0, (24, 36)), ('bassline', 1, (36, 48)), ('pad', 2, (48, 60)), ('chords', 3, (55, 67)), ('arp', 4, (60, 72)), ('lead', 5, (67, 79)), ('fx_perc', 6, (72, 84))]
-        for role_name, channel, _ in roles: tracks[role_name] = []
-        
-        for bar in range(bars):
-            base_tick = bar * 4 * TICKS_BEAT
-            for s in range(16):
-                tick = base_tick + s * (TICKS_BEAT // 4)
-                p_step = s % 16
-                swing_offset = int(g['swing'] * (TICKS_BEAT // 4)) if (p_step % 2 == 1) else 0
-                
-                if g['kick'][p_step]:
-                    if 'drums' not in tracks: tracks['drums'] = []
-                    tracks['drums'].extend([{'tick': tick, 'type': 'on', 'pitch': GM_KICK, 'vel': 110, 'channel': DRUM_CH}, {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_KICK, 'vel': 0, 'channel': DRUM_CH}])
-                if g.get('snare', [0]*16)[p_step]:
-                    tracks['drums'].extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_SNARE, 'vel': 100, 'channel': DRUM_CH}, {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_SNARE, 'vel': 0, 'channel': DRUM_CH}])
-                if g.get('clap', [0]*16)[p_step]:
-                    tracks['drums'].extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_CLAP, 'vel': 90, 'channel': DRUM_CH}, {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_CLAP, 'vel': 0, 'channel': DRUM_CH}])
-                if g['hat'][p_step]:
-                    tracks['drums'].extend([{'tick': tick + swing_offset, 'type': 'on', 'pitch': GM_HAT_CLOSED, 'vel': 75, 'channel': DRUM_CH}, {'tick': tick + (TICKS_BEAT//4)//2, 'type': 'off', 'pitch': GM_HAT_CLOSED, 'vel': 0, 'channel': DRUM_CH}])
-                
-                for role_name, channel, (low_pitch, high_pitch) in roles:
-                    if role_name == 'bassline' and g['bass'][p_step]:
-                        idx = 0 if random.random() < 0.8 else random.choice([1, len(scale)-1])
-                        pitch = root - 12 + scale[idx % len(scale)]
-                        tracks['bassline'].extend([{'tick': tick, 'type': 'on', 'pitch': max(30, min(pitch, 48)), 'vel': 95, 'channel': channel}, {'tick': tick + (TICKS_BEAT//4), 'type': 'off', 'pitch': max(30, min(pitch, 48)), 'vel': 0, 'channel': channel}])
-                    elif role_name == 'arp' and random.random() < g['arp_density']:
-                        pitch = random.randint(low_pitch, high_pitch)
-                        pitch = snap_to_scale(pitch, root, scale)
-                        tracks['arp'].extend([{'tick': tick, 'type': 'on', 'pitch': pitch, 'vel': 75, 'channel': channel}, {'tick': tick + (TICKS_BEAT//4) - 10, 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': channel}])
-
+        _arrange_generative(g, root, scale, secmap, tracks)
+    drums = build_drum_events(g, secmap)
+    if drums: tracks['drums'] = drums
+    tracks = {k: v for k, v in tracks.items() if v}
     if split_drums and 'drums' in tracks:
         tracks = split_drum_track(tracks)
     return tracks, root, scale, headers, bars
@@ -408,7 +604,7 @@ def _events_to_notes(events):
     cleaned_all.sort(key=lambda x: (x[0], x[2]))
     return cleaned_all
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -421,6 +617,9 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None):
     t_tempo = mido.MidiTrack()
     t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
     t_tempo.append(mido.MetaMessage('time_signature', numerator=4, denominator=4, time=0))
+    if key_name:
+        try: t_tempo.append(mido.MetaMessage('key_signature', key=key_name, time=0))
+        except ValueError: pass
     if label:
         text = ("MIDI Forge - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
         t_tempo.append(mido.MetaMessage('marker', text=text, time=0))
@@ -482,7 +681,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     g = GENRES[genre]
     report.extend(["PATTERN RITMICI (1 sedicesimi)", f"   Kick (GM 36):  {''.join(['#' if x else '.' for x in g['kick']])}", f"   Snare (GM 38): {''.join(['#' if x else '.' for x in g.get('snare', [0]*16)])}"])
     if 'clap' in g: report.append(f"   Clap (GM 39):  {''.join(['#' if x else '.' for x in g['clap']])}")
-    report.extend([f"   Hat (GM 42):   {''.join(['#' if x else '.' for x in g['hat']])}", f"   Bass:          {''.join(['#' if x else '.' for x in g['bass']])}", f"   Swing: {g['swing'] * 100:.0f}%", f"   Densità Arp: {g['arp_density'] * 100:.0f}%", "", "STRUTTURA BRANO (DJ-Friendly)", "   [ INTRO drum-only ] -> [ BREAK 1 ] -> [ BUILD-UP ] -> [ DROP ] -> [ BREAK 2 ] -> [ OUTRO drum-only ]", "", "TRACCE OUTPUT"])
+    report.extend([f"   Hat (GM 42):   {''.join(['#' if x else '.' for x in g['hat']])}", f"   Bass:          {''.join(['#' if x else '.' for x in g['bass']])}", f"   Swing: {g['swing'] * 100:.0f}%", f"   Densità Arp: {g['arp_density'] * 100:.0f}%", "", "STRUTTURA BRANO (DJ-Friendly)", _structure_line(bars), "", "TRACCE OUTPUT"])
     track_idx = 1
     for track_key in tracks.keys():
         if track_key in DRUM_TRACK_NAMES: report.append(f"   {track_idx}. {DRUM_TRACK_NAMES[track_key]} (Canale 10 - GM Drum Map)")
@@ -606,9 +805,9 @@ with col1:
     uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
     mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"])
     if mode == "minimal":
-        submode = st.selectbox("Sotto-modalità", ["extract", "generate"])
+        submode = st.selectbox("Sotto-modalità", ["extract", "generate"], format_func=lambda x: {"extract": "Remix (riarrangia le note originali)", "generate": "Nuovo tema (dalle note originali)"}[x])
     else:
-        submode = st.selectbox("Sotto-modalità", ["faithful", "generative"])
+        submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], format_func=lambda x: {"faithful": "Faithful (fedele all'originale)", "generative": "Generative (solo tonalità, da zero)"}[x])
         split_drums = st.checkbox("Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True)
 
 with col2:
@@ -646,7 +845,7 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                 file_bytes = io.BytesIO(uploaded_file.getvalue())
                 notes_data = extract_notes(file_bytes)
                 if not notes_data:
-                    st.error("Il file MIDI non contiene note valide.")
+                    st.error("Il file MIDI non contiene note melodiche (i canali batteria vengono ignorati).")
                 else:
                     final_bpm = g_defaults['bpm_default'] if use_default_bpm else bpm
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
@@ -656,6 +855,11 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                         st.info(f"Durata calcolata: {final_bars} battute (per coprire ~{duration_seconds} secondi a {final_bpm} BPM)")
                     else:
                         final_bars = g_defaults['bars_default'] if use_default_bars else bars
+
+                    norm_bars = max(16, (int(final_bars) // 4) * 4)
+                    if norm_bars != final_bars:
+                        st.info(f"Battute allineate al multiplo di 4: {norm_bars}")
+                        final_bars = norm_bars
 
                     if mode == "minimal":
                         tracks, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed)
@@ -668,7 +872,7 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                             st.info(f"Durata allineata: {final_bars} battute (richieste: {requested_bars})")
 
                     label = f"{genre} - {mode}/{submode}"
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label)
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale))
                     report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, uploaded_file.name)
 
                     st.session_state.generated = {
