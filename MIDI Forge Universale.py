@@ -45,7 +45,7 @@ GENRES = {
     'techno': {'bpm_default': 132, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
     'trap': {'bpm_default': 140, 'bars_default': 68, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.4, 'swing': 0.0},
     'trance': {'bpm_default': 140, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1]*16, 'arp_density': 0.9, 'swing': 0.0},
-    'underground': {'bpm_default': 135, 'bars_default': 84, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.1},
+    'underground': {'bpm_default': 135, 'bars_default': 84, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.1, 'snare_shift': True},
 }
 
 NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
@@ -150,100 +150,106 @@ def snap_to_scale(pitch, root, scale):
 #              roll(rullata di snare nelle ultime 4 battute) rolls(rullata corta e piano, ultime 2)
 #   melodici : bass bassl(basso sui battiti, piano) pad chords(stab) chordsl(accordi lunghi) arp arpl(arp rado) lead leadl(lead rado)
 # Gli strati melodici che entrano di nuovo salgono di volume in 4 battute (ingresso morbido, niente tagli netti).
-LAYER_TOKENS = frozenset('kick hat clap open perc bass bassl pad chords chordsl arp arpl lead leadl roll rolls fill'.split())
+LAYER_TOKENS = frozenset('kick hat clap open perc bass bassl pad chords chordsl arp arpl lead leadl roll rolls fill event'.split())
+EVENT = frozenset({'event'})   # un suono isolato e piano per battuta (Lowercase, Onkyo)
 MELODIC = frozenset('bass bassl pad chords chordsl arp arpl lead leadl'.split())
 DRUM_LAYERS = frozenset('kick hat clap open perc roll rolls fill'.split())
 FAMILY = {'bass': 'bass', 'bassl': 'bass', 'pad': 'pad', 'chords': 'chords', 'chordsl': 'chords',
           'arp': 'arp', 'arpl': 'arp', 'lead': 'lead', 'leadl': 'lead'}
 SYN_FACTOR = {'arp': 1.0, 'lead': 1.0, 'chords': 0.85, 'arpl': 0.5, 'leadl': 0.5, 'chordsl': 0.5, 'pad': 0.5}
 
-_CH = 'kick hat clap open perc bass chords arp lead fill'
 TIMELINES = {
- 'acid': [('Intro DJ', 16, 'kick hat'), ('Groove 303', 16, 'kick hat clap open bass'), ('Stab', 16, 'kick hat clap open perc bass chords'),
-          ('Main 1', 32, 'kick hat clap open perc bass chords arp fill'), ('Breakdown', 8, 'hat bassl pad'), ('Build', 8, 'kick hat bass pad roll'),
-          ('Main 2', 32, _CH), ('Outro DJ', 16, 'kick hat perc')],
- 'ambient': [('Seme', 16, 'pad'), ('Strato', 16, 'pad chordsl'), ('Fioritura', 32, 'pad chordsl arpl leadl'), ('Culmine', 32, 'pad chordsl arp leadl'),
-             ('Dissolvenza', 16, 'pad chordsl'), ('Coda', 16, 'pad')],
- 'armonico': [('Intro', 8, 'kick hat pad'), ('Giro 1', 16, 'kick hat clap bass chords'), ('Giro 2', 16, 'kick hat clap bass chords arpl leadl'),
-              ('Sviluppo', 8, 'hat pad chordsl leadl'), ('Giro 3', 16, _CH + ' open'), ('Outro', 8, 'kick hat pad')],
- 'breakcore': [('Intro', 8, 'kick hat'), ('Blocco 1', 12, 'kick hat clap bass'), ('Rottura', 8, 'hat perc arpl'), ('Blocco 2', 16, _CH),
-               ('Frammento', 8, 'hat clap perc arpl'), ('Blocco 3', 12, _CH)],
- 'commerciale_90s': [('Intro', 8, 'kick hat'), ('Strofa 1', 16, 'kick hat clap open bass chords'), ('Pre', 8, 'kick hat clap bass chords arpl roll'),
-                     ('Ritornello', 16, _CH + ' open'), ('Strofa 2', 16, 'kick hat clap open bass chords arpl'), ('Bridge', 8, 'hat pad chordsl bassl rolls'),
-                     ('Ritornello 2', 16, _CH + ' open'), ('Outro', 8, 'kick hat bass')],
+ # Famiglia 1: generi ritmici e da club
+ 'acid': [('Intro DJ', 32, 'kick hat pad bassl'), ('Groove building', 32, 'kick hat perc pad bass'), ('Main 1', 32, 'kick hat clap perc pad bass fill'),
+          ('Breakdown', 16, 'pad bass'), ('Build-up', 16, 'hat pad bassl roll'), ('Drop / Main 2', 32, 'kick hat clap open perc pad bass fill'),
+          ('Outro', 32, 'kick hat')],
+ 'drum_n_bass': [('Intro', 32, 'hat pad leadl'), ('Tension / Build', 16, 'kick hat pad roll'), ('Drop 1', 32, 'kick hat clap bass fill'),
+                 ('Breakdown', 16, 'pad lead'), ('Build 2', 16, 'kick hat pad roll'), ('Drop 2', 32, 'kick hat clap perc bass arp lead fill'),
+                 ('Outro', 16, 'pad')],
+ 'dub_techno': [('Intro sommersa', 32, 'kick pad'), ('Groove dub', 32, 'kick hat open pad bass chords'), ('Evoluzione', 32, 'kick hat open pad bass chords perc'),
+                ('Breakdown dub', 16, 'pad chords'), ('Ritorno', 32, 'kick hat open pad bass chords perc'), ('Outro', 16, 'kick pad')],
+ 'edm_2000s': [('Intro', 16, 'kick hat arpl'), ('Build 1', 16, 'kick hat pad arpl roll'), ('Drop 1', 32, 'kick hat clap open perc bass chords lead fill'),
+               ('Breakdown', 16, 'pad lead'), ('Build 2', 16, 'kick hat pad chords roll'),
+               ('Drop 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
+ 'hip_hop': [('Intro', 4, 'hat chordsl'), ('Beat completo', 4, 'kick hat clap bass'), ('Strofa 1', 16, 'kick hat clap bass chordsl leadl'),
+             ('Hook', 8, 'kick hat clap bass pad chords lead'), ('Strofa 2', 16, 'kick hat clap perc bass chordsl leadl'),
+             ('Hook 2', 8, 'kick hat clap bass pad chords lead fill'), ('Bridge', 8, 'pad chordsl'),
+             ('Strofa 3 / Hook', 16, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'pad chordsl')],
+ 'minimal_techno': [('Intro loop', 32, 'kick hat'), ('Evoluzione 1', 32, 'kick hat perc bass'), ('Evoluzione 2', 32, 'kick hat perc bass arpl'),
+                    ('Evoluzione 3', 32, 'kick hat clap perc bass arp'), ('Outro loop', 32, 'kick hat')],
+ 'reggaeton': [('Intro', 8, 'kick clap hat'), ('Beat completo', 8, 'kick clap hat perc bass'), ('Strofa 1', 8, 'kick clap hat bass chordsl leadl'),
+               ('Hook', 8, 'kick clap hat perc bass pad chords lead'), ('Strofa 2', 8, 'kick clap hat perc bass chordsl leadl'),
+               ('Hook 2', 8, 'kick clap hat perc bass pad chords lead fill'), ('Bridge', 8, 'clap hat pad bassl'),
+               ('Hook finale', 16, 'kick clap hat open perc bass pad chords arp lead fill'), ('Outro', 24, 'kick clap hat')],
+ 'techno': [('Intro DJ', 32, 'kick hat'), ('Build', 32, 'kick hat clap open bass'), ('Main 1', 32, 'kick hat clap open perc bass chords arp'),
+            ('Breakdown', 16, 'pad'), ('Build-up', 16, 'hat pad roll'), ('Drop / Main 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+            ('Outro', 32, 'kick hat')],
+ 'trance': [('Intro lunga', 64, 'kick hat pad arpl'), ('Main 1', 32, 'kick hat clap open bass pad arpl lead'), ('Breakdown', 32, 'pad chordsl lead'),
+            ('Build', 16, 'hat pad chords arp roll'), ('Drop', 32, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'pad')],
+ 'trap': [('Intro', 8, 'pad leadl bassl'), ('Hook', 8, 'kick hat clap perc bass pad lead'), ('Strofa 1', 16, 'kick hat clap bass pad leadl'),
+          ('Hook 2', 16, 'kick hat clap perc bass pad lead arp fill'), ('Strofa 2', 16, 'kick hat clap bass pad leadl'), ('Bridge', 8, 'pad leadl'),
+          ('Hook finale', 16, 'kick hat clap perc bass pad lead arp fill'), ('Outro', 8, 'pad leadl bassl')],
+ # Famiglia 2: generi armonici e da canzone
+ 'commerciale_90s': [('Intro', 8, 'kick hat arpl'), ('Strofa 1', 16, 'kick hat clap bass chordsl leadl'), ('Pre-chorus', 8, 'kick hat clap bass pad roll'),
+                     ('Ritornello', 16, 'kick hat clap open perc bass pad chords arp lead fill'), ('Strofa 2', 16, 'kick hat clap open bass chordsl leadl arpl'),
+                     ('Pre-chorus 2', 8, 'kick hat clap bass pad roll'), ('Ritornello 2', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+                     ('Bridge', 8, 'pad chordsl bassl'), ('Ritornello finale', 16, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
  'deep': [('Intro DJ', 16, 'kick hat pad'), ('Groove base', 16, 'kick hat clap open bass pad'), ('Armonia', 16, 'kick hat clap open perc bass pad chords'),
           ('Hook / Main 1', 16, 'kick hat clap open perc bass pad chords arpl lead'), ('Breakdown breve', 8, 'kick hat perc pad chordsl'),
           ('Build-up soft', 8, 'kick hat open bass pad chordsl rolls'), ('Main 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
           ('Outro DJ', 16, 'kick hat bass')],
- 'disco': [('Intro', 16, 'kick hat open'), ('Strofa 1', 16, 'kick hat open clap bass chords arpl'), ('Ritornello', 8, 'kick hat open clap perc bass chords arp lead fill'),
-           ('Strofa 2', 16, 'kick hat open clap perc bass chords arpl'), ('Ritornello 2', 8, 'kick hat open clap perc bass chords arp lead fill'),
-           ('Bridge', 8, 'hat perc bassl pad chordsl rolls'), ('Ritornello 3', 16, 'kick hat open clap perc bass chords arp lead fill'), ('Outro', 16, 'kick hat open bass')],
- 'drone': [('Tono', 32, 'pad'), ('Armonici', 32, 'pad bass'), ('Massa', 32, 'pad bass chordsl'), ('Dissolvenza', 32, 'pad bass')],
- 'drum_n_bass': [('Intro', 16, 'kick hat pad'), ('Build', 16, 'kick hat pad chordsl roll'), ('Drop 1', 32, 'kick hat clap perc bass arpl fill'),
-                 ('Breakdown', 16, 'hat pad chordsl leadl roll'), ('Drop 2', 32, 'kick hat clap perc bass arp lead fill'), ('Outro', 16, 'kick hat perc')],
- 'dub_techno': [('Intro', 16, 'kick hat'), ('Strato 1', 16, 'kick hat open pad'), ('Accordi', 32, 'kick hat open pad chords perc'),
-                ('Basso', 32, 'kick hat open pad chords perc bass'), ('Picco', 32, 'kick hat clap open pad chords perc bass arpl'),
-                ('Breakdown', 16, 'hat pad chords'), ('Ritorno', 32, 'kick hat open pad chords perc bass arpl'), ('Outro', 32, 'kick hat pad')],
- 'edm_2000s': [('Intro', 16, 'kick hat'), ('Break 1', 16, 'pad chordsl leadl'), ('Build 1', 16, 'kick hat pad chords arp roll'),
-               ('Drop 1', 32, 'kick hat clap open perc bass chords lead fill'), ('Break 2', 16, 'pad chordsl arpl'), ('Build 2', 8, 'kick hat pad chords roll'),
-               ('Drop 2', 32, 'kick hat clap open perc bass chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
- 'elettronico': [('Intro', 16, 'kick hat'), ('Groove', 16, 'kick hat clap bass'), ('Build', 8, 'kick hat clap bass arpl roll'),
-                 ('Main 1', 32, _CH + ' open'), ('Break', 16, 'hat pad chordsl arpl'), ('Main 2', 16, _CH + ' open'), ('Outro', 16, 'kick hat bass')],
- 'funk': [('Intro', 4, 'kick hat clap'), ('Vamp', 16, 'kick hat clap bass chords'), ('Riff', 16, 'kick hat clap perc bass chords lead'),
-          ('Bridge', 8, 'hat perc bass'), ('Vamp 2', 16, 'kick hat clap perc bass chords lead arp fill'), ('The One', 4, 'kick bass'),
-          ('Finale', 16, 'kick hat clap open perc bass chords lead arp fill'), ('Outro', 8, 'kick hat bass')],
- 'glitch': [('Intro', 8, 'kick hat'), ('Loop A', 16, 'kick hat clap bass'), ('Stutter', 8, 'hat perc arpl fill'), ('Loop B', 24, _CH),
-            ('Break', 8, 'hat arpl pad'), ('Loop C', 16, _CH), ('Outro', 8, 'kick hat')],
- 'harsh_noise': [('Ingresso', 8, 'pad arp'), ('Muro', 40, 'pad bass arp lead'), ('Frattura', 8, 'arpl'), ('Muro 2', 16, 'pad bass arp lead')],
- 'hip_hop': [('Intro', 8, 'kick hat'), ('Verse 1', 16, 'kick hat clap bass chords'), ('Hook', 8, 'kick hat clap open perc bass chords arp lead pad'),
-             ('Verse 2', 16, 'kick hat clap perc bass chords'), ('Hook 2', 8, 'kick hat clap open perc bass chords arp lead pad'), ('Break', 4, 'kick hat pad'),
-             ('Verse 3', 16, 'kick hat clap perc bass chords arpl'), ('Hook 3', 8, 'kick hat clap open perc bass chords arp lead pad fill'),
-             ('Hook 4', 8, 'kick hat clap open perc bass chords arp lead pad fill'), ('Outro', 8, 'kick hat bass')],
- 'idm': [('Intro', 8, 'hat arpl'), ('Blocco A', 12, 'kick hat bass'), ('Blocco B', 16, 'kick hat clap bass arp'), ('Rottura', 8, 'hat perc arpl pad'),
-         ('Blocco C', 20, _CH), ('Dissolvenza', 12, 'kick hat arpl pad')],
- 'industrial': [('Intro', 16, 'kick hat'), ('A', 16, 'kick hat clap bass'), ("A'", 16, 'kick hat clap perc bass arpl'), ('B', 16, 'hat perc bass pad leadl rolls'),
-                ("A''", 16, _CH + ' open'), ('Outro', 16, 'kick hat perc')],
- 'lowercase': [('Soglia', 16, 'arpl'), ('Eventi', 32, 'arpl leadl'), ('Pausa', 16, ''), ('Eventi 2', 32, 'arp leadl'), ('Coda', 24, 'arpl')],
- 'microsound': [('Nube 1', 16, 'arpl'), ('Densificazione', 24, 'arp'), ('Nube densa', 32, 'arp lead'), ('Rarefazione', 16, 'arpl'), ('Coda', 8, 'pad')],
- 'minimal': [('Cellula', 8, 'kick hat'), ('Aggiunta', 8, 'kick hat bass'), ('Strato', 16, 'kick hat bass arpl'), ('Fase', 16, 'kick hat clap bass arp'),
-             ('Sottrazione', 8, 'kick hat arp'), ('Ritorno', 16, 'kick hat clap bass arp lead'), ('Fine', 8, 'kick hat')],
- 'minimal_techno': [('Intro', 16, 'kick hat'), ('+ Perc', 16, 'kick hat perc'), ('+ Basso', 16, 'kick hat perc bass'), ('+ Clap', 16, 'kick hat clap perc bass'),
-                    ('+ Stab', 16, 'kick hat clap perc bass arpl'), ('Sottrazione', 8, 'kick hat perc'), ('Main', 24, 'kick hat clap open perc bass arp'),
-                    ('Riduzione', 16, 'kick hat perc bass'), ('Outro', 16, 'kick hat perc')],
- 'minimalismo_ritmico': [('Ciclo 1', 12, 'kick hat'), ('Ciclo 2', 12, 'kick hat bass'), ('Ciclo 3', 12, 'kick hat clap bass arpl'),
-                         ('Ciclo 4', 12, 'kick hat clap perc bass arp'), ('Ciclo 5', 12, 'kick hat clap perc bass arp lead'),
-                         ('Ciclo 6', 12, 'kick hat bass arpl'), ('Ciclo 7', 12, 'kick hat')],
- 'noise': [('Texture', 16, 'pad'), ('Densita', 24, 'pad bass arpl'), ('Muro', 32, 'pad bass arp lead'), ('Svuotamento', 16, 'pad arpl'), ('Residuo', 8, 'pad')],
- 'onkyo': [('Gesto', 16, 'arpl'), ('Silenzio', 16, ''), ('Gesti', 24, 'arpl leadl'), ('Silenzio 2', 24, ''), ('Gesto 3', 24, 'pad arpl'),
-           ('Silenzio 3', 8, ''), ('Coda', 16, 'leadl')],
- 'r&b': [('Intro', 8, 'kick hat pad'), ('Verse 1', 16, 'kick hat clap bass chords'), ('Pre', 8, 'kick hat clap bass chords arpl rolls'),
-         ('Chorus', 12, 'kick hat clap open perc bass pad chords arp lead'), ('Verse 2', 16, 'kick hat clap perc bass chords arpl'),
-         ('Pre 2', 8, 'kick hat clap bass chords arpl rolls'), ('Chorus 2', 12, 'kick hat clap open perc bass pad chords arp lead'),
-         ('Bridge', 8, 'hat pad chordsl bassl'), ('Chorus 3', 12, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 8, 'kick hat pad bass')],
- 'reggaeton': [('Intro', 8, 'kick clap hat'), ('Verse 1', 16, 'kick clap hat bass chords'), ('Hook', 16, 'kick clap hat perc bass chords arp lead fill'),
-               ('Verse 2', 16, 'kick clap hat perc bass chords arpl'), ('Hook 2', 16, 'kick clap hat perc bass chords arp lead fill'),
-               ('Bridge', 8, 'hat perc bassl pad rolls'), ('Hook 3', 16, 'kick clap hat perc bass pad chords arp lead fill'), ('Outro', 8, 'kick clap hat bass')],
- 'sperimentale': [('Processo A', 12, 'kick hat arpl'), ('Processo B', 16, 'kick clap bass arpl'), ('Processo C', 16, 'hat perc bass arp lead'),
-                  ('Inversione', 12, 'kick hat clap bass arp lead'), ('Dissoluzione', 12, 'arpl')],
- 'soul': [('Intro', 4, 'kick hat'), ('Verse 1', 16, 'kick hat clap bass chords'), ('Pre', 8, 'kick hat clap bass chords arpl rolls'),
-          ('Chorus', 8, 'kick hat clap perc bass pad chords arp lead'), ('Verse 2', 16, 'kick hat clap perc bass chords arpl'),
-          ('Chorus 2', 8, 'kick hat clap perc bass pad chords arp lead'), ('Bridge', 12, 'hat pad chordsl bassl'),
-          ('Chorus 3', 16, 'kick hat clap perc bass pad chords arp lead fill'), ('Outro', 8, 'kick hat bass')],
- 'synthpop': [('Intro', 8, 'kick hat arpl'), ('Verse 1', 16, 'kick hat clap bass chords arpl'), ('Chorus 1', 16, _CH + ' open'),
-              ('Verse 2', 16, 'kick hat clap bass chords arp'), ('Chorus 2', 16, _CH + ' open'), ('Bridge', 8, 'hat pad chordsl bassl rolls'),
-              ('Chorus 3', 16, _CH + ' open pad'), ('Outro', 8, 'kick hat bass')],
- 'techno': [('Intro 1', 16, 'kick'), ('Intro 2', 16, 'kick hat perc'), ('Groove', 16, 'kick hat clap open perc bass'), ('Main 1', 16, 'kick hat clap open perc bass arp'),
-            ('Break', 16, 'hat perc pad arpl roll'), ('Main 2', 16, 'kick hat clap open perc bass arp lead fill'), ('Main 3', 16, 'kick hat clap open perc bass arp lead'),
-            ('Outro 1', 16, 'kick hat perc'), ('Outro 2', 16, 'kick hat')],
- 'trap': [('Intro', 8, 'kick hat pad'), ('Hook', 16, 'kick hat clap perc bass pad lead'), ('Verse', 16, 'kick hat clap bass pad arpl'),
-          ('Hook 2', 16, 'kick hat clap perc bass pad lead arp fill'), ('Verse 2', 16, 'kick hat clap bass pad arpl'), ('Bridge', 8, 'hat pad leadl bassl rolls'),
-          ('Hook 3', 16, 'kick hat clap perc bass pad lead arp fill'), ('Outro', 8, 'kick hat bass pad')],
- 'trance': [('Intro', 16, 'kick hat'), ('Groove', 16, 'kick hat open bass'), ('Main 1', 16, 'kick hat clap open bass arp'), ('Breakdown', 24, 'pad chords arpl leadl'),
-            ('Build', 16, 'hat pad chords arp roll'), ('Drop', 32, 'kick hat clap open perc bass chords arp lead fill'), ('Breakdown 2', 16, 'pad chordsl lead'),
-            ('Build 2', 8, 'hat pad arp roll'), ('Drop 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
- 'underground': [('Intro', 8, 'kick hat'), ('Verse', 16, 'kick hat clap bass pad'), ('Hook', 16, 'kick hat clap perc bass pad chords arp lead fill'),
-                 ('Verse 2', 16, 'kick hat clap perc bass pad arpl'), ('Bridge', 8, 'hat pad bassl'), ('Hook 2', 16, 'kick hat clap perc bass pad chords arp lead fill'),
-                 ('Outro', 8, 'kick hat bass')],
+ 'disco': [('Intro vamp', 32, 'kick hat open bass chords'), ('Strofa 1', 16, 'kick hat open clap bass chords leadl arpl'),
+           ('Ritornello', 16, 'kick hat open clap perc bass chords arp lead fill'), ('Strofa 2', 16, 'kick hat open clap bass chords leadl arpl'),
+           ('Ritornello 2', 16, 'kick hat open clap perc bass chords arp lead fill'), ('Breakdown strumentale', 16, 'kick hat open bass chords arp'),
+           ('Ritornello finale', 16, 'kick hat open clap perc bass chords arp lead fill'), ('Outro vamp', 16, 'kick hat open bass chords')],
+ 'funk': [('Intro', 8, 'kick hat clap chords'), ('Riff principale', 8, 'kick hat clap bass chords lead'), ('Strofa', 16, 'kick hat clap bass chords leadl'),
+          ('Ritornello / Vamp', 16, 'kick hat clap perc bass chords lead arp fill'), ('Strofa 2', 16, 'kick hat clap perc bass chords leadl'),
+          ('Bridge', 8, 'bass chords'), ('Assolo', 8, 'kick hat clap bass chords lead'), ('Finale', 16, 'kick hat clap open perc bass chords arp lead fill')],
+ 'r&b': [('Intro', 8, 'pad chordsl'), ('Strofa 1', 16, 'kick hat clap bass chords leadl'), ('Pre-chorus', 8, 'kick hat clap bass pad rolls'),
+         ('Ritornello', 12, 'kick hat clap open perc bass pad chords arp lead'), ('Strofa 2', 16, 'kick hat clap perc bass chords leadl arpl'),
+         ('Ritornello 2', 12, 'kick hat clap open perc bass pad chords arp lead'), ('Bridge', 8, 'pad chordsl bassl'),
+         ('Ritornello finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'soul': [('Intro', 4, 'kick hat clap bass chords'), ('Strofa 1', 16, 'kick hat clap bass chords leadl arpl'), ('Pre-chorus', 8, 'kick hat clap bass chords arp rolls'),
+          ('Ritornello', 12, 'kick hat clap perc bass pad chords arp lead'), ('Strofa 2', 16, 'kick hat clap perc bass chords leadl arpl'),
+          ('Ritornello 2', 12, 'kick hat clap perc bass pad chords arp lead'), ('Bridge / Vamp', 12, 'kick hat clap bass pad chords arp'),
+          ('Finale', 16, 'kick hat clap perc bass pad chords arp lead fill')],
+ 'synthpop': [('Intro', 8, 'kick hat leadl arpl'), ('Verse 1', 8, 'kick hat clap bass arp leadl'), ('Chorus', 16, 'kick hat clap open perc bass chords arp lead fill'),
+              ('Verse 2', 16, 'kick hat clap bass arp leadl chordsl'), ('Chorus 2', 8, 'kick hat clap open perc bass chords arp lead fill'),
+              ('Bridge', 8, 'pad chordsl bassl'), ('Chorus finale', 8, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 8, 'kick hat bass')],
+ # Famiglia 3: generi sperimentali e d'avanguardia
+ 'ambient': [('Fade in', 32, 'pad'), ('Evoluzione 1', 32, 'pad chordsl'), ('Trasformazione', 32, 'chordsl leadl'), ('Sovrapposizione', 32, 'pad chordsl arp leadl'),
+             ('Fade out', 32, 'pad')],
+ 'breakcore': [('Intro', 8, 'hat perc arpl leadl'), ('Sezione A', 16, 'kick hat clap perc bass fill'), ('Sezione B', 8, 'kick hat clap perc bass arpl fill'),
+               ('Transizione', 8, 'hat clap perc bass rolls'), ('Sezione C', 16, 'kick hat clap perc bass arp lead fill'),
+               ('Finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'drone': [('Tono fondamentale', 32, 'pad'), ('Armoniche', 32, 'pad chordsl'), ('Morphing', 32, 'pad bass chordsl'), ('Dissolvenza', 32, 'pad')],
+ 'glitch': [('Intro', 8, 'hat arpl'), ('Beat', 8, 'kick hat clap perc fill'), ('Evoluzione', 16, 'kick hat clap perc bass arp'), ('Breakdown', 8, 'pad arpl'),
+            ('Ritorno', 16, 'kick hat clap perc bass arp lead fill')],
+ 'idm': [('Intro', 8, 'pad arpl'), ('Sezione 1', 8, 'kick hat clap perc'), ('Sezione 2', 16, 'kick hat clap perc bass arp lead'), ('Breakdown', 8, 'pad arpl'),
+         ('Sezione 3', 16, 'kick hat clap perc bass arp lead fill')],
+ 'lowercase': [('Silenzio', 8, ''), ('Evento 1', 1, 'event'), ('Silenzio 2', 15, ''), ('Eventi ravvicinati', 2, 'event'), ('Silenzio 3', 22, ''), ('Evento 2', 2, 'event')],
+ 'microsound': [('Nube 1', 16, 'arpl'), ('Aumento densita', 16, 'arp'), ('Nube 2', 16, 'arp lead'), ('Dissolvenza', 16, 'arpl')],
+ 'minimal': [('Cellula 1', 16, 'kick hat bass'), ('Cellula 2', 16, 'kick hat bass arpl'), ('Addizione', 16, 'kick hat clap bass arp'),
+             ('Sottrazione', 16, 'kick hat bass arpl'), ('Ritorno', 16, 'kick hat clap bass arp')],
+ 'minimalismo_ritmico': [('Pattern 1', 15, 'kick hat'), ('Pattern 2', 15, 'kick hat perc bass'), ('Pattern 3', 15, 'kick hat clap perc bass arpl'),
+                         ('Trasformazione', 15, 'kick hat clap perc bass arp lead'), ('Dissoluzione', 15, 'kick hat bass arpl')],
+ 'noise': [('Texture 1', 16, 'pad'), ('Texture 2', 16, 'pad bass arpl'), ('Muro di rumore', 16, 'pad bass arp lead'), ('Silenzio', 8, ''), ('Texture 3', 16, 'pad arpl')],
+ 'onkyo': [('Silenzio', 8, ''), ('Gesto 1', 1, 'event'), ('Silenzio 2', 11, ''), ('Gesto 2 + risposta', 2, 'event'), ('Silenzio 3', 18, ''), ('Dialogo', 4, 'event arpl')],
+ 'sperimentale': [('Processo 1', 8, 'hat arpl'), ('Processo 2', 8, 'kick clap bass arpl'), ('Processo 3', 8, 'hat perc bass arp lead'), ('Dissoluzione', 8, 'arpl')],
+ 'underground': [('Intro', 8, 'pad leadl bassl'), ('Beat drill', 8, 'kick hat clap bass'), ('Strofa 1', 16, 'kick hat clap bass pad leadl'),
+                 ('Hook', 8, 'kick hat clap perc bass pad chords lead arp'), ('Strofa 2', 16, 'kick hat clap perc bass pad leadl'),
+                 ('Hook 2', 8, 'kick hat clap perc bass pad chords lead arp fill'), ('Bridge', 8, 'pad chordsl bassl'),
+                 ('Hook finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ # Famiglia 4: noise e glitch (approfondimento)
+ 'harsh_noise': [('Wall 1', 16, 'pad arp'), ('Wall 2', 16, 'pad bass arp lead'), ('Blocco dinamico', 16, 'bass lead'), ('Wall finale', 16, 'pad bass arp lead chords')],
+ 'industrial': [('Intro', 16, 'kick hat arpl'), ('Verse', 16, 'kick hat clap bass'), ('Chorus', 16, 'kick hat clap open perc bass chords lead arp'),
+                ('Bridge', 16, 'pad bassl'), ('Finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'armonico': [('Intro armonica', 8, 'pad chordsl'), ('Sezione A', 16, 'kick hat clap bass chords leadl'), ("Sezione A'", 8, 'kick hat clap bass pad chords lead arpl'),
+              ('Sezione B', 16, 'kick hat clap bass chords lead arp'), ('Bridge / modulazione', 8, 'pad chordsl leadl'),
+              ('Ritorno tema', 16, 'kick hat clap bass pad chords lead arp'), ('Outro', 24, 'pad chordsl')],
+ 'elettronico': [('Intro', 16, 'kick hat'), ('Build', 16, 'kick hat clap open bass'), ('Main / Drop', 32, 'kick hat clap open perc bass pad chords lead'),
+                 ('Breakdown', 16, 'pad chordsl'), ('Build 2', 16, 'hat pad chords arp roll'),
+                 ('Drop 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
 }
 
 def _parse_timeline(rows):
@@ -251,7 +257,7 @@ def _parse_timeline(rows):
     for name, bars, layers in rows:
         ls = frozenset(layers.split())
         assert ls <= LAYER_TOKENS, (name, ls - LAYER_TOKENS)
-        assert bars % 4 == 0 and bars > 0, (name, bars)
+        assert bars > 0, (name, bars)
         out.append((name, bars, ls))
     return out
 
@@ -265,17 +271,23 @@ DEFAULT_TIMELINE = _parse_timeline([
     ('Intro', 8, 'kick hat'), ('Break', 8, 'kick hat pad chordsl arpl bassl'), ('Build-up', 8, 'kick hat clap bass pad chords arp roll'),
     ('Drop', 24, 'kick hat clap open perc bass pad chords arp lead fill'), ('Break 2', 8, 'kick hat pad chordsl leadl bassl'), ('Outro', 8, 'kick hat')])
 
+def timeline_unit(tl):
+    """Le sezioni si allocano a blocchi di 4 battute; se la timeline ha sezioni non multiple di 4 (silenzi, eventi singoli) a battuta singola."""
+    return 4 if all(b % 4 == 0 for _n, b, _l in (tl or DEFAULT_TIMELINE)) else 1
+
 def min_bars(g):
-    return 4 * len(g.get('timeline') or DEFAULT_TIMELINE)
+    tl = g.get('timeline') or DEFAULT_TIMELINE
+    return timeline_unit(tl) * len(tl)
 
 def compute_structure(bars, timeline=None, seed=None):
-    """Distribuisce le battute sulle sezioni della timeline del genere (sempre multipli di 4). A durata di default si ottengono
+    """Distribuisce le battute sulle sezioni della timeline del genere (multipli di 4, o di 1 se la timeline ha eventi singoli). A durata di default si ottengono
     esattamente le lunghezze della timeline; con altre durate le sezioni scalano in proporzione. Con un seed le sezioni
     centrali variano (+-20% circa). Ritorna (battute, [(nome, inizio, lunghezza, strati)])."""
     tl = timeline or DEFAULT_TIMELINE
     n = len(tl)
-    bars = max(4 * n, (int(bars) // 4) * 4)
-    units = bars // 4
+    unit = timeline_unit(tl)
+    bars = max(unit * n, (int(bars) // unit) * unit)
+    units = bars // unit
     w = [float(b) for _n, b, _l in tl]
     if seed is not None:
         rs = random.Random(int(seed) * 31 + 7)
@@ -286,7 +298,7 @@ def compute_structure(bars, timeline=None, seed=None):
         alloc[k] += 1
     sections, pos = [], 0
     for (name, _b, layers), a in zip(tl, alloc):
-        sections.append((name, pos, a * 4, layers)); pos += a * 4
+        sections.append((name, pos, a * unit, layers)); pos += a * unit
     return bars, sections
 
 # ================= METRI (battuta = N sedicesimi raggruppati) =================
@@ -514,6 +526,7 @@ def build_drum_events(g, secmap, bm=None):
         rr = idx - (length - N) if in_roll else 0
         roll_skip = ([4, 2, 2, 1] if N == 4 else [2, 1])[-N:][rr] if in_roll else 0
         roll_amp = 70 if 'roll' in layers else 40
+        sn_shift = 4 if g.get('snare_shift') and (idx // 2) % 2 == 1 else 0   # drill: snare dal beat 3 al beat 4 ogni 2 battute
         for s in range(L):
             p = pi[s]
             tick = base + s * q
@@ -539,7 +552,7 @@ def build_drum_events(g, secmap, bm=None):
             elif fill_bar and s >= L - 4:
                 _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - (L - 4)) * 15, DRUM_CH)
             elif 'clap' in layers:
-                if P['snare'][p]: _note(ev, tick + sw + lazy, q // 2, GM_SNARE, (90 if roll_any else 105) + R(0, 10), DRUM_CH)
+                if P['snare'][(p - sn_shift) % 16]: _note(ev, tick + sw + lazy, q // 2, GM_SNARE, (90 if roll_any else 105) + R(0, 10), DRUM_CH)
                 elif P['ghost'][p] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 28 + R(0, 16), DRUM_CH)
                 if P['clap'][p]: _note(ev, tick + sw + lazy, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
             # PERCUSSIONI
@@ -606,9 +619,11 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
         layers, idx, length = B['layers'], B['idx'], B['length']
         bass_full, bass_soft = 'bass' in layers, 'bassl' in layers
         factor = max([SYN_FACTOR[t] for t in layers if t in SYN_FACTOR] or [0])
-        if not (bass_full or bass_soft or factor): continue
+        if not (bass_full or bass_soft or factor or 'event' in layers): continue
         m = bm[bar]; base, L, pi, gst = m['start'], m['L'], m['idx'], set(m['gstarts'])
         ramp = idx / max(1, length - 1)
+        if 'event' in layers:       # un suono isolato e piano in un punto a caso della battuta
+            _note(tracks['arp'], base + random.randrange(L) * q, 2 * q, _pc_pitch((root + scale[random.randrange(n)]) % 12, arp_base), 32 + random.randint(0, 18), 1)
         roll_any, energy = bool(layers & {'roll', 'rolls'}), 'clap' in layers
         arp_vel = (62 + int(18 * ramp)) if roll_any else (72 if energy else 55)
         fb = _fade(B, 'bass')
@@ -741,8 +756,8 @@ def _arrange_faithful(mid, all_notes, g, secmap, tracks, headers, root, scale):
     swing = g['swing']
     for bar, B in enumerate(secmap):
         idx, length = B['idx'], B['length']
-        if not (B['layers'] & MELODIC): continue
-        mel = B['sec']
+        if not (B['layers'] & (MELODIC | EVENT)): continue
+        mel = B['sec'] if B['sec'] in ('break1', 'break2', 'build', 'drop') else 'break1'   # eventi: suonano le battute originali
         base = bar * bt
         sec_end = base + (length - idx) * bt
         ob = idx % loop_bars
@@ -787,7 +802,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
 
     for bar, B in enumerate(secmap):
         layers, idx, length, prev = B['layers'], B['idx'], B['length'], B['prev']
-        if not (layers & MELODIC): continue
+        if not (layers & (MELODIC | EVENT)): continue
         m = bm[bar]; base, L, pi, gstarts = m['start'], m['L'], m['idx'], m['gstarts']
         gst, bt = set(gstarts), L * q
         if bar % 4 == 0:
@@ -802,6 +817,8 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         rpc = cpcs[0]
         ramp = idx / max(1, length - 1)
         roll_any, energy = bool(layers & {'roll', 'rolls'}), 'clap' in layers
+        if 'event' in layers:       # un suono isolato e piano in un punto a caso della battuta
+            _note(tracks['lead'], base + random.randrange(L) * q, 2 * q, _pc_pitch(pc_of(random.randrange(n)), lead_oct), 32 + R(0, 18), 5)
 
         # SUB BASS + BASSLINE: il basso e' portante (bass = pattern del genere, bassl = solo sui battiti e piu' piano)
         if 'bass' in layers or 'bassl' in layers:
@@ -933,7 +950,70 @@ def _events_to_notes(events):
     cleaned_all.sort(key=lambda x: (x[0], x[2]))
     return cleaned_all
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None):
+# ================= MARKER DI SEZIONE + AUTOMAZIONI FILTRO (CC74) =================
+import unicodedata
+
+def _ascii(s):
+    return unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode('ascii')
+
+def section_markers(sections, bm):
+    """[(tick, testo)] un marker per sezione: nome, battuta di inizio e strati che entrano (compaiono nella Marker List di Logic)."""
+    out, prev = [], frozenset()
+    for name, start, _length, layers in sections:
+        ins = sorted(layers - prev)
+        txt = f"{name} - bar {start + 1}" + (" | +" + " +".join(ins) if ins else "")
+        out.append((bm[start]['start'], _ascii(txt)[:110]))
+        prev = layers
+    return out
+
+_SYNTH_MIN = frozenset({'arp', 'arpl', 'lead', 'leadl', 'chords', 'chordsl', 'pad'})
+
+def build_automation(sections, bm, tracks):
+    """CC74 (cutoff/brightness) per le tracce melodiche: uno strato che entra apre il filtro in 4 battute (25 -> livello della sezione),
+    i break lo chiudono un po', le sezioni con rullata (build) aprono il filtro fino a 127 nelle ultime 8 battute.
+    Ritorna {chiave_traccia: [(tick, cc, valore)]}."""
+    q = TICKS_BEAT // 4
+    if 'bassline' in tracks:
+        maps = {'sub_bass': ({'bass', 'bassl'}, {'bassl'}), 'bassline': ({'bass', 'bassl'}, {'bassl'}), 'pad': ({'pad'}, set()),
+                'chords': ({'chords', 'chordsl'}, {'chordsl'}), 'arp': ({'arp', 'arpl'}, {'arpl'}), 'lead': ({'lead', 'leadl'}, {'leadl'})}
+    else:
+        maps = {'bass': ({'bass', 'bassl'}, {'bassl'}), 'arp': (set(_SYNTH_MIN), {'arpl', 'leadl', 'chordsl', 'pad'})}
+    maps = {k: v for k, v in maps.items() if k in tracks}
+    pts = {k: {} for k in maps}          # tick -> valore (l'ultimo scritto vince)
+    last = {k: None for k in maps}
+    def ramp(k, t0, t1, v0, v1, nsteps):
+        for i in range(nsteps):
+            pts[k][int(t0 + (t1 - t0) * i / nsteps)] = int(round(v0 + (v1 - v0) * i / nsteps))
+        pts[k][max(int(t0), int(t1) - 1)] = int(v1)
+    prev = frozenset()
+    for name, start, length, layers in sections:
+        t0 = bm[start]['start']
+        tend = bm[start + length - 1]['start'] + bm[start + length - 1]['L'] * q
+        avg = (tend - t0) / length
+        roll_any = bool(layers & {'roll', 'rolls'})
+        base = 110 if 'clap' in layers else 92
+        W = min(8, length)
+        ts = tend - W * avg
+        for k, (tok, light) in maps.items():
+            active = layers & tok
+            if not active:
+                last[k] = None; continue
+            target = base if (active - light) else base - 28
+            fresh = last[k] is None or not (prev & tok)
+            R = min(4, length)
+            if fresh:
+                if roll_any and t0 + R * avg > ts: pass            # lo sweep del build copre gia' l'ingresso
+                else: ramp(k, t0, t0 + R * avg, 25, target, R * 4)
+            elif last[k] == 127: pts[k][t0] = target                  # dopo il build il filtro torna subito al livello normale
+            elif abs(target - last[k]) > 4: ramp(k, t0, t0 + min(2, length) * avg, last[k], target, min(2, length) * 4)
+            last[k] = target
+            if roll_any:
+                ramp(k, ts, tend, 25 if fresh else max(60, target - 40), 127, W * 4)
+                last[k] = 127
+        prev = layers
+    return {k: [(t, 74, v) for t, v in sorted(p.items())] for k, p in pts.items() if p}
+
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -956,9 +1036,13 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
     if label:
         text = ("MIDI Forge - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
         t_tempo.append(mido.MetaMessage('marker', text=text, time=0))
+    timed = [(tk, 0, 'ts', sig) for tk, sig in ts_changes[1:]] + [(tk, 1, 'mk', txt) for tk, txt in (markers or [])]
+    timed.sort(key=lambda x: (x[0], x[1]))
     last = 0
-    for tk, (nu, de) in ts_changes[1:]:
-        t_tempo.append(mido.MetaMessage('time_signature', numerator=nu, denominator=de, time=tk - last)); last = tk
+    for tk, _o, kind, val in timed:
+        if kind == 'ts': t_tempo.append(mido.MetaMessage('time_signature', numerator=val[0], denominator=val[1], time=tk - last))
+        else: t_tempo.append(mido.MetaMessage('marker', text=val, time=tk - last))
+        last = tk
     t_tempo.append(mido.MetaMessage('end_of_track', time=max(0, total_end - last)))
     mid.tracks.append(t_tempo)
 
@@ -995,10 +1079,13 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
         for start, end, pitch, vel in notes:
             ev.append((end, 0, pitch, 0))
             ev.append((start, 1, pitch, vel))
+        for tk, cc, val in (automation or {}).get(key, []):
+            ev.append((tk, -1, cc, val))                 # CC prima delle note allo stesso tick
         ev.sort(key=lambda x: (x[0], x[1]))
         prev = 0
-        for tick, is_on, pitch, vel in ev:
-            midi_track.append(mido.Message('note_on' if is_on else 'note_off', note=pitch, velocity=vel, time=tick - prev, channel=ch))
+        for tick, kind, a_, b_ in ev:
+            if kind == -1: midi_track.append(mido.Message('control_change', control=a_, value=b_, time=tick - prev, channel=ch))
+            else: midi_track.append(mido.Message('note_on' if kind else 'note_off', note=a_, velocity=b_, time=tick - prev, channel=ch))
             prev = tick
         midi_track.append(mido.MetaMessage('end_of_track', time=max(0, total_end - prev)))
         mid.tracks.append(midi_track)
@@ -1014,7 +1101,7 @@ def _meter_line(meter_plan):
     if len(c) == 1: return f"   {next(iter(c))} (tutto il brano)"
     return "   Ciclo: " + " | ".join(f"{k} x{n}" for k, n in c.items()) + "  (cambi di time signature scritti nel MIDI)"
 
-def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename, meter_plan=None, g_used=None):
+def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename, meter_plan=None, g_used=None, cc_markers=(False, False)):
     report = ["=" * 60, "MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE", "=" * 60, "", "DATA E ORA", f"   Generato il: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", "", "PARAMETRI GENERAZIONE", f"   File originale: {original_filename}", f"   Modalità: {mode.upper()}", f"   Sotto-modalità: {submode.upper()}", f"   Genere: {genre.upper()}", f"   Seed: {seed}", f"   BPM: {bpm}", f"   Battute: {bars}"]
     if duration_mode == "Minuti:Secondi" and duration_seconds:
         report.append(f"   Durata target: {duration_seconds // 60}:{duration_seconds % 60:02d}")
@@ -1031,7 +1118,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
         elif track_key.startswith('instrument_'): report.append(f"   {track_idx}. {track_key} (Canale melodico)")
         else: report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
         track_idx += 1
-    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa)", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
+    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa)", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", *(["   - Automazioni CC74 (filtro): mappa CC74 sul cutoff del synth di ogni traccia; gli strati che entrano aprono il filtro in 4 battute, il build lo apre fino in fondo"] if cc_markers[0] else []), *(["   - Marker di sezione nel file: in Logic li trovi nella Marker List (Navigate > Open Marker List) e sulla timeline, con gli strati che entrano"] if cc_markers[1] else []), "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
@@ -1162,6 +1249,8 @@ with col1:
             submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], format_func=lambda x: {"faithful": "Faithful (fedele all'originale)", "generative": "Generative (solo tonalità, da zero)"}[x])
     if mode == "multitrack":
         split_drums = st.checkbox("Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True)
+        auto_cc = st.checkbox("Automazioni filtro (CC74) su ingressi, break e build", value=True)
+        add_markers = st.checkbox("Marker di sezione nel MIDI", value=True)
 
 with col2:
     genre_list = sorted(GENRES.keys())
@@ -1178,7 +1267,7 @@ with col2:
         duration_mode = st.radio("Durata traccia", ["Battute", "Minuti:Secondi"], horizontal=True)
         if duration_mode == "Battute":
             use_default_bars = st.checkbox("Battute Automatiche", value=True)
-            bars = st.number_input("Battute", min_value=16, max_value=512, step=4, value=g_defaults['bars_default'], disabled=use_default_bars)
+            bars = st.number_input("Battute", min_value=min(16, min_bars(g_defaults)), max_value=512, step=timeline_unit(g_defaults['timeline']), value=g_defaults['bars_default'], disabled=use_default_bars)
             duration_seconds = None
         else:
             col_min, col_sec = st.columns(2)
@@ -1216,15 +1305,17 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
                         odd_ok = uses_odd_meter(mode, submode, bool(notes_data))
                         raw_bars = (duration_seconds * final_bpm) / 60 * 4 / avg_bar_sixteenths(g_defaults, odd_ok)
-                        final_bars = int(round(raw_bars / 4) * 4)  # Arrotonda al multiplo di 4
+                        _u = timeline_unit(g_defaults['timeline'])
+                        final_bars = int(round(raw_bars / _u) * _u)  # arrotonda all'unita' della struttura
                         final_bars = max(min_bars(g_defaults), final_bars)
                         st.info(f"Durata calcolata: {final_bars} battute (per coprire ~{duration_seconds} secondi a {final_bpm} BPM)")
                     else:
                         final_bars = g_defaults['bars_default'] if use_default_bars else bars
 
-                    norm_bars = max(min_bars(g_defaults), (int(final_bars) // 4) * 4)
+                    _u = timeline_unit(g_defaults['timeline'])
+                    norm_bars = max(min_bars(g_defaults), (int(final_bars) // _u) * _u)
                     if norm_bars != final_bars:
-                        st.info(f"Battute allineate al multiplo di 4: {norm_bars}")
+                        st.info(f"Battute allineate alla struttura del genere: {norm_bars}")
                         final_bars = norm_bars
 
                     if mode == "minimal":
@@ -1242,8 +1333,12 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
 
                     label = f"{genre} - {mode}/{submode}"
                     meter_plan = plan_meter(g_defaults, final_bars, uses_odd_meter(mode, submode, bool(notes_data)))
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan)
-                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_defaults, seed, genre))
+                    _, sections_now = compute_structure(final_bars, g_defaults.get('timeline'), seed)
+                    use_cc = auto_cc and not (mode == 'multitrack' and submode == 'faithful')   # in Faithful le tracce sono quelle originali
+                    automation = build_automation(sections_now, meter_plan, tracks) if use_cc else None
+                    markers = section_markers(sections_now, meter_plan) if add_markers else None
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers)
+                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_defaults, seed, genre), (bool(use_cc), bool(add_markers)))
 
                     st.session_state.generated = {
                         'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
