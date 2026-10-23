@@ -12,7 +12,7 @@ st.set_page_config(page_title="MIDI Forge Universale", page_icon="🎛️", layo
 
 # ================= DATABASE DEI GENERI =================
 GENRES = {
-    'acid': {'bpm_default': 135, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
+    'acid': {'bpm_default': 135, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,1, 0,1,0,1, 1,0,1,0, 1,1,0,1], 'arp_density': 0.85, 'swing': 0.0},
     'ambient': {'bpm_default': 80, 'bars_default': 124, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0},
     'armonico': {'bpm_default': 100, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.7, 'swing': 0.1},
     'breakcore': {'bpm_default': 200, 'bars_default': 52, 'kick': [1,0,0,1, 0,1,0,0, 1,0,1,0, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,1,0,0, 1,0,0,1], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,1], 'arp_density': 0.8, 'swing': 0.05, 'meter': ['7/8', '7/8', '4/4', '13/8']},
@@ -42,9 +42,9 @@ GENRES = {
     'sperimentale': {'bpm_default': 100, 'bars_default': 72, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.7, 'swing': 0.1, 'meter': ['5/16', '7/16', '4/4']},
     'soul': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.25, 'lazy': 0.08},
     'synthpop': {'bpm_default': 120, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.75, 'swing': 0.0},
-    'techno': {'bpm_default': 132, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
+    'techno': {'bpm_default': 132, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [0,1,1,1, 0,1,1,1, 0,1,1,1, 0,1,1,1], 'arp_density': 0.75, 'swing': 0.0},
     'trap': {'bpm_default': 140, 'bars_default': 68, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.4, 'swing': 0.0},
-    'trance': {'bpm_default': 140, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1]*16, 'arp_density': 0.9, 'swing': 0.0},
+    'trance': {'bpm_default': 140, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0]*16, 'arp_density': 0.9, 'swing': 0.0},
     'underground': {'bpm_default': 135, 'bars_default': 84, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.1, 'snare_shift': True},
 }
 
@@ -267,6 +267,46 @@ for _k, _v in GENRES.items():
     _v['timeline'] = _tl
     _v['bars_default'] = sum(b for _n, b, _l in _tl)
 
+# Stile armonico e di basso per genere: probabilita' di accordi di settima / nona (per brano) e carattere del basso.
+#   acid: accenti, slide (note legate) e salti d'ottava | octave: ottave alternate (disco) | long: sub 808 lungo (trap)
+#   reese: note sostenute + seconda traccia leggermente scordata (pitch bend) con filtro che si muove (DnB)
+#   rolling: basso fisso sulla tonica tra i kick (techno) | offbeat: basso sui levare (trance) | sync: sincopato (deep)
+GENRE_STYLE = {
+    'deep': dict(seventh=1.0, ninth=0.6, bass_style='sync'), 'dub_techno': dict(seventh=0.9, ninth=0.2), 'r&b': dict(seventh=0.95, ninth=0.5),
+    'soul': dict(seventh=0.95, ninth=0.5), 'funk': dict(seventh=0.9, ninth=0.3), 'disco': dict(seventh=0.8, ninth=0.2, bass_style='octave'),
+    'armonico': dict(seventh=0.8, ninth=0.4), 'hip_hop': dict(seventh=0.6, ninth=0.2), 'synthpop': dict(seventh=0.15), 'trance': dict(seventh=0.0, bass_style='offbeat'),
+    'techno': dict(seventh=0.1, bass_style='rolling'), 'edm_2000s': dict(seventh=0.0), 'minimal_techno': dict(seventh=0.2), 'acid': dict(seventh=0.5, bass_style='acid'),
+    'trap': dict(seventh=0.3, bass_style='long'), 'drum_n_bass': dict(seventh=0.4, bass_style='reese'), 'reggaeton': dict(seventh=0.3), 'elettronico': dict(seventh=0.35), 'commerciale_90s': dict(seventh=0.3),
+}
+for _k, _s in GENRE_STYLE.items(): GENRES[_k].update(_s)
+#   funk: slap/pop (ottave staccate e ghost) | walk: giro sulle note dell'accordo | arp: arpeggio | dubsub: sub sostenuto solo sulla tonica
+STYLE_EXTRA = {'funk': dict(bass_style='funk'), 'soul': dict(bass_style='walk'), 'armonico': dict(bass_style='walk'), 'synthpop': dict(bass_style='arp'),
+               'r&b': dict(bass_style='long'), 'hip_hop': dict(bass_style='long'), 'reggaeton': dict(bass_style='long'), 'dub_techno': dict(bass_style='dubsub'),
+               'industrial': dict(seventh=0.1, bass_style='rolling'), 'edm_2000s': dict(bass_style='offbeat')}
+for _k, _s in STYLE_EXTRA.items(): GENRES[_k].update(_s)
+BASS_ROOT_P = {'rolling': 0.97, 'offbeat': 0.92, 'acid': 0.7, 'octave': 0.9, 'long': 0.85, 'reese': 0.9, 'dubsub': 0.98, 'funk': 0.8}
+
+def _bass_pc(style, hit, cpcs, rpc, root_p):
+    """Nota (classe di altezza) del basso: arp = arpeggio sull'accordo (synthpop), walk = giro sulle note dell'accordo (soul, armonico)."""
+    if style == 'arp': return cpcs[(0, 2, 0, 1)[hit % 4] % len(cpcs)]
+    if style == 'walk': return cpcs[(0, 1, 2, 1)[hit % 4] % len(cpcs)]
+    return rpc if random.random() < root_p else random.choice(cpcs[1:])
+
+def _bass_shape(style, hit, gap, room):
+    """(ottava extra, durata in step, velocity extra) per una nota di basso secondo lo stile del genere."""
+    if style == 'acid':
+        return (12 if random.random() < 0.2 else 0), (gap + 1 if random.random() < 0.35 else gap), (22 if random.random() < 0.3 else 0)
+    if style == 'octave': return (12 if hit % 2 else 0), gap, 0
+    if style == 'long': return (12 if random.random() < 0.12 else 0), min(gap * 2, room), 0
+    if style in ('reese', 'dubsub'): return 0, min(gap * 2, room), 0          # note lunghe e sostenute
+    if style == 'funk':                                             # slap/pop: ottave staccate e note fantasma
+        r = random.random()
+        if r < 0.25: return 12, 1, 12
+        if r < 0.45: return 0, 1, -38
+        return 0, gap, 0
+    return 0, gap, 0
+
+
 DEFAULT_TIMELINE = _parse_timeline([
     ('Intro', 8, 'kick hat'), ('Break', 8, 'kick hat pad chordsl arpl bassl'), ('Build-up', 8, 'kick hat clap bass pad chords arp roll'),
     ('Drop', 24, 'kick hat clap open perc bass pad chords arp lead fill'), ('Break 2', 8, 'kick hat pad chordsl leadl bassl'), ('Outro', 8, 'kick hat')])
@@ -274,6 +314,45 @@ DEFAULT_TIMELINE = _parse_timeline([
 def timeline_unit(tl):
     """Le sezioni si allocano a blocchi di 4 battute; se la timeline ha sezioni non multiple di 4 (silenzi, eventi singoli) a battuta singola."""
     return 4 if all(b % 4 == 0 for _n, b, _l in (tl or DEFAULT_TIMELINE)) else 1
+
+LAYER_ORDER = ['kick', 'hat', 'clap', 'open', 'perc', 'bass', 'bassl', 'pad', 'chords', 'chordsl', 'arp', 'arpl', 'lead', 'leadl', 'roll', 'rolls', 'fill', 'event']
+
+def timeline_table(timeline):
+    """Righe: sezioni; colonne: battute e strati attivi (per l'anteprima nell'app)."""
+    cols = [t for t in LAYER_ORDER if any(t in ls for _n, _b, ls in timeline)]
+    rows, pos = [], 0
+    for n, b, ls in timeline:
+        rows.append({'Sezione': n, 'Battute': f"{pos + 1}-{pos + b}", **{t: ('●' if t in ls else '') for t in cols}})
+        pos += b
+    return rows
+
+def timelines_to_json():
+    """Le timeline attuali di tutti i generi in JSON modificabile: {genere: [[nome, battute, "strati"], ...]}."""
+    data = {k: [[n, b, ' '.join(t for t in LAYER_ORDER if t in ls)] for n, b, ls in v['timeline']] for k, v in sorted(GENRES.items())}
+    return json.dumps(data, ensure_ascii=False, indent=1)
+
+def apply_timelines(data):
+    """Applica timeline personalizzate (anche solo di alcuni generi). Solleva ValueError con un messaggio chiaro se qualcosa non va."""
+    if not isinstance(data, dict): raise ValueError("il JSON deve essere un oggetto {genere: [[nome, battute, strati], ...]}")
+    parsed = {}
+    for k, rows in data.items():
+        if k not in GENRES: raise ValueError(f"genere sconosciuto: {k}")
+        if not isinstance(rows, list) or not rows: raise ValueError(f"{k}: serve una lista di sezioni")
+        try: parsed[k] = _parse_timeline([(str(r[0]), int(r[1]), str(r[2])) for r in rows])
+        except (AssertionError, IndexError, TypeError, ValueError) as e: raise ValueError(f"{k}: sezione non valida ({e})")
+    for k, tl in parsed.items():
+        GENRES[k]['timeline'] = tl
+        GENRES[k]['bars_default'] = sum(b for _n, b, _l in tl)
+    return len(parsed)
+
+TIMELINE_FILE_MSG = ''
+try:
+    from pathlib import Path
+    _tlp = Path(__file__).with_name('midi_forge_timelines.json')
+    if _tlp.exists():
+        TIMELINE_FILE_MSG = f"Timeline personalizzate caricate da {_tlp.name} ({apply_timelines(json.loads(_tlp.read_text(encoding='utf-8')))} generi)"
+except NameError: pass
+except Exception as _e: TIMELINE_FILE_MSG = f"midi_forge_timelines.json ignorato: {_e}"
 
 def min_bars(g):
     tl = g.get('timeline') or DEFAULT_TIMELINE
@@ -393,6 +472,23 @@ def _note(ev, tick, dur, pitch, vel, ch):
     ev.append({'tick': int(tick), 'type': 'on', 'pitch': pitch, 'vel': max(1, min(127, int(vel))), 'channel': ch})
     ev.append({'tick': int(tick + max(1, int(dur))), 'type': 'off', 'pitch': pitch, 'vel': 0, 'channel': ch})
 
+def _question(motif, n):
+    """Frase 'domanda': l'ultima nota resta lontana dalla tonica."""
+    q = list(motif); idx = [i for i, v in enumerate(q) if v is not None]
+    if idx and q[idx[-1]] == 0: q[idx[-1]] = random.choice([2, 4]) % n
+    return q
+
+def _answer(motif):
+    """Frase 'risposta': contorno discendente nella seconda meta' e chiusura sulla tonica."""
+    a = list(motif); idx = [i for i, v in enumerate(a) if v is not None]
+    if idx:
+        for i in idx[len(idx) // 2:]: a[i] = max(0, a[i] - random.choice([1, 2]))
+        a[idx[-1]] = 0
+    return a
+
+def _thin(motif, p=0.25):
+    return [None if (v is not None and random.random() < p) else v for v in motif]
+
 def _gaps(steps, size=16, cap=4):
     steps = sorted(steps)
     out = {}
@@ -461,17 +557,99 @@ def _vary_hat(hat, rs, groove, amount):
         elif groove and rs.random() < amount * 0.35: out[s] = 3
     return out
 
+# ================= LIBRERIA DI PATTERN PER GENERE =================
+# Pattern reali a 16 step (x = colpo, X = accento, g = ghost, - = vuoto). Il seed sceglie una variante per kick / hat / basso
+# (poi le mutazioni di vary_genre la rifiniscono). Dove il kick e' l'identita' del genere (four-on-the-floor, reggaeton) non c'e' la variante.
+def _pat(s, binary=False):
+    m = {'x': 1, 'X': 2, 'g': 3, '-': 0, '.': 0}
+    out = [m[c] for c in s if c in m]
+    assert len(out) == 16, s
+    return [1 if v else 0 for v in out] if binary else out
+
+PATTERN_LIB = {
+ 'acid': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxXx xxXx xxXx xxXx', '-x-X -x-X -x-X -x-X', 'x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg'],
+          'bass': ['x-xx -x-x x-x- xx-x', 'x-x- xx-x x-xx -x-x', 'xx-x -xx- x-x- xx-x', 'x--x -x-x x-xx -x--']},
+ 'breakcore': {'kick': ['x--- --x- -x-- x-x-', 'x-x- --x- ---x x--x', 'x--x --x- x--- -x-x', 'x-x- x--- -x-x --x-'],
+               'hat': ['xxxx xxxx xxxx xxxx', 'xgxx xgxx xgxx xgxx', 'x-xx -xx- xx-x x-xx'], 'bass': ['x--- x--- -x-- x-x-', 'x-x- --x- x--x -x--']},
+ 'commerciale_90s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
+                     'bass': ['x-x- x-x- x-x- x-x-', 'x--x --x- x--x --x-', 'x-xx -x-x x-xx -x-x']},
+ 'deep': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'], 'hat': ['x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg', 'x-Xg x-Xg x-Xg x-Xg'],
+          'bass': ['x--- --x- ---- --x-', 'x--x --x- --x- -x--', 'x-x- ---x --x- x---', 'x--- -x-- --x- x--x']},
+ 'disco': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- ---x x---'], 'hat': ['xxXx xxXx xxXx xxXx', 'x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg'],
+           'bass': ['x-xx -xx- x-xx -xx-', 'x--x x-x- x--x x-x-', 'xx-x xx-x xx-x xx-x', 'x-x- xx-x x-x- xx-x']},
+ 'drum_n_bass': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'], 'kick': ['x--- ---- --x- ----', 'x--- --x- --x- ----', 'x--- ---- --x- --x-', 'x--x ---- --x- ----'],
+                 'hat': ['xxxx xxxx xxxx xxxx', 'xgxg xgxg xgxg xgxg', 'x-xx x-xx x-xx x-xx'],
+                 'bass': ['x--- ---x --x- ----', 'x--x ---- x--- --x-', 'x--- --x- ---x ----', 'x-x- ---- --x- x---']},
+ 'dub_techno': {'clap': ['---- x--- ---- x---', '---- ---- ---- x---', '---- x--- ---- ----'], 'hat': ['--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-', '--X- ---- --X- ----'],
+                'bass': ['x--- ---- x--- ----', 'x--- ---x ---- x---', 'x--- ---- x--x ----', 'x--- --x- ---- ----']},
+ 'edm_2000s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
+               'bass': ['--x- --x- --x- --x-', 'x-x- x-x- x-x- x-x-', '-xx- -xx- -xx- -xx-', 'xxxx xxxx xxxx xxxx']},
+ 'elettronico': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
+                 'bass': ['x--x --x- x--x --x-', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--x -x--']},
+ 'funk': {'snare': ['---- x--- ---- x---', '---- x--x ---- x---', '---- x--- ---x x---', '---- x--- ---- x-x-'], 'kick': ['x--x ---- x-x- ----', 'x--- --x- x--x ----', 'x-x- --x- x--- -x--', 'x--x -x-- x-x- ----'],
+          'hat': ['Xxxx Xxxx Xxxx Xxxx', 'xgxg xgxg xgxg xgxg', 'Xxgx Xxgx Xxgx Xxgx'],
+          'bass': ['x--x -x-x x--- x-x-', 'x-x- -x-x x--x --x-', 'x--x x--- x-x- -x--', 'x-xx --x- x--x -x--']},
+ 'glitch': {'snare': ['---- ---- x--- ----', 'x--- ---- x--- ----', '---- ---- x--- --x-'], 'kick': ['x--- ---- x--- ----', 'x--- ---x x--- ----', 'x--- ---- x-x- ----'],
+            'hat': ['xxxx xxxx xxxx xxxx', 'x-xx -xx- x-xx -xxx', 'xgxx xgxg xxgx xgxx'], 'bass': ['x--- x--- x-x- ----', 'x-x- ---- x--x ----']},
+ 'hip_hop': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---', '---- x--x ---- x---'], 'kick': ['x--- --x- x--- ----', 'x--- --x- x-x- ----', 'x-x- ---- x--- --x-', 'x--- ---x x--- -x--'],
+             'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgxg xgx- xgxx'],
+             'bass': ['x--- --x- x--- --x-', 'x--- ---x x--x ----', 'x-x- --x- x--- -x--']},
+ 'idm': {'kick': ['x--x -x-x ---x --x-', 'x-x- -x-- x--x -x--', 'x--x --x- -x-x x---', 'x-x- --x- x--x --x-'],
+         'hat': ['x-xg xgx- gxxg x-xg', 'xxgx -xgx xgxx gx-x', 'x-x- xxg- x-xg -xxx'], 'bass': ['x--x -x-- x-x- -x--', 'x-x- --x- x--x x---']},
+ 'industrial': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxxx xxxx xxxx xxxx', 'x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx'],
+                'bass': ['xxxx xxxx xxxx xxxx', 'x-x- x-x- x-x- x-x-', 'x--x x--x x-x- x-x-']},
+ 'minimal': {'hat': ['xxxx xxxx xxxx xxxx', 'x-x- x-x- x-x- x-x-', 'x-xg x-xg x-xg x-xg'],
+             'bass': ['x--- ---- x--- ----', 'x--x ---- x--- -x--', 'x-x- ---- x--- ----']},
+ 'minimal_techno': {'hat': ['xxxx xxxx xxxx xxxx', 'x-xx x-xx x-xx x-xx', 'xgxx xgxx xgxx xgxx', 'x-X- x-X- x-X- x-X-'],
+                    'bass': ['x--x --x- --x- x---', 'x--- x--- --x- ----', 'x-x- ---x --x- ----', 'x--- --x- x--- ---x']},
+ 'minimalismo_ritmico': {'kick': ['x--x --x- --x- x---', 'x--- x--x --x- --x-', 'x-x- --x- x--- x-x-'],
+                         'hat': ['xxxx xxxx xxxx xxxx', 'x-x- xx-x x-x- xx-x'], 'bass': ['x--x --x- --x- x---', 'x-x- x--x --x- ----']},
+ 'r&b': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---'], 'kick': ['x--- --x- x--- ----', 'x--- --x- x--- -x--', 'x--- ---x x--- --x-', 'x-x- ---- x--- --x-'],
+         'hat': ['xgxg xgxg xgxg xgxg', 'xgXg xgxg xgXg xgxg', 'x-xg x-xg x-xg x-xx'],
+         'bass': ['x--- --x- x--- --x-', 'x--- ---x --x- x---', 'x-x- --x- x--- ----']},
+ 'reggaeton': {'hat': ['x-x- x-x- x-x- x-x-', '--x- --x- --x- --x-', 'x-xx x-xx x-xx x-xx', 'x-x- x-xx x-x- x-xx'],
+               'bass': ['x--x --x- x--- ----', 'x--x --x- x--x --x-', 'x--- --x- x--x ----']},
+ 'sperimentale': {'kick': ['x--- ---x --x- ----', 'x-x- --x- ---- x---', 'x--x ---- -x-- x---'],
+                  'hat': ['x-x- -xx- x--x -x--', 'xxxx ---- xxxx ----', 'x-xx -x-x x-x- xx--'], 'bass': ['x--- x--x ---x ----', 'x-x- ---- x--x -x--']},
+ 'soul': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'kick': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--- -x--'],
+          'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgx- xgx- xgxg'],
+          'bass': ['x--- ---- x--- --x-', 'x--- --x- x--- ----', 'x-x- ---- x--- --x-']},
+ 'synthpop': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', 'x-x- x-x- x-x- x-x-'],
+              'bass': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x--x x--x x--x x--x']},
+ 'techno': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- ---- ---- x---'], 'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-', '-xXx -xXx -xXx -xXx'],
+            'bass': ['-xxx -xxx -xxx -xxx', '-x-x -x-x -x-x -x-x', '-xx- -xx- -xx- -xx-', '-xxx -x-x -xxx -x-x']},
+ 'trance': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
+            'bass': ['--x- --x- --x- --x-', '-xx- -xx- -xx- -xx-', '--x- --xx --x- --xx', '-x-x -x-x -x-x -x-x']},
+ 'trap': {'kick': ['x--- --x- ---- ----', 'x--- --x- --x- ----', 'x--x ---- --x- ----', 'x--- ---- -x-- x---'],
+          'hat': ['xxxx xxxx xxxx xxxx', 'x-xx x-xx xxxx x-xx', 'xxgx xxgx xxxg xxgx'],
+          'bass': ['x--- ---- ---- ----', 'x--- --x- ---- ----', 'x--- ---- --x- ----', 'x--x ---- --x- ----']},
+ 'underground': {'kick': ['x--- ---- x--- ----', 'x--- ---x x--- ----', 'x--- --x- x--- ----'],
+                 'hat': ['x--x --x- x--x --x-', 'x--x --x- x--x --xx', 'x--x -xx- x--x -xx-'],
+                 'bass': ['x--x --x- x--x --x-', 'x--x --x- x--x -x--', 'x--x -xx- x--x -xx-']},
+ 'armonico': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx'], 'bass': ['x--- ---- x--- ----', 'x--- --x- x--- --x-', 'x-x- x-x- x-x- x-x-']},
+}
+for _g, _d in PATTERN_LIB.items():            # controllo all'avvio: ogni pattern deve avere 16 step
+    assert _g in GENRES, _g
+    for _k, _vs in _d.items():
+        for _s in _vs: _pat(_s)
+
 def vary_genre(g, seed, name=None):
     """Copia del genere con pattern variati in modo deterministico dal seed (+ 'alt': variante B per le frasi pari)."""
     g2 = dict(g)
     rs = random.Random(int(seed) * 7919 + 11)
     kick, bass = list(g['kick']), list(g['bass'])
+    lib = PATTERN_LIB.get(name or g.get('_name'), {})
+    if lib.get('kick'): kick = _pat(rs.choice(lib['kick']), True)
+    if lib.get('bass'): bass = _pat(rs.choice(lib['bass']), True)
+    hat_src = _pat(rs.choice(lib['hat'])) if lib.get('hat') else list(g['hat'])
     four = all(kick[i] for i in (0, 4, 8, 12))
     groove = not four
     if any(kick):
         if not four and name not in FIXED_KICK:
             kick = _mutate(kick, rs, {0}, [3, 6, 7, 10, 11, 14, 15], 0.35, 0.12, 0.4, 2)
-    snare = list(g.get('snare', [0] * 16))
+    snare, clap = list(g.get('snare', [0] * 16)), list(g.get('clap', [0] * 16))
+    if lib.get('snare'): snare = _pat(rs.choice(lib['snare']), True)
+    if lib.get('clap'): clap = _pat(rs.choice(lib['clap']), True)
     if any(snare) and name in LOOSE_SNARE:
         snare = _mutate(snare, rs, {s for s in range(0, 16, 4) if snare[s]}, [2, 3, 6, 7, 10, 11, 14, 15], 0.3, 0.1, 0.3, 2)
     ghost = list(g.get('ghost', [0] * 16))
@@ -481,8 +659,8 @@ def vary_genre(g, seed, name=None):
         for s in rs.sample(cand, rs.randint(2, min(5, len(cand)))): ghost[s] = 1
     if any(bass):
         bass = _mutate(bass, rs, {0}, [2, 3, 6, 7, 10, 11, 14, 15], 0.15 if four else 0.3, 0.1 if four else 0.15, 0.2 if four else 0.35, 1 if four else 2)
-    hat = _vary_hat(g['hat'], rs, groove, 0.10 if four else 0.2) if any(g['hat']) else list(g['hat'])
-    g2.update(kick=kick, snare=snare, ghost=ghost, bass=bass, hat=hat)
+    hat = _vary_hat(hat_src, rs, groove, 0.10 if four else 0.2) if any(g['hat']) else list(g['hat'])
+    g2.update(kick=kick, snare=snare, clap=clap, ghost=ghost, bass=bass, hat=hat)
     # linea di percussioni del seed (rimshot / claves / shaker / tamburello / cowbell) sui levare, solo nel drop
     taken = {s for s in range(16) if kick[s] or snare[s]}
     cand = [s for s in (2, 3, 6, 7, 10, 11, 14, 15) if s not in taken]
@@ -495,44 +673,93 @@ def vary_genre(g, seed, name=None):
     if g.get('swing'): g2['swing'] = round(g['swing'] * rs.uniform(0.7, 1.3), 3)
     g2['arp_density'] = min(0.95, g['arp_density'] * rs.uniform(0.8, 1.25))
     # variante B (usata nella seconda meta' di ogni frase di 8 battute del drop)
-    alt = {'kick': kick, 'snare': snare, 'clap': g.get('clap', [0] * 16), 'ghost': ghost, 'hat': hat, 'perc': _perc() if any(perc) else perc}
+    alt = {'kick': kick, 'snare': snare, 'clap': clap, 'ghost': ghost, 'hat': hat, 'perc': _perc() if any(perc) else perc}
     if any(kick) and not four and name not in FIXED_KICK:
         alt['kick'] = _mutate(kick, rs, {0}, [3, 6, 7, 10, 11, 14, 15], 0.2, 0.08, 0.35, 1)
     if any(hat): alt['hat'] = _vary_hat(hat, rs, groove, 0.14)
     g2['alt'] = alt
     return g2
 
+# ================= TRANSIZIONI (crash, reverse, pausa prima del drop, fill di fine sezione) =================
+GM_CRASH, GM_REVERSE = 49, 119
+TOMS = (50, 48, 47, 45)
+# Generi con transizioni "forti" (pausa di un beat + reverse prima del drop); gli altri hanno transizioni morbide (crash leggero, fill piccoli)
+BIG_TRANSITIONS = frozenset({'techno', 'trance', 'edm_2000s', 'drum_n_bass', 'acid', 'elettronico', 'commerciale_90s', 'trap', 'breakcore', 'industrial', 'synthpop'})
+
+def _entry_strong(layers, prev):
+    """Una sezione 'forte': entra il backbeat (clap) o rientra il kick."""
+    return ('clap' in layers and 'clap' not in prev) or ('kick' in layers and 'kick' not in prev and bool(prev))
+
+def _pause_before(nxt_layers, cur):
+    """Prima del drop: pausa se la sezione corrente ha la rullata o non ha il kick."""
+    return _entry_strong(nxt_layers, cur) and bool((cur & {'roll', 'rolls'}) or 'kick' not in cur)
+
+def _transition_fill(L, big):
+    """Fill di fine sezione: [(step, nota, velocity)], scelto a caso (cambia a ogni transizione)."""
+    S = GM_SNARE
+    t = random.choice(['snare16', 'tom', 'snare8', 'open', 'kicksn'] if big else ['open', 'tom'])
+    if t == 'snare16': f = [(L - 4, S, 70), (L - 3, GM_TOM_HIGH, 85), (L - 2, S, 100), (L - 1, GM_TOM_HIGH, 115)]
+    elif t == 'tom': f = [(L - 4, TOMS[0], 80), (L - 3, TOMS[1], 88), (L - 2, TOMS[2], 96), (L - 1, TOMS[3], 108)]
+    elif t == 'snare8': f = [(L - 8, S, 60), (L - 6, S, 72), (L - 4, S, 84), (L - 2, S, 100), (L - 1, S, 112)]
+    elif t == 'open': f = [(L - 2, GM_CLAP, 95), (L - 1, GM_HAT_OPEN, 100)]
+    else: f = [(L - 4, GM_KICK, 110), (L - 3, S, 90), (L - 2, GM_KICK, 110), (L - 1, S, 115)]
+    return [x for x in f if x[0] >= 0]
+
 def build_drum_events(g, secmap, bm=None):
     """Batteria a strati secondo la timeline del genere: kick, hat, clap (snare+clap sul backbeat), open hat, perc entrano ed escono
-    per sezione; fill ogni 8 battute con 'fill'; rullata di snare con 'roll' (ultime 4 battute) o 'rolls' (ultime 2, piano)."""
+    per sezione; fill ogni 8 battute con 'fill'; rullata di snare con 'roll' (ultime 4 battute) o 'rolls' (ultime 2, piano).
+    Transizioni (g['transitions'], default attive): crash sui cambi forti, fill diverso a ogni fine sezione e, nei generi 'big',
+    reverse cymbal + un beat di pausa prima del drop."""
     if is_drumless(g): return []
     ev, q, R = [], TICKS_BEAT // 4, random.randint
     bm = bm or plan_meter(g, len(secmap), False)
+    use_tr = g.get('transitions', True)
+    big = g.get('_name') in BIG_TRANSITIONS
     pat_a = {'kick': g['kick'], 'snare': g.get('snare', [0] * 16), 'clap': g.get('clap', [0] * 16), 'ghost': g.get('ghost', [0] * 16), 'hat': g['hat'], 'perc': g.get('perc', [0] * 16)}
     pat_b = g.get('alt') or pat_a
     lazy = int(g.get('lazy', 0) * (TICKS_BEAT // 4))   # snare dietro la griglia (hip hop, R&B, soul)
     for bar, B in enumerate(secmap):
-        layers, idx, length = B['layers'], B['idx'], B['length']
-        if not (layers & DRUM_LAYERS): continue
+        layers, idx, length, prev = B['layers'], B['idx'], B['length'], B['prev']
         m = bm[bar]; base, L, pi, gst = m['start'], m['L'], m['idx'], set(m['gstarts'])
+        nxt = secmap[bar + 1] if bar + 1 < len(secmap) else None
+        new_sec = bool(nxt and nxt['idx'] == 0)
+        # crash all'inizio di una sezione forte (o quando il kick esce / entrano molti strati insieme)
+        if use_tr and idx == 0 and bar > 0:
+            strong_in = _entry_strong(layers, prev)
+            kick_out = 'kick' in prev and 'kick' not in layers
+            if strong_in or (big and (kick_out or len(layers - prev) >= 3)):
+                _note(ev, base, TICKS_BEAT * 2, GM_CRASH, (105 if big else 72) - (15 if (kick_out and not strong_in) else 0) + R(0, 8), DRUM_CH)
+        # reverse cymbal + pausa di un beat prima del drop
+        pause_from = None
+        if use_tr and big and new_sec and _pause_before(nxt['layers'], layers) and L >= 8:
+            pause_from = L - 4
+            sb = bar - 1 if idx >= 1 else bar
+            _note(ev, bm[sb]['start'], base + L * q - bm[sb]['start'], GM_REVERSE, 85, DRUM_CH)
+        if not (layers & DRUM_LAYERS): continue
         strong = {0, 8} if L == 16 else {0}
         open_steps = {e - 2 for e in m['ends']}
         P = pat_b if ('clap' in layers and idx % 8 >= 4) else pat_a
         roll_any = bool(layers & {'roll', 'rolls'})
         energy = 'clap' in layers or roll_any
-        fill_bar = 'fill' in layers and idx % 8 == 7
         N = min(4 if 'roll' in layers else (2 if 'rolls' in layers else 0), length)
         in_roll = bool(N) and idx >= length - N
         rr = idx - (length - N) if in_roll else 0
         roll_skip = ([4, 2, 2, 1] if N == 4 else [2, 1])[-N:][rr] if in_roll else 0
         roll_amp = 70 if 'roll' in layers else 40
         sn_shift = 4 if g.get('snare_shift') and (idx // 2) % 2 == 1 else 0   # drill: snare dal beat 3 al beat 4 ogni 2 battute
+        # fill di fine sezione (diverso a ogni transizione)
+        tfill = []
+        if use_tr and new_sec and idx == length - 1 and pause_from is None and not in_roll and L >= 8 and (layers & {'kick', 'clap'}) and nxt['layers'] != layers:
+            tfill = _transition_fill(L, big)
+        fill_set = {x[0] for x in tfill}
+        fill_bar = 'fill' in layers and idx % 8 == 7 and not tfill
         for s in range(L):
+            if pause_from is not None and s >= pause_from: continue
             p = pi[s]
             tick = base + s * q
             sw = int(g['swing'] * q) if s % 2 == 1 else 0
             # KICK
-            if 'kick' in layers and P['kick'][p]:
+            if 'kick' in layers and P['kick'][p] and s not in fill_set:
                 if not energy: vel = (110 + R(0, 5)) if s in gst else (95 + R(0, 10))
                 else:          vel = (120 + R(0, 5)) if s in gst else (100 + R(0, 10))
                 if s in strong: vel += 10
@@ -551,15 +778,17 @@ def build_drum_events(g, secmap, bm=None):
                     _note(ev, tick, q // 2, GM_SNARE, 55 + int(roll_amp * (rr * L + s) / (N * L)), DRUM_CH)
             elif fill_bar and s >= L - 4:
                 _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - (L - 4)) * 15, DRUM_CH)
-            elif 'clap' in layers:
+            elif 'clap' in layers and s not in fill_set:
                 if P['snare'][(p - sn_shift) % 16]: _note(ev, tick + sw + lazy, q // 2, GM_SNARE, (90 if roll_any else 105) + R(0, 10), DRUM_CH)
                 elif P['ghost'][p] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 28 + R(0, 16), DRUM_CH)
                 if P['clap'][p]: _note(ev, tick + sw + lazy, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
             # PERCUSSIONI
-            if 'perc' in layers and not in_roll and not (fill_bar and s >= L - 4):
+            if 'perc' in layers and not in_roll and not (fill_bar and s >= L - 4) and s not in fill_set:
                 if P['perc'][p]: _note(ev, tick + sw, q // 2, g.get('perc_note', GM_RIMSHOT), 55 + R(0, 30), DRUM_CH)
                 if s % 2 == 1 and random.random() < 0.15:
                     _note(ev, tick + sw, q // 2, GM_RIMSHOT if random.random() < 0.5 else GM_TOM_HIGH, 50 + R(0, 40), DRUM_CH)
+        for s_, pch, v in tfill:
+            _note(ev, base + s_ * q, q // 2, pch, min(127, int(v * (1.0 if big else 0.8)) + R(0, 6)), DRUM_CH)
     return ev
 
 # ================= GENERAZIONE MINIMAL (3 TRACCE: Bass / Synth / Drums) =================
@@ -628,6 +857,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
         arp_vel = (62 + int(18 * ramp)) if roll_any else (72 if energy else 55)
         fb = _fade(B, 'bass')
         fs = max([_fade(B, FAMILY[t]) for t in layers if t in SYN_FACTOR] or [1.0])
+        hit = 0
         if remix:
             ob, pool = _pool_at(pools, first_b, last_b, first_b + idx % loop_bars)
             bar_tones = sorted({_pc_pitch(p % 12, 60) for _s, _e, p in pool})
@@ -652,7 +882,8 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
                 else:
                     pc = (root + scale[(bass_prog[bar % 4] if random.random() < 0.8 else pick()) % n]) % 12
                 gap = bass_gap[p] if L == 16 else min(bass_gap[p], L - s)
-                _note(tracks['bass'], tick, gap * q - 15, _bass_pitch(pc), int(((95 if bass_full else 82) + (5 if s in gst else 0)) * fb), 0)
+                oc, dur, vx = _bass_shape(g.get('bass_style'), hit, gap, L - s); hit += 1
+                _note(tracks['bass'], tick, dur * q - 15, _bass_pitch(pc) + oc, min(127, max(1, int(((95 if bass_full else 82) + (5 if s in gst else 0) + vx) * fb))), 0)
 
             # SYNTH / ARP
             av = int((arp_vel + random.randint(0, 8)) * fs)
@@ -692,8 +923,8 @@ def _guess_program(name):
     return 0
 
 DRUM_GROUPS = [('drum_kick', {GM_KICK}), ('drum_snare', {GM_SNARE}), ('drum_hat', {GM_HAT_CLOSED, GM_HAT_OPEN}),
-               ('drum_clap', {GM_CLAP}), ('drum_perc', {GM_RIMSHOT, GM_TOM_HIGH, 54, 56, 70, 75})]
-DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap', 'drum_perc': 'Perc'}
+               ('drum_clap', {GM_CLAP}), ('drum_perc', {GM_RIMSHOT, GM_TOM_HIGH, 54, 56, 70, 75, 43, 45, 47, 48}), ('drum_fx', {49, 119})]
+DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap', 'drum_perc': 'Perc', 'drum_fx': 'Crash / FX'}
 
 def split_drum_track(tracks):
     events = tracks.get('drums')
@@ -777,6 +1008,11 @@ def _tame_scale(scale):
     sel = [i for i in ideal if i in scale]
     return sel if len(sel) >= 5 else ideal
 
+def _add_reese(g, tracks):
+    """Reese bass: la linea di basso raddoppiata su un altro canale; build_automation la scorda con il pitch bend."""
+    if g.get('bass_style') == 'reese' and tracks.get('bassline'):
+        tracks['reese'] = [dict(e, channel=7) for e in tracks['bassline']]
+
 def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     """GENERATIVE: ignora le note originali, usa solo tonalità/scala (DNA). 7 ruoli + batteria,
     ognuno attivo solo nelle sezioni dove ha senso."""
@@ -790,14 +1026,17 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         head = 0 if random.random() < 0.85 else random.choice([3, 4])
         return [head] + random.choices([2, 3, 4, 5, 1, 6], weights=[2, 3, 4, 3, 1, 1], k=3)
     prog_a, prog_b = _rand_prog(), _rand_prog()
-    use7 = random.random() < 0.35                       # accordi di settima
+    use7 = random.random() < g.get('seventh', 0.35)       # accordi di settima (Deep, Soul, R&B... quasi sempre)
+    use9 = random.random() < g.get('ninth', 0.0)          # con la nona
+    bass_style = g.get('bass_style')
     chord_off = random.choice([0, 1, 2, 2, 3])           # dove cadono gli stab degli accordi nel gruppo
     arp_base, lead_oct = random.choice([60, 67, 72]), random.choice([67, 72])
-    bass_root_p, lead_p = random.uniform(0.6, 0.9), random.uniform(0.3, 0.6)
+    bass_root_p, lead_p = BASS_ROOT_P.get(bass_style, random.uniform(0.6, 0.9)), random.uniform(0.3, 0.6)
     bass_steps = [s for s in range(16) if g['bass'][s]]
     bass_gap = _gaps(bass_steps) if bass_steps else {}
     lead_base = [random.randrange(n) if random.random() < lead_p else None for _ in range(16)]
     lead = lead_base
+    lead_q, lead_a = _question(lead_base, n), _answer(lead_base)
     arp_mode, R = 'up', random.randint
 
     for bar, B in enumerate(secmap):
@@ -807,13 +1046,16 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         gst, bt = set(gstarts), L * q
         if bar % 4 == 0:
             arp_mode = random.choice(['up', 'updown', 'rand'])
+            blk = lead_base
             if bar > 0:
                 op = random.choice(['transpose', 'invert', 'drop'])
-                if op == 'transpose': lead_base = [(x + 1) % n if x is not None else None for x in lead_base]; lead = lead_base
-                elif op == 'invert': lead_base = list(reversed(lead_base)); lead = lead_base
-                else: lead = [None if random.random() < 0.3 else x for x in lead_base]
+                if op == 'transpose': lead_base = [(x + 1) % n if x is not None else None for x in lead_base]; blk = lead_base
+                elif op == 'invert': lead_base = list(reversed(lead_base)); blk = lead_base
+                else: blk = _thin(lead_base, 0.3)
+            lead_q, lead_a = _question(blk, n), _answer(blk)      # frase di 4 battute: domanda, domanda, domanda variata, risposta
+        lead = lead_a if bar % 4 == 3 else (_thin(lead_q) if bar % 4 == 2 else lead_q)
         d = (prog_a if (bar // 4) % 2 == 0 else prog_b)[bar % 4]
-        cpcs = [pc_of(d), pc_of(d + 2), pc_of(d + 4)] + ([pc_of(d + 6)] if use7 else [])
+        cpcs = [pc_of(d), pc_of(d + 2), pc_of(d + 4)] + ([pc_of(d + 6)] if use7 else []) + ([pc_of(d + 8)] if use9 else [])
         rpc = cpcs[0]
         ramp = idx / max(1, length - 1)
         roll_any, energy = bool(layers & {'roll', 'rolls'}), 'clap' in layers
@@ -824,12 +1066,14 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         if 'bass' in layers or 'bassl' in layers:
             soft, fb = 'bass' not in layers, _fade(B, 'bass')
             _note(tracks['sub_bass'], base, bt - 20, _pc_pitch(rpc, 24), int((84 if soft else 100) * fb), 0)
+            hit = 0
             for s in range(L):
                 if not g['bass'][pi[s]]: continue
                 if soft and s not in gst: continue
-                pc = rpc if random.random() < bass_root_p else random.choice(cpcs[1:])
+                pc = _bass_pc(bass_style, hit, cpcs, rpc, bass_root_p)
                 gap = bass_gap[pi[s]] if L == 16 else min(bass_gap[pi[s]], L - s)
-                _note(tracks['bassline'], base + s * q, gap * q - 15, _pc_pitch(pc, 36), int(((82 if soft else 95) + (5 if s in gst else 0)) * fb), 1)
+                oc, dur, vx = _bass_shape(bass_style, hit, gap, L - s); hit += 1
+                _note(tracks['bassline'], base + s * q, dur * q - 15, _pc_pitch(pc, 36) + oc, min(127, max(1, int(((82 if soft else 95) + (5 if s in gst else 0) + vx) * fb))), 1)
 
         # PAD: accordo lungo
         if 'pad' in layers:
@@ -899,6 +1143,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
         _arrange_faithful(mid, all_notes, g, secmap, tracks, headers, root, scale)
     else:
         _arrange_generative(g, root, scale, secmap, tracks, bm)
+        _add_reese(g, tracks)
     drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
@@ -916,6 +1161,7 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     tracks, headers = {}, {}
     bm = plan_meter(g, bars, True)
     _arrange_generative(g, root, scale, secmap, tracks, bm)
+    _add_reese(g, tracks)
     drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
@@ -968,7 +1214,7 @@ def section_markers(sections, bm):
 
 _SYNTH_MIN = frozenset({'arp', 'arpl', 'lead', 'leadl', 'chords', 'chordsl', 'pad'})
 
-def build_automation(sections, bm, tracks):
+def build_automation(sections, bm, tracks, style=None):
     """CC74 (cutoff/brightness) per le tracce melodiche: uno strato che entra apre il filtro in 4 battute (25 -> livello della sezione),
     i break lo chiudono un po', le sezioni con rullata (build) aprono il filtro fino a 127 nelle ultime 8 battute.
     Ritorna {chiave_traccia: [(tick, cc, valore)]}."""
@@ -1011,7 +1257,34 @@ def build_automation(sections, bm, tracks):
                 ramp(k, ts, tend, 25 if fresh else max(60, target - 40), 127, W * 4)
                 last[k] = 127
         prev = layers
-    return {k: [(t, 74, v) for t, v in sorted(p.items())] for k, p in pts.items() if p}
+    out = {k: [(t, 74, v) for t, v in sorted(p.items())] for k, p in pts.items() if p}
+    # glide (pitch bend) tra note vicine del basso: 808 lungo (trap) e slide dell'acid. Range del bend = 12 semitoni (RPN 0).
+    if style in ('long', 'acid'):
+        max_gap, max_glen = (3840, 360) if style == 'long' else (240, 100)
+        for k in ('sub_bass', 'bassline', 'bass'):
+            if k not in tracks: continue
+            ons = sorted([e for e in tracks[k] if e['type'] == 'on'], key=lambda e: e['tick'])
+            glide = []
+            for a_, b_ in zip(ons, ons[1:]):
+                d = a_['pitch'] - b_['pitch']
+                if d == 0 or abs(d) > 12 or b_['tick'] - a_['tick'] > max_gap or (b_['tick'] // 120 + b_['pitch']) % 5 >= 3: continue
+                glen = min(b_['tick'] - a_['tick'], max_glen); n_ = max(2, glen // 60)
+                for i in range(n_): glide.append((b_['tick'] + i * glen // n_, 'pb', int(max(-8192, min(8191, round(d / 12 * 8191 * (1 - i / n_)))))))
+                glide.append((b_['tick'] + glen, 'pb', 0))
+            if glide:
+                rpn = [(0, 101, 0), (0, 100, 0), (0, 6, 12), (0, 38, 0), (0, 101, 127), (0, 100, 127)]
+                out[k] = rpn + sorted(out.get(k, []) + glide, key=lambda x: x[0])
+    # Reese: seconda traccia scordata (+0.17 semitoni) e cutoff che si muove lentamente (periodo 8 battute)
+    if 'reese' in tracks:
+        import math
+        end = bm[-1]['start'] + bm[-1]['L'] * q
+        out['reese'] = [(0, 'pb', 700)] + [(t, 74, int(75 + 35 * math.sin(2 * math.pi * t / (8 * 1920)))) for t in range(0, end, 960)]
+    return out
+
+def _show_html(html, height):
+    """Mostra un blocco HTML: st.iframe se disponibile (components.html e' deprecato), altrimenti components.html."""
+    if hasattr(st, 'iframe'): st.iframe(html, height=height)
+    else: components.html(html, height=height)
 
 def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None):
     headers = headers or {}
@@ -1053,7 +1326,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
         if not any(h['type'] == 'program_change' for h in header):
             if is_drums: pc = 0
             else:
-                pc = None if faithful else {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117}.get(key)
+                pc = None if faithful else {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'reese': 39}.get(key)
                 if pc is None: pc = _guess_program(key)
             header.append({'type': 'program_change', 'program': pc})
         bank = [h for h in header if h['type'] == 'control_change' and h['control'] in (0, 32)]
@@ -1064,7 +1337,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
         if is_drums: name = DRUM_TRACK_NAMES.get(key, 'Drums')
         elif key.startswith('instrument_'): name = GM_PROGRAM_NAMES[program] if program is not None else key
         elif faithful: name = key
-        else: name = {'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass', 'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano', 'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drums'}.get(key, key.replace('_', ' ').title())
+        else: name = {'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass', 'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano', 'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drums', 'reese': 'Reese Bass'}.get(key, key.replace('_', ' ').title())
         
         used_names[name] += 1
         if used_names[name] > 1: name = f'{name} {used_names[name]}'
@@ -1080,11 +1353,13 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
             ev.append((end, 0, pitch, 0))
             ev.append((start, 1, pitch, vel))
         for tk, cc, val in (automation or {}).get(key, []):
-            ev.append((tk, -1, cc, val))                 # CC prima delle note allo stesso tick
+            if cc == 'pb': ev.append((tk, -2, max(-8192, min(8191, int(val))), 0))   # pitch bend
+            else: ev.append((tk, -1, cc, val))                 # CC prima delle note allo stesso tick
         ev.sort(key=lambda x: (x[0], x[1]))
         prev = 0
         for tick, kind, a_, b_ in ev:
-            if kind == -1: midi_track.append(mido.Message('control_change', control=a_, value=b_, time=tick - prev, channel=ch))
+            if kind == -2: midi_track.append(mido.Message('pitchwheel', pitch=a_, time=tick - prev, channel=ch))
+            elif kind == -1: midi_track.append(mido.Message('control_change', control=a_, value=b_, time=tick - prev, channel=ch))
             else: midi_track.append(mido.Message('note_on' if kind else 'note_off', note=a_, velocity=b_, time=tick - prev, channel=ch))
             prev = tick
         midi_track.append(mido.MetaMessage('end_of_track', time=max(0, total_end - prev)))
@@ -1094,6 +1369,9 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
     mid.save(file=buf)
     buf.seek(0)
     return buf
+
+def _style_line(g):
+    return f"   Basso: {g.get('bass_style') or 'standard'} | accordi: settima {g.get('seventh', 0.35):.0%}, nona {g.get('ninth', 0.0):.0%} dei brani"
 
 def _meter_line(meter_plan):
     if not meter_plan: return "   4/4 (tutto il brano)"
@@ -1107,7 +1385,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
         report.append(f"   Durata target: {duration_seconds // 60}:{duration_seconds % 60:02d}")
     total_q = sum(m['L'] for m in meter_plan) if meter_plan else bars * 16
     duration_actual = (total_q / 4 * 60) / bpm
-    report.extend([f"   Durata effettiva: {int(duration_actual)}:{int((duration_actual - int(duration_actual)) * 60):02d}", "", "METRO", _meter_line(meter_plan), "", "ANALISI TONALE", f"   Tonica rilevata: {NOTE_NAMES[root]}", f"   Scala: {' - '.join([NOTE_NAMES[(root + i) % 12] for i in scale])}", f"   Intervalli: {scale}", ""])
+    report.extend([f"   Durata effettiva: {int(duration_actual)}:{int((duration_actual - int(duration_actual)) * 60):02d}", "", "METRO", _meter_line(meter_plan), "", "STILE BASSO / ARMONIA", _style_line(g_used or GENRES[genre]), "", "ANALISI TONALE", f"   Tonica rilevata: {NOTE_NAMES[root]}", f"   Scala: {' - '.join([NOTE_NAMES[(root + i) % 12] for i in scale])}", f"   Intervalli: {scale}", ""])
     g = g_used or GENRES[genre]
     report.extend(["PATTERN RITMICI (16 step, adattati ai gruppi del metro)", f"   Kick (GM 36):  {''.join(['#' if x else '.' for x in g['kick']])}", f"   Snare (GM 38): {''.join(['#' if x else '.' for x in g.get('snare', [0]*16)])}"])
     if 'clap' in g: report.append(f"   Clap (GM 39):  {''.join(['#' if x else '.' for x in g['clap']])}")
@@ -1118,7 +1396,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
         elif track_key.startswith('instrument_'): report.append(f"   {track_idx}. {track_key} (Canale melodico)")
         else: report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
         track_idx += 1
-    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa)", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", *(["   - Automazioni CC74 (filtro): mappa CC74 sul cutoff del synth di ogni traccia; gli strati che entrano aprono il filtro in 4 battute, il build lo apre fino in fondo"] if cc_markers[0] else []), *(["   - Marker di sezione nel file: in Logic li trovi nella Marker List (Navigate > Open Marker List) e sulla timeline, con gli strati che entrano"] if cc_markers[1] else []), "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
+    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa)", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", *(["   - Automazioni CC74 (filtro): mappa CC74 sul cutoff del synth di ogni traccia; gli strati che entrano aprono il filtro in 4 battute, il build lo apre fino in fondo"] if cc_markers[0] else []), *(["   - Marker di sezione nel file: in Logic li trovi nella Marker List (Navigate > Open Marker List) e sulla timeline, con gli strati che entrano"] if cc_markers[1] else []), *(["   - Transizioni: crash (nota 49) e reverse cymbal (nota 119) sono nella traccia Crash / FX; se il tuo drum kit non mappa la 119 sostituiscila con un riser. Prima del drop, nei generi forti, c'e' un beat di pausa"] if any(e.get('pitch') in (49, 119) for k_ in ('drum_fx', 'drums') for e in tracks.get(k_, [])) else []), "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
@@ -1219,7 +1497,7 @@ def render_midi_player(tracks, bpm):
     </body>
     </html>
     """
-    components.html(html_player, height=150)
+    _show_html(html_player, 150)
 
 # ================= INTERFACCIA STREAMLIT =================
 
@@ -1247,16 +1525,29 @@ with col1:
             submode = st.selectbox("Sotto-modalità", ["extract", "generate"], format_func=lambda x: {"extract": "Remix (riarrangia le note originali)", "generate": "Nuovo tema (dalle note originali)"}[x])
         else:
             submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], format_func=lambda x: {"faithful": "Faithful (fedele all'originale)", "generative": "Generative (solo tonalità, da zero)"}[x])
-    if mode == "multitrack":
-        split_drums = st.checkbox("Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True)
-        auto_cc = st.checkbox("Automazioni filtro (CC74) su ingressi, break e build", value=True)
-        add_markers = st.checkbox("Marker di sezione nel MIDI", value=True)
+    split_drums = st.checkbox("Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True) if mode == "multitrack" else False
+    auto_cc = st.checkbox("Automazioni filtro (CC74), glide e movimento del basso", value=True)
+    add_markers = st.checkbox("Marker di sezione nel MIDI", value=True)
+    use_trans = st.checkbox("Transizioni (crash, reverse, pausa prima del drop, fill)", value=True)
 
 with col2:
+    with st.expander("Timeline personalizzate (JSON)"):
+        _up = st.file_uploader("Carica timeline modificate (.json)", type=["json"], key="tl_json")
+        if _up is not None:
+            try: st.success(f"Timeline applicate a {apply_timelines(json.loads(_up.getvalue().decode('utf-8')))} generi")
+            except Exception as _e: st.error(f"JSON non valido: {_e}")
+        st.download_button("Scarica le timeline attuali (JSON)", data=timelines_to_json(), file_name="midi_forge_timelines.json", mime="application/json")
+        if TIMELINE_FILE_MSG: st.caption(TIMELINE_FILE_MSG)
+        st.caption("Formato: {\"deep\": [[\"Intro DJ\", 16, \"kick hat pad\"], ...]}. Strati: " + " ".join(LAYER_ORDER) + ". Un file midi_forge_timelines.json accanto allo script viene caricato in automatico.")
     genre_list = sorted(GENRES.keys())
     genre = st.selectbox("Genere Musicale", genre_list, index=genre_list.index("techno"))
     g_defaults = GENRES[genre]
     st.caption('Struttura tipica (' + str(g_defaults['bars_default']) + ' battute):' + _structure_line(g_defaults['bars_default'], g_defaults.get('timeline')))
+    with st.expander("Anteprima struttura e strati"):
+        _off = st.multiselect("Spegni questi strati in tutto il brano", [t for t in LAYER_ORDER if t != 'event'], key=f"off_{genre}")
+        st.table(timeline_table([(n, b, ls - set(_off)) for n, b, ls in g_defaults['timeline']]))
+        st.caption("Le lunghezze valgono per la durata di default: con un altro numero di battute, o col seed, le sezioni scalano in proporzione.")
+    g_run = dict(g_defaults, timeline=[(n, b, frozenset(ls - set(_off))) for n, b, ls in g_defaults['timeline']])
     if g_defaults.get('meter'):
         st.caption('Metro: ' + ' | '.join(g_defaults['meter']) + ' (ciclo per battuta). Con Remix/Faithful resta 4/4, come il MIDI originale.')
     col_bpm1, col_bpm2 = st.columns(2)
@@ -1319,26 +1610,26 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                         final_bars = norm_bars
 
                     if mode == "minimal":
-                        tracks, root, scale = generate_minimal(notes_data, g_defaults, submode, final_bars, seed, dna=dna)
+                        tracks, root, scale = generate_minimal(notes_data, dict(g_run, transitions=use_trans), submode, final_bars, seed, dna=dna)
                         headers = {}
                     else:
                         requested_bars = final_bars
                         if scratch:
-                            tracks, root, scale, headers, final_bars = generate_from_scratch(g_defaults, dna, final_bars, seed, split_drums)
+                            tracks, root, scale, headers, final_bars = generate_from_scratch(dict(g_run, transitions=use_trans), dna, final_bars, seed, split_drums)
                         else:
                             file_bytes.seek(0)
-                            tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, g_defaults, submode, final_bars, seed, split_drums)
+                            tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, dict(g_run, transitions=use_trans), submode, final_bars, seed, split_drums)
                         if final_bars != requested_bars:
                             st.info(f"Durata allineata: {final_bars} battute (richieste: {requested_bars})")
 
                     label = f"{genre} - {mode}/{submode}"
                     meter_plan = plan_meter(g_defaults, final_bars, uses_odd_meter(mode, submode, bool(notes_data)))
-                    _, sections_now = compute_structure(final_bars, g_defaults.get('timeline'), seed)
+                    _, sections_now = compute_structure(final_bars, g_run.get('timeline'), seed)
                     use_cc = auto_cc and not (mode == 'multitrack' and submode == 'faithful')   # in Faithful le tracce sono quelle originali
-                    automation = build_automation(sections_now, meter_plan, tracks) if use_cc else None
+                    automation = build_automation(sections_now, meter_plan, tracks, g_defaults.get('bass_style')) if use_cc else None
                     markers = section_markers(sections_now, meter_plan) if add_markers else None
                     midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers)
-                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_defaults, seed, genre), (bool(use_cc), bool(add_markers)))
+                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_run, seed, genre), (bool(use_cc), bool(add_markers)))
 
                     st.session_state.generated = {
                         'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
