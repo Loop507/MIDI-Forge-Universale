@@ -799,6 +799,29 @@ def _trip_motif(n, count):
     if count == 12: tpl = tpl + [x + random.choice([0, 1, 2]) for x in tpl]
     return tpl
 
+HUMAN_TICKS = {'hip_hop': 10, 'r&b': 10, 'soul': 10, 'funk': 8, 'reggae': 12, 'trip_hop': 12, 'vaporwave': 12, 'jungle': 6, 'disco': 6, 'afro_house': 6, 'amapiano': 6,
+               'soulful_house': 6, 'space_disco': 5, 'uk_garage': 6, 'deep': 5, 'house_90s': 5, 'armonico': 6, 'synthwave': 3, 'dub_techno': 4}
+for _k, _v in HUMAN_TICKS.items(): GENRES[_k]['human'] = _v
+
+def _humanize(tracks, amount, seed):
+    """Micro-timing (+-amount tick; kick e crash restano sulla griglia, snare/clap solo 1/3) e velocity (+-5) sulle tracce generate.
+    Le tracce originali del MIDI (Faithful) non si toccano."""
+    rs = random.Random(int(seed) * 29 + 3)
+    for k, evs in tracks.items():
+        if k == 'drum_kick' or k == 'drum_fx' or k.startswith('instrument'): continue
+        evs.sort(key=lambda e: (e['tick'], e['type'] != 'off'))
+        open_ = {}
+        for e in evs:
+            fixed = e['pitch'] in (36, 49, 57, 119) and (k.startswith('drum'))
+            amt = amount // 3 if (k.startswith('drum') and e['pitch'] in (37, 38, 39)) else amount
+            if e['type'] == 'on':
+                d = 0 if fixed else max(rs.randint(-amt, amt), -e['tick'])
+                open_.setdefault(e['pitch'], []).append(d); e['tick'] += d
+                e['vel'] = max(1, min(127, e['vel'] + (0 if fixed else rs.randint(-5, 5))))
+            else:
+                st_ = open_.get(e['pitch']); e['tick'] = max(0, e['tick'] + (st_.pop(0) if st_ else 0))
+        evs.sort(key=lambda e: (e['tick'], e['type'] != 'off'))
+
 def _free_time(tracks, amount):
     """Niente quantizzazione (Musique Concrete): ogni nota delle tracce non-drum si sposta di +-amount tick, insieme al suo note-off."""
     rs = random.Random(12345 + len(tracks))
@@ -1174,17 +1197,20 @@ def build_drum_events(g, secmap, bm=None):
         nxt = secmap[bar + 1] if bar + 1 < len(secmap) else None
         new_sec = bool(nxt and nxt['idx'] == 0)
         # crash all'inizio di una sezione forte (o quando il kick esce / entrano molti strati insieme)
+        crash_now = False
         if use_tr and idx == 0 and bar > 0:
             strong_in = _entry_strong(layers, prev)
             kick_out = 'kick' in prev and 'kick' not in layers
             if strong_in or (big and (kick_out or len(layers - prev) >= 3)):
+                crash_now = True
                 _note(ev, base, TICKS_BEAT * 2, GM_CRASH, (105 if big else 72) - (15 if (kick_out and not strong_in) else 0) + R(0, 8), DRUM_CH)
         # reverse cymbal + pausa di un beat prima del drop
         pause_from = None
         if use_tr and big and new_sec and _pause_before(nxt['layers'], layers) and L >= 8:
             pause_from = L - 4
             sb = bar - 1 if idx >= 1 else bar
-            _note(ev, bm[sb]['start'], base + L * q - bm[sb]['start'], GM_REVERSE, 85, DRUM_CH)
+            rn = g.get('reverse_note', GM_REVERSE)
+            if rn is not None: _note(ev, bm[sb]['start'], base + L * q - bm[sb]['start'], rn, 85, DRUM_CH)
         if not (layers & DRUM_LAYERS): continue
         strong = {0, 8} if L == 16 else {0}
         open_steps = {e - 2 for e in m['ends']}
@@ -1222,11 +1248,13 @@ def build_drum_events(g, secmap, bm=None):
                 if s == L - 4:
                     for i_ in range(3): _note(ev, tick + i_ * (4 * q // 3), 4 * q // 3 - 10, GM_HAT_CLOSED, 68 + i_ * 14 + R(0, 8), DRUM_CH)
                 hat_on = op = False
-            if hat_on or op:
+            if (hat_on or op) and not (crash_now and s == 0):      # niente hi-hat chiuso insieme al crash
                 hv = (75 + R(0, 20)) if energy else (62 + R(0, 14))
                 if hat_on: hv += {2: 18, 3: -28}.get(P['hat'][p], 0)    # 2 = accento, 3 = ghost
+                hv += 6 if s == 0 else (3 if s % 8 == 0 else 0)          # accento naturale sul 1 e sul 3
+                hv = min(hv, 105)                                          # le fonti: 65-95 normale, 100+ solo accenti
                 if hv:
-                    _note(ev, tick + sw, (TICKS_BEAT // 2) if op else q // 2, GM_HAT_OPEN if op else GM_HAT_CLOSED, hv + (15 if op else 0), DRUM_CH)
+                    _note(ev, tick + sw, (TICKS_BEAT // 2) if op else q // 2, GM_HAT_OPEN if op else GM_HAT_CLOSED, min(110, hv + (15 if op else 0)), DRUM_CH)
                     if g.get('hat_sub') and not op and random.random() < 0.35:     # stutter 1/32 (hyperpop)
                         _note(ev, tick + sw + q // 2, q // 4, GM_HAT_CLOSED, max(20, hv - 18), DRUM_CH)
             # SNARE / CLAP / ROLL / FILL
@@ -1239,7 +1267,7 @@ def build_drum_events(g, secmap, bm=None):
                 _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - (L - 4)) * 15, DRUM_CH)
             elif 'clap' in layers and s not in fill_set:
                 if P['snare'][(p - sn_shift) % 16]: _note(ev, tick + sw + lazy, q // 2, g.get('snare_note', GM_SNARE), (90 if roll_any else 105) + R(0, 10), DRUM_CH)
-                elif P['ghost'][p] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 28 + R(0, 16), DRUM_CH)
+                elif P['ghost'][p] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 36 + R(0, 14), DRUM_CH)
                 if P['clap'][p]: _note(ev, tick + sw + lazy, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
             # PERCUSSIONI
             if 'perc' in layers and not in_roll and not (fill_bar and s >= L - 4) and s not in fill_set:
@@ -1359,6 +1387,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
 
     tr_ = {k: v for k, v in tracks.items() if v}
     if g.get('free_time'): _free_time(tr_, g['free_time'])
+    if g.get('human') and g.get('humanize', True): _humanize(tr_, g['human'], seed)
     return tr_, root, scale
 
 # ================= GENERAZIONE MULTITRACK =================
@@ -1384,7 +1413,7 @@ def _guess_program(name):
     return 0
 
 DRUM_GROUPS = [('drum_kick', {GM_KICK}), ('drum_snare', {GM_SNARE}), ('drum_hat', {GM_HAT_CLOSED, GM_HAT_OPEN}),
-               ('drum_clap', {GM_CLAP}), ('drum_perc', {GM_RIMSHOT, GM_TOM_HIGH, 54, 56, 70, 75, 43, 45, 47, 48}), ('drum_fx', {49, 119})]
+               ('drum_clap', {GM_CLAP}), ('drum_perc', {GM_RIMSHOT, GM_TOM_HIGH, 54, 56, 70, 75, 43, 45, 47, 48}), ('drum_fx', {49, 57, 119})]
 DRUM_TRACK_NAMES = {'drums': 'Drums', 'drum_kick': 'Kick', 'drum_snare': 'Snare', 'drum_hat': 'Hat', 'drum_clap': 'Clap', 'drum_perc': 'Perc', 'drum_fx': 'Crash / FX'}
 
 def split_drum_track(tracks):
@@ -1621,6 +1650,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
     if g.get('free_time'): _free_time(tracks, g['free_time'])
+    if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
     if split_drums and 'drums' in tracks:
         tracks = split_drum_track(tracks)
     return tracks, root, scale, headers, bars
@@ -1640,6 +1670,7 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
     if g.get('free_time'): _free_time(tracks, g['free_time'])
+    if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
     if split_drums and 'drums' in tracks: tracks = split_drum_track(tracks)
     return tracks, root, scale, headers, bars
 
@@ -1961,7 +1992,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
         elif track_key.startswith('instrument_'): report.append(f"   {track_idx}. {track_key} (Canale melodico)")
         else: report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
         track_idx += 1
-    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa)", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", *(["   - Automazioni CC74 (filtro): mappa CC74 sul cutoff del synth di ogni traccia; gli strati che entrano aprono il filtro in 4 battute, il build lo apre fino in fondo"] if cc_markers[0] else []), *(["   - Marker di sezione nel file: in Logic li trovi nella Marker List (Navigate > Open Marker List) e sulla timeline, con gli strati che entrano"] if cc_markers[1] else []), *(["   - Transizioni: crash (nota 49) e reverse cymbal (nota 119) sono nella traccia Crash / FX; se il tuo drum kit non mappa la 119 sostituiscila con un riser. Prima del drop, nei generi forti, c'e' un beat di pausa"] if any(e.get('pitch') in (49, 119) for k_ in ('drum_fx', 'drums') for e in tracks.get(k_, [])) else []), "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
+    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa): solo cosi' Logic carica anche marker, cambi di tempo e di metro; se importi in un progetto esistente rispondi Si' a \"importa informazioni di tempo\", altrimenti le battute non coincidono", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", *(["   - Automazioni CC74 (filtro): mappa CC74 sul cutoff del synth di ogni traccia; gli strati che entrano aprono il filtro in 4 battute, il build lo apre fino in fondo"] if cc_markers[0] else []), *(["   - Marker di sezione nel file: in Logic li trovi nella Marker List (Navigate > Open Marker List) e sulla timeline, con gli strati che entrano"] if cc_markers[1] else []), *(["   - Transizioni: crash (nota 49) e reverse cymbal (nota 119) sono nella traccia Crash / FX; se il tuo drum kit non mappa la 119 sostituiscila con un riser. Prima del drop, nei generi forti, c'e' un beat di pausa"] if any(e.get('pitch') in (49, 119) for k_ in ('drum_fx', 'drums') for e in tracks.get(k_, [])) else []), "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
@@ -2075,25 +2106,27 @@ st.markdown("Trasforma qualsiasi file MIDI in 50+ generi musicali. Ogni genere h
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    source = st.radio("Sorgente", ["Da un MIDI caricato", "Da zero (senza MIDI)"], horizontal=True)
+    source = st.radio("Sorgente", ["Da un MIDI caricato", "Da zero (senza MIDI)"], horizontal=True, key='source')
     scratch = source.startswith("Da zero")
     if scratch:
         uploaded_file = None
-        key_choice = st.selectbox("Tonalità", ["Random"] + NOTE_NAMES)
-        scale_choice = st.selectbox("Scala", ["Random"] + list(SCALES.keys()))
-        mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], format_func=lambda x: {"minimal": "Minimal (3 tracce)", "multitrack": "Multitraccia (7+ tracce)"}[x])
+        key_choice = st.selectbox("Tonalità", ["Random"] + NOTE_NAMES, key='key_choice')
+        scale_choice = st.selectbox("Scala", ["Random"] + list(SCALES.keys()), key='scale_choice')
+        mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], format_func=lambda x: {"minimal": "Minimal (3 tracce)", "multitrack": "Multitraccia (7+ tracce)"}[x], key='mode')
         submode = "generate" if mode == "minimal" else "generative"
     else:
         uploaded_file = st.file_uploader("Carica il tuo file MIDI (.mid o .midi)", type=["mid", "midi"])
-        mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"])
+        mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], format_func=lambda x: {"minimal": "Minimal (3 tracce)", "multitrack": "Multitraccia (7+ tracce)"}[x], key='mode')
         if mode == "minimal":
-            submode = st.selectbox("Sotto-modalità", ["extract", "generate"], format_func=lambda x: {"extract": "Remix (riarrangia le note originali)", "generate": "Nuovo tema (dalle note originali)"}[x])
+            submode = st.selectbox("Sotto-modalità", ["extract", "generate"], format_func=lambda x: {"extract": "Remix (riarrangia le note originali)", "generate": "Nuovo tema (dalle note originali)"}[x], key='submode_minimal')
         else:
-            submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], format_func=lambda x: {"faithful": "Faithful (fedele all'originale)", "generative": "Generative (solo tonalità, da zero)"}[x])
+            submode = st.selectbox("Sotto-modalità", ["faithful", "generative"], format_func=lambda x: {"faithful": "Faithful (fedele all'originale)", "generative": "Generative (solo tonalità, da zero)"}[x], key='submode_multitrack')
     split_drums = st.checkbox("Batteria su tracce separate (Kick / Snare / Hat / Clap)", value=True) if mode == "multitrack" else False
     auto_cc = st.checkbox("Automazioni filtro (CC74), glide e movimento del basso", value=True)
     add_markers = st.checkbox("Marker di sezione nel MIDI", value=True)
     use_trans = st.checkbox("Transizioni (crash, reverse, pausa prima del drop, fill)", value=True)
+    rev_note = st.selectbox("Nota del reverse cymbal", [119, 57, None], format_func=lambda n: {119: "119 - Reverse Cymbal (Roland GS)", 57: "57 - Crash 2 (GM)", None: "Nessuno"}[n]) if use_trans else GM_REVERSE
+    use_human = st.checkbox("Humanize (micro-timing e velocity nei generi organici)", value=True)
 
 with col2:
     with st.expander("Timeline personalizzate (JSON)"):
@@ -2105,7 +2138,8 @@ with col2:
         if TIMELINE_FILE_MSG: st.caption(TIMELINE_FILE_MSG)
         st.caption("Formato: {\"deep\": [[\"Intro DJ\", 16, \"kick hat pad\"], ...]}. Strati: " + " ".join(LAYER_ORDER) + ". Un file midi_forge_timelines.json accanto allo script viene caricato in automatico.")
     genre_list = sorted(GENRES.keys(), key=lambda k: _ascii(GENRE_LABELS.get(k, k)).lower())   # ordine alfabetico per nome
-    genre = st.selectbox("Genere Musicale", genre_list, index=genre_list.index("techno"), format_func=lambda k: GENRE_LABELS.get(k, k))
+    st.session_state.setdefault('genre', 'techno')
+    genre = st.selectbox("Genere Musicale", genre_list, format_func=lambda k: GENRE_LABELS.get(k, k), key='genre')
     g_defaults = GENRES[genre]
     st.caption('Struttura tipica (' + str(g_defaults['bars_default']) + ' battute):' + _structure_line(g_defaults['bars_default'], g_defaults.get('timeline')))
     with st.expander("Anteprima struttura e strati"):
@@ -2143,9 +2177,50 @@ def _regen():
     st.session_state['seed'] = random.SystemRandom().randint(1, 99999)
     st.session_state['_regen_run'] = True
 
-def _restore_seed(s):
-    st.session_state['seed'] = int(s)
+def _fav_id(e):
+    return (e.get('genre'), e.get('mode'), e.get('submode'), e.get('seed'), e.get('key_choice'), e.get('scale_choice'), e.get('source'))
+
+def _fav_path():
+    try:
+        from pathlib import Path
+        return Path(__file__).with_name('midi_forge_favorites.json')
+    except NameError:
+        return None
+
+def _fav_load():
+    p = _fav_path()
+    try:
+        if p and p.exists(): return [x for x in json.loads(p.read_text(encoding='utf-8')) if isinstance(x, dict) and 'seed' in x and 'genre' in x]
+    except Exception: pass
+    return []
+
+def _fav_save(favs):
+    """Salva su file solo se midi_forge_favorites.json esiste gia' accanto allo script (opt-in: su un'app pubblica il file sarebbe condiviso da tutti)."""
+    p = _fav_path()
+    try:
+        if p and p.exists(): p.write_text(json.dumps(favs, ensure_ascii=False, indent=1), encoding='utf-8')
+    except Exception: pass
+
+def _fav_add(e):
+    if not e: return
+    favs = [x for x in st.session_state.get('favorites', []) if _fav_id(x) != _fav_id(e)]
+    favs.insert(0, dict(e)); st.session_state['favorites'] = favs[:100]; _fav_save(st.session_state['favorites'])
+
+def _fav_del(i):
+    favs = list(st.session_state.get('favorites', []))
+    if 0 <= i < len(favs): favs.pop(i)
+    st.session_state['favorites'] = favs; _fav_save(favs)
+
+def _fav_restore(e):
+    """Ripristina le impostazioni del brano (sorgente, modalita', genere, tonalita', scala, seed) e rigenera subito."""
+    for k_ui in ('source', 'mode', 'genre', 'seed', 'key_choice', 'scale_choice'):
+        if e.get(k_ui) is not None: st.session_state[k_ui] = e[k_ui]
+    if e.get('submode'): st.session_state['submode_minimal' if e.get('mode') == 'minimal' else 'submode_multitrack'] = e['submode']
     st.session_state['_regen_run'] = True
+
+def _preset_label(e):
+    extra = f" - {e['key_choice']} {e['scale_choice']}" if e.get('key_choice') not in (None, 'Random') else ''
+    return f"{GENRE_LABELS.get(e['genre'], e['genre'])} - seed {e['seed']} - {e.get('mode')}/{e.get('submode')}{extra}"
 
 _bc1, _bc2 = st.columns([3, 1])
 _gen_clicked = _bc1.button("Genera MIDI", type="primary", use_container_width=True)
@@ -2193,15 +2268,15 @@ if _gen_clicked or _regen_flag:
                         final_bars = norm_bars
 
                     if mode == "minimal":
-                        tracks, root, scale = generate_minimal(notes_data, dict(g_run, transitions=use_trans), submode, final_bars, seed, dna=dna)
+                        tracks, root, scale = generate_minimal(notes_data, dict(g_run, transitions=use_trans, humanize=use_human, reverse_note=rev_note), submode, final_bars, seed, dna=dna)
                         headers = {}
                     else:
                         requested_bars = final_bars
                         if scratch:
-                            tracks, root, scale, headers, final_bars = generate_from_scratch(dict(g_run, transitions=use_trans), dna, final_bars, seed, split_drums)
+                            tracks, root, scale, headers, final_bars = generate_from_scratch(dict(g_run, transitions=use_trans, humanize=use_human, reverse_note=rev_note), dna, final_bars, seed, split_drums)
                         else:
                             file_bytes.seek(0)
-                            tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, dict(g_run, transitions=use_trans), submode, final_bars, seed, split_drums)
+                            tracks, root, scale, headers, final_bars = generate_multitrack(file_bytes, dict(g_run, transitions=use_trans, humanize=use_human, reverse_note=rev_note), submode, final_bars, seed, split_drums)
                         if final_bars != requested_bars:
                             st.info(f"Durata allineata: {final_bars} battute (richieste: {requested_bars})")
 
@@ -2215,15 +2290,17 @@ if _gen_clicked or _regen_flag:
                     midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev)
                     report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_run, seed, genre), (bool(use_cc), bool(add_markers)), tempo_ev)
 
+                    _preset = {'genre': genre, 'mode': mode, 'submode': submode, 'seed': int(seed), 'source': source, 'key_choice': globals().get('key_choice', 'Random'), 'scale_choice': globals().get('scale_choice', 'Random'), 'bpm': final_bpm}
                     st.session_state.generated = {
                         'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
                         'bars': final_bars, 'bpm': final_bpm, 'midi_bytes': midi_buffer.getvalue(),
                         'report_text': report_text, 'label': label, 'mode': mode,
                         'submode': submode, 'genre': genre, 'duration_mode': duration_mode,
-                        'duration_seconds': duration_seconds, 'original_filename': src_name, 'seed': seed
+                        'duration_seconds': duration_seconds, 'original_filename': src_name, 'seed': seed, 'preset': _preset
                     }
-                    _h = [x for x in st.session_state.get('seed_history', []) if x['seed'] != seed]
-                    st.session_state['seed_history'] = ([{'seed': seed, 'genre': genre, 'bpm': final_bpm, 'mode': f"{mode}/{submode}"}] + _h)[:10]
+                    st.session_state['seed_history'] = ([_preset] + [x for x in st.session_state.get('seed_history', []) if _fav_id(x) != _fav_id(_preset)])[:10]
+                    if tempo_ev or any(m_['key'] != '4/4' for m_ in meter_plan):
+                        st.info("Questo brano ha cambi di metro o di tempo: in Logic aprilo con File > Apri (Cmd+O). Se lo importi in un progetto esistente, rispondi Si' a 'importa informazioni di tempo', altrimenti le battute non coincidono.")
                     st.success(f"Completato! (Tonica: {NOTE_NAMES[root]}, BPM: " + (f"variabile {min(b_ for _t, b_ in tempo_ev)}-{max(b_ for _t, b_ in tempo_ev)}" if tempo_ev else str(final_bpm)) + f", Seed: {seed})")
             except Exception as e:
                 st.error(f"Errore: {str(e)}")
@@ -2237,16 +2314,32 @@ if g and g.get('midi_bytes') is not None and g.get('report_text'):
         st.download_button(label="Scarica MIDI", data=g['midi_bytes'], file_name=f"midi_forge_{g['genre']}_{g['mode']}_{g['submode']}_seed{g.get('seed', '')}.mid", mime="audio/midi", use_container_width=True)
     with col_dl2:
         st.download_button(label="Scarica Report TXT", data=g['report_text'].encode('utf-8'), file_name=f"report_{g['genre']}_{g['mode']}_{g['submode']}_seed{g.get('seed', '')}.txt", mime="text/plain", use_container_width=True)
+    if g.get('preset'):
+        st.button("⭐ Mi piace (salva nei preferiti)", key="fav_add", on_click=_fav_add, args=(g['preset'],), use_container_width=True)
     with st.expander("Visualizza Report"):
         st.code(g['report_text'], language=None)
 else:
     st.info("Carica un MIDI e clicca 'Genera' per iniziare.")
 
-if st.session_state.get('seed_history'):
-    with st.expander("Cronologia seed (per tornare a un brano precedente)"):
-        st.caption("Per ritrovare lo stesso brano seleziona lo stesso genere e le stesse impostazioni, poi clicca il seed.")
-        for i_, h_ in enumerate(st.session_state['seed_history']):
-            st.button(f"Seed {h_['seed']} - {GENRE_LABELS.get(h_['genre'], h_['genre'])} - {h_['bpm']} BPM ({h_['mode']})", key=f"hist_{i_}", on_click=_restore_seed, args=(h_['seed'],))
+if 'favorites' not in st.session_state: st.session_state['favorites'] = _fav_load()
+with st.expander(f"Preferiti ⭐ ({len(st.session_state['favorites'])})"):
+    st.caption("Ogni preferito ricorda genere, modalita', tonalita', scala e seed: un clic e ritrovi lo stesso brano. Restano finche' l'app e' aperta: "
+               "per conservarli scarica il JSON e ricaricalo la volta dopo. In locale, se accanto allo script crei un file midi_forge_favorites.json con dentro [], si salvano da soli.")
+    _fv = st.session_state['favorites']
+    for i_, e_ in enumerate(_fv):
+        c1_, c2_ = st.columns([8, 1])
+        c1_.button("⭐ " + _preset_label(e_), key=f"fav_{i_}", on_click=_fav_restore, args=(e_,), use_container_width=True)
+        c2_.button("🗑", key=f"favdel_{i_}", on_click=_fav_del, args=(i_,))
+    if _fv: st.download_button("Scarica i preferiti (JSON)", data=json.dumps(_fv, ensure_ascii=False, indent=1), file_name="midi_forge_favorites.json", mime="application/json")
+    _fu = st.file_uploader("Carica preferiti (.json)", type=["json"], key="fav_json")
+    if _fu is not None and st.session_state.get('_fav_imported') != (_fu.name, _fu.size):
+        try:
+            for x_ in reversed([x for x in json.loads(_fu.getvalue().decode('utf-8')) if isinstance(x, dict) and 'seed' in x and 'genre' in x]): _fav_add(x_)
+            st.session_state['_fav_imported'] = (_fu.name, _fu.size); st.rerun()
+        except Exception as e_:
+            st.error(f"JSON dei preferiti non valido: {e_}")
 
-st.markdown("---")
-st.caption("MIDI Forge Universale | Standard General MIDI | Struttura per genere a strati | 100% Open Source & Free")
+if st.session_state.get('seed_history'):
+    with st.expander("Cronologia (ultimi brani generati)"):
+        for i_, h_ in enumerate(st.session_state['seed_history']):
+            st.button(_preset_label(h_), key=f"hist_{i_}", on_click=_fav_restore, args=(h_,), use_container_width=True)
