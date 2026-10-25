@@ -13,39 +13,57 @@ st.set_page_config(page_title="MIDI Forge Universale", page_icon="🎛️", layo
 # ================= DATABASE DEI GENERI =================
 GENRES = {
     'acid': {'bpm_default': 135, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,1, 0,1,0,1, 1,0,1,0, 1,1,0,1], 'arp_density': 0.85, 'swing': 0.0},
+    'afro_house': {'bpm_default': 122, 'bars_default': 96, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.08},
+    'amapiano': {'bpm_default': 112, 'bars_default': 96, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,1,1,0, 0,0,1,0, 0,1,0,0], 'ghost': [0]*16, 'arp_density': 0.25, 'swing': 0.16},
     'ambient': {'bpm_default': 80, 'bars_default': 124, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0},
     'armonico': {'bpm_default': 100, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.7, 'swing': 0.1},
     'breakcore': {'bpm_default': 200, 'bars_default': 52, 'kick': [1,0,0,1, 0,1,0,0, 1,0,1,0, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,1,0,0, 1,0,0,1], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,1], 'arp_density': 0.8, 'swing': 0.05, 'meter': ['7/8', '7/8', '4/4', '13/8']},
+    'chiptune': {'bpm_default': 120, 'bars_default': 48, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.8, 'swing': 0.0, 'arp_sub': 2},
     'commerciale_90s': {'bpm_default': 120, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'arp_density': 0.6, 'swing': 0.08},
     'deep': {'bpm_default': 124, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,1], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.15},
     'disco': {'bpm_default': 122, 'bars_default': 76, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.2},
     'drone': {'bpm_default': 70, 'bars_default': 124, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.05, 'swing': 0.0},
     'drum_n_bass': {'bpm_default': 174, 'bars_default': 116, 'kick': [1,0,0,0, 0,0,1,0, 0,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,1, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'arp_density': 0.7, 'swing': 0.0},
     'dub_techno': {'bpm_default': 128, 'bars_default': 156, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'arp_density': 0.4, 'swing': 0.0},
+    'dubstep': {'bpm_default': 140, 'bars_default': 144, 'kick': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.25, 'swing': 0.0, 'roll32': True},
     'edm_2000s': {'bpm_default': 128, 'bars_default': 100, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
     'elettronico': {'bpm_default': 130, 'bars_default': 84, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
     'funk': {'bpm_default': 112, 'bars_default': 56, 'kick': [1,0,0,1, 0,0,0,0, 1,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [2,1,1,1, 2,1,1,1, 2,1,1,1, 2,1,1,1], 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,1,0,0], 'ghost': [0,0,0,1, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.05},
+    'future_bass': {'bpm_default': 150, 'bars_default': 80, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.5, 'swing': 0.0, 'chord_off': 2, 'hat_triplet': True, 'roll32': True},
     'glitch': {'bpm_default': 128, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,1, 0,0,0,0, 1,0,0,0], 'arp_density': 0.95, 'swing': 0.1},
+    'hardstyle': {'bpm_default': 150, 'bars_default': 112, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.5, 'swing': 0.0, 'lead_triplet': True},
     'harsh_noise': {'bpm_default': 100, 'bars_default': 68, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 1.0, 'swing': 0.0, 'meter': ['7/8', '9/8', '4/4']},
     'hip_hop': {'bpm_default': 92, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.3, 'swing': 0.2, 'lazy': 0.12},
+    'house_90s': {'bpm_default': 122, 'bars_default': 112, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,2,0, 0,0,2,0, 0,0,2,0, 0,0,2,0], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.05},
+    'hyperpop': {'bpm_default': 140, 'bars_default': 56, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [1,1,1,1, 1,0,1,1, 1,1,1,0, 1,1,1,1], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.0, 'meter_sections': ['4/4', '4/4', '7/8', '3/4', '4/4', '4/4'], 'tempo_plan': [70, 140, 94, 120, 170, 70], 'hat_sub': True},
     'idm': {'bpm_default': 135, 'bars_default': 72, 'kick': [1,0,0,1, 0,1,0,1, 0,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,0,1,0, 1,0,1,0], 'hat': [1]*16, 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.85, 'swing': 0.1},
     'industrial': {'bpm_default': 135, 'bars_default': 76, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.7, 'swing': 0.0},
+    'jungle': {'bpm_default': 165, 'bars_default': 144, 'kick': [1,0,0,0, 0,0,1,0, 0,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,1,1,1, 0,1,1,1, 0,1,1,1, 0,1,1,1], 'ghost': [0,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'arp_density': 0.2, 'swing': 0.15, 'chord_off': 2},
     'lowercase': {'bpm_default': 104, 'bars_default': 116, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.05, 'swing': 0.0, 'meter': ['17/8']},
     'microsound': {'bpm_default': 90, 'bars_default': 92, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.1, 'swing': 0.0},
     'minimal': {'bpm_default': 126, 'bars_default': 68, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.3, 'swing': 0.0},
     'minimal_techno': {'bpm_default': 130, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.5, 'swing': 0.0},
     'minimalismo_ritmico': {'bpm_default': 115, 'bars_default': 92, 'kick': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 0,0,0,1, 0,1,0,0, 0,0,0,1], 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.05, 'meter': ['11/8', '11/8', '15/8', '15/8']},
+    'musique_concrete': {'bpm_default': 90, 'bars_default': 80, 'kick': [0]*16, 'snare': [0]*16, 'clap': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'ghost': [0]*16, 'arp_density': 0.2, 'swing': 0.0, 'meter': ['5/4', '7/8', '11/8', '3/4'], 'tempo_plan': [60, 72, 58, 90, 60], 'free_time': 240},
     'noise': {'bpm_default': 120, 'bars_default': 76, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 0.9, 'swing': 0.0, 'meter': ['29/16', '4/4']},
     'onkyo': {'bpm_default': 50, 'bars_default': 124, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.02, 'swing': 0.0},
+    'psytrance': {'bpm_default': 145, 'bars_default': 224, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0]*16, 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [0,1,1,1, 0,1,1,1, 0,1,1,1, 0,1,1,1], 'ghost': [0]*16, 'arp_density': 0.8, 'swing': 0.0},
     'r&b': {'bpm_default': 95, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'arp_density': 0.55, 'swing': 0.2, 'lazy': 0.12},
+    'reggae': {'bpm_default': 76, 'bars_default': 68, 'kick': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [3,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.03, 'lazy': 0.1, 'chord_off': 2, 'snare_note': 37},
     'reggaeton': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,1,0, 0,1,0,0, 0,0,1,0, 0,1,0,0], 'clap': [0]*16, 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.0},
-    'sperimentale': {'bpm_default': 100, 'bars_default': 72, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.7, 'swing': 0.1, 'meter': ['5/16', '7/16', '4/4']},
     'soul': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.25, 'lazy': 0.08},
+    'soulful_house': {'bpm_default': 123, 'bars_default': 128, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,2,3, 1,3,2,3, 1,3,2,3, 1,3,2,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.15},
+    'space_disco': {'bpm_default': 120, 'bars_default': 128, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'ghost': [0]*16, 'arp_density': 0.6, 'swing': 0.02},
+    'sperimentale': {'bpm_default': 100, 'bars_default': 72, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.7, 'swing': 0.1, 'meter': ['5/16', '7/16', '4/4']},
     'synthpop': {'bpm_default': 120, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.75, 'swing': 0.0},
+    'synthwave': {'bpm_default': 90, 'bars_default': 80, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1]*16, 'ghost': [0]*16, 'arp_density': 0.5, 'swing': 0.02},
     'techno': {'bpm_default': 132, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [0,1,1,1, 0,1,1,1, 0,1,1,1, 0,1,1,1], 'arp_density': 0.75, 'swing': 0.0},
+    'trance': {'bpm_default': 140, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0], 'arp_density': 0.9, 'swing': 0.0},
     'trap': {'bpm_default': 140, 'bars_default': 68, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'arp_density': 0.4, 'swing': 0.0},
-    'trance': {'bpm_default': 140, 'bars_default': 148, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0]*16, 'arp_density': 0.9, 'swing': 0.0},
+    'trip_hop': {'bpm_default': 80, 'bars_default': 88, 'kick': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [1,0,3,0, 1,0,3,0, 1,0,3,0, 1,0,3,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0,0,1,0, 0,0,0,0, 0,0,1,0, 0,0,1,0], 'arp_density': 0.3, 'swing': 0.2, 'lazy': 0.12},
+    'uk_garage': {'bpm_default': 132, 'bars_default': 88, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.4, 'swing': 0.15},
     'underground': {'bpm_default': 135, 'bars_default': 84, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.65, 'swing': 0.1, 'snare_shift': True},
+    'vaporwave': {'bpm_default': 70, 'bars_default': 64, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [3,0,3,0, 3,0,3,0, 3,0,3,0, 3,0,3,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.2, 'lazy': 0.1},
 }
 
 NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
@@ -159,97 +177,342 @@ FAMILY = {'bass': 'bass', 'bassl': 'bass', 'pad': 'pad', 'chords': 'chords', 'ch
 SYN_FACTOR = {'arp': 1.0, 'lead': 1.0, 'chords': 0.85, 'arpl': 0.5, 'leadl': 0.5, 'chordsl': 0.5, 'pad': 0.5}
 
 TIMELINES = {
- # Famiglia 1: generi ritmici e da club
- 'acid': [('Intro DJ', 32, 'kick hat pad bassl'), ('Groove building', 32, 'kick hat perc pad bass'), ('Main 1', 32, 'kick hat clap perc pad bass fill'),
-          ('Breakdown', 16, 'pad bass'), ('Build-up', 16, 'hat pad bassl roll'), ('Drop / Main 2', 32, 'kick hat clap open perc pad bass fill'),
+ 'acid': [('Intro DJ', 32, 'kick hat pad bassl'),
+          ('Groove building', 32, 'kick hat perc pad bass'),
+          ('Main 1', 32, 'kick hat clap perc pad bass fill'),
+          ('Breakdown', 16, 'pad bass'),
+          ('Build-up', 16, 'hat pad bassl roll'),
+          ('Drop / Main 2', 32, 'kick hat clap open perc pad bass fill'),
           ('Outro', 32, 'kick hat')],
- 'drum_n_bass': [('Intro', 32, 'hat pad leadl'), ('Tension / Build', 16, 'kick hat pad roll'), ('Drop 1', 32, 'kick hat clap bass fill'),
-                 ('Breakdown', 16, 'pad lead'), ('Build 2', 16, 'kick hat pad roll'), ('Drop 2', 32, 'kick hat clap perc bass arp lead fill'),
-                 ('Outro', 16, 'pad')],
- 'dub_techno': [('Intro sommersa', 32, 'kick pad'), ('Groove dub', 32, 'kick hat open pad bass chords'), ('Evoluzione', 32, 'kick hat open pad bass chords perc'),
-                ('Breakdown dub', 16, 'pad chords'), ('Ritorno', 32, 'kick hat open pad bass chords perc'), ('Outro', 16, 'kick pad')],
- 'edm_2000s': [('Intro', 16, 'kick hat arpl'), ('Build 1', 16, 'kick hat pad arpl roll'), ('Drop 1', 32, 'kick hat clap open perc bass chords lead fill'),
-               ('Breakdown', 16, 'pad lead'), ('Build 2', 16, 'kick hat pad chords roll'),
-               ('Drop 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
- 'hip_hop': [('Intro', 4, 'hat chordsl'), ('Beat completo', 4, 'kick hat clap bass'), ('Strofa 1', 16, 'kick hat clap bass chordsl leadl'),
-             ('Hook', 8, 'kick hat clap bass pad chords lead'), ('Strofa 2', 16, 'kick hat clap perc bass chordsl leadl'),
-             ('Hook 2', 8, 'kick hat clap bass pad chords lead fill'), ('Bridge', 8, 'pad chordsl'),
-             ('Strofa 3 / Hook', 16, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'pad chordsl')],
- 'minimal_techno': [('Intro loop', 32, 'kick hat'), ('Evoluzione 1', 32, 'kick hat perc bass'), ('Evoluzione 2', 32, 'kick hat perc bass arpl'),
-                    ('Evoluzione 3', 32, 'kick hat clap perc bass arp'), ('Outro loop', 32, 'kick hat')],
- 'reggaeton': [('Intro', 8, 'kick clap hat'), ('Beat completo', 8, 'kick clap hat perc bass'), ('Strofa 1', 8, 'kick clap hat bass chordsl leadl'),
-               ('Hook', 8, 'kick clap hat perc bass pad chords lead'), ('Strofa 2', 8, 'kick clap hat perc bass chordsl leadl'),
-               ('Hook 2', 8, 'kick clap hat perc bass pad chords lead fill'), ('Bridge', 8, 'clap hat pad bassl'),
-               ('Hook finale', 16, 'kick clap hat open perc bass pad chords arp lead fill'), ('Outro', 24, 'kick clap hat')],
- 'techno': [('Intro DJ', 32, 'kick hat'), ('Build', 32, 'kick hat clap open bass'), ('Main 1', 32, 'kick hat clap open perc bass chords arp'),
-            ('Breakdown', 16, 'pad'), ('Build-up', 16, 'hat pad roll'), ('Drop / Main 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
-            ('Outro', 32, 'kick hat')],
- 'trance': [('Intro lunga', 64, 'kick hat pad arpl'), ('Main 1', 32, 'kick hat clap open bass pad arpl lead'), ('Breakdown', 32, 'pad chordsl lead'),
-            ('Build', 16, 'hat pad chords arp roll'), ('Drop', 32, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'pad')],
- 'trap': [('Intro', 8, 'pad leadl bassl'), ('Hook', 8, 'kick hat clap perc bass pad lead'), ('Strofa 1', 16, 'kick hat clap bass pad leadl'),
-          ('Hook 2', 16, 'kick hat clap perc bass pad lead arp fill'), ('Strofa 2', 16, 'kick hat clap bass pad leadl'), ('Bridge', 8, 'pad leadl'),
-          ('Hook finale', 16, 'kick hat clap perc bass pad lead arp fill'), ('Outro', 8, 'pad leadl bassl')],
- # Famiglia 2: generi armonici e da canzone
- 'commerciale_90s': [('Intro', 8, 'kick hat arpl'), ('Strofa 1', 16, 'kick hat clap bass chordsl leadl'), ('Pre-chorus', 8, 'kick hat clap bass pad roll'),
-                     ('Ritornello', 16, 'kick hat clap open perc bass pad chords arp lead fill'), ('Strofa 2', 16, 'kick hat clap open bass chordsl leadl arpl'),
-                     ('Pre-chorus 2', 8, 'kick hat clap bass pad roll'), ('Ritornello 2', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
-                     ('Bridge', 8, 'pad chordsl bassl'), ('Ritornello finale', 16, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
- 'deep': [('Intro DJ', 16, 'kick hat pad'), ('Groove base', 16, 'kick hat clap open bass pad'), ('Armonia', 16, 'kick hat clap open perc bass pad chords'),
-          ('Hook / Main 1', 16, 'kick hat clap open perc bass pad chords arpl lead'), ('Breakdown breve', 8, 'kick hat perc pad chordsl'),
-          ('Build-up soft', 8, 'kick hat open bass pad chordsl rolls'), ('Main 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+ 'afro_house': [('Intro DJ', 16, 'kick hat perc'),
+          ('Groove', 16, 'kick hat clap open perc bass'),
+          ('Main 1', 16, 'kick hat clap open perc bass pad chords lead'),
+          ('Breakdown', 8, 'perc lead'),
+          ('Main 2', 24, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'kick hat perc')],
+ 'amapiano': [('Intro percussiva', 16, 'hat perc bassl'),
+          ('Groove base', 16, 'kick hat perc bass'),
+          ('Primo picco', 16, 'kick hat clap perc bass pad chords lead'),
+          ('Sezione calma', 16, 'hat perc pad'),
+          ('Secondo picco', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'kick hat perc')],
+ 'ambient': [('Fade in', 32, 'pad'),
+          ('Evoluzione 1', 32, 'pad chordsl'),
+          ('Trasformazione', 32, 'chordsl leadl'),
+          ('Sovrapposizione', 32, 'pad chordsl arp leadl'),
+          ('Fade out', 32, 'pad')],
+ 'armonico': [('Intro armonica', 8, 'pad chordsl'),
+          ('Sezione A', 16, 'kick hat clap bass chords leadl'),
+          ("Sezione A'", 8, 'kick hat clap bass pad chords lead arpl'),
+          ('Sezione B', 16, 'kick hat clap bass chords lead arp'),
+          ('Bridge / modulazione', 8, 'pad chordsl leadl'),
+          ('Ritorno tema', 16, 'kick hat clap bass pad chords lead arp'),
+          ('Outro', 24, 'pad chordsl')],
+ 'breakcore': [('Intro', 8, 'hat perc arpl leadl'),
+          ('Sezione A', 16, 'kick hat clap perc bass fill'),
+          ('Sezione B', 8, 'kick hat clap perc bass arpl fill'),
+          ('Transizione', 8, 'hat clap perc bass rolls'),
+          ('Sezione C', 16, 'kick hat clap perc bass arp lead fill'),
+          ('Finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'chiptune': [('Intro', 8, 'hat arp'),
+          ('Verse', 8, 'kick hat clap bass lead'),
+          ('Chorus', 16, 'kick hat clap perc bass chords arp lead fill'),
+          ('Bridge', 8, 'arp'),
+          ('Chorus finale', 8, 'kick hat clap perc bass chords arp lead fill')],
+ 'commerciale_90s': [('Intro', 8, 'kick hat arpl'),
+          ('Strofa 1', 16, 'kick hat clap bass chordsl leadl'),
+          ('Pre-chorus', 8, 'kick hat clap bass pad roll'),
+          ('Ritornello', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Strofa 2', 16, 'kick hat clap open bass chordsl leadl arpl'),
+          ('Pre-chorus 2', 8, 'kick hat clap bass pad roll'),
+          ('Ritornello 2', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Bridge', 8, 'pad chordsl bassl'),
+          ('Ritornello finale', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'kick hat bass')],
+ 'deep': [('Intro DJ', 16, 'kick hat pad'),
+          ('Groove base', 16, 'kick hat clap open bass pad'),
+          ('Armonia', 16, 'kick hat clap open perc bass pad chords'),
+          ('Hook / Main 1', 16, 'kick hat clap open perc bass pad chords arpl lead'),
+          ('Breakdown breve', 8, 'kick hat perc pad chordsl'),
+          ('Build-up soft', 8, 'kick hat open bass pad chordsl rolls'),
+          ('Main 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
           ('Outro DJ', 16, 'kick hat bass')],
- 'disco': [('Intro vamp', 32, 'kick hat open bass chords'), ('Strofa 1', 16, 'kick hat open clap bass chords leadl arpl'),
-           ('Ritornello', 16, 'kick hat open clap perc bass chords arp lead fill'), ('Strofa 2', 16, 'kick hat open clap bass chords leadl arpl'),
-           ('Ritornello 2', 16, 'kick hat open clap perc bass chords arp lead fill'), ('Breakdown strumentale', 16, 'kick hat open bass chords arp'),
-           ('Ritornello finale', 16, 'kick hat open clap perc bass chords arp lead fill'), ('Outro vamp', 16, 'kick hat open bass chords')],
- 'funk': [('Intro', 8, 'kick hat clap chords'), ('Riff principale', 8, 'kick hat clap bass chords lead'), ('Strofa', 16, 'kick hat clap bass chords leadl'),
-          ('Ritornello / Vamp', 16, 'kick hat clap perc bass chords lead arp fill'), ('Strofa 2', 16, 'kick hat clap perc bass chords leadl'),
-          ('Bridge', 8, 'bass chords'), ('Assolo', 8, 'kick hat clap bass chords lead'), ('Finale', 16, 'kick hat clap open perc bass chords arp lead fill')],
- 'r&b': [('Intro', 8, 'pad chordsl'), ('Strofa 1', 16, 'kick hat clap bass chords leadl'), ('Pre-chorus', 8, 'kick hat clap bass pad rolls'),
-         ('Ritornello', 12, 'kick hat clap open perc bass pad chords arp lead'), ('Strofa 2', 16, 'kick hat clap perc bass chords leadl arpl'),
-         ('Ritornello 2', 12, 'kick hat clap open perc bass pad chords arp lead'), ('Bridge', 8, 'pad chordsl bassl'),
-         ('Ritornello finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
- 'soul': [('Intro', 4, 'kick hat clap bass chords'), ('Strofa 1', 16, 'kick hat clap bass chords leadl arpl'), ('Pre-chorus', 8, 'kick hat clap bass chords arp rolls'),
-          ('Ritornello', 12, 'kick hat clap perc bass pad chords arp lead'), ('Strofa 2', 16, 'kick hat clap perc bass chords leadl arpl'),
-          ('Ritornello 2', 12, 'kick hat clap perc bass pad chords arp lead'), ('Bridge / Vamp', 12, 'kick hat clap bass pad chords arp'),
+ 'disco': [('Intro vamp', 32, 'kick hat open bass chords'),
+          ('Strofa 1', 16, 'kick hat open clap bass chords leadl arpl'),
+          ('Ritornello', 16, 'kick hat open clap perc bass chords arp lead fill'),
+          ('Strofa 2', 16, 'kick hat open clap bass chords leadl arpl'),
+          ('Ritornello 2', 16, 'kick hat open clap perc bass chords arp lead fill'),
+          ('Breakdown strumentale', 16, 'kick hat open bass chords arp'),
+          ('Ritornello finale', 16, 'kick hat open clap perc bass chords arp lead fill'),
+          ('Outro vamp', 16, 'kick hat open bass chords')],
+ 'drone': [('Tono fondamentale', 32, 'pad'),
+          ('Armoniche', 32, 'pad chordsl'),
+          ('Morphing', 32, 'pad bass chordsl'),
+          ('Dissolvenza', 32, 'pad')],
+ 'drum_n_bass': [('Intro', 32, 'hat pad leadl'),
+          ('Tension / Build', 16, 'kick hat pad roll'),
+          ('Drop 1', 32, 'kick hat clap bass fill'),
+          ('Breakdown', 16, 'pad lead'),
+          ('Build 2', 16, 'kick hat pad roll'),
+          ('Drop 2', 32, 'kick hat clap perc bass arp lead fill'),
+          ('Outro', 16, 'pad')],
+ 'dub_techno': [('Intro sommersa', 32, 'kick pad'),
+          ('Groove dub', 32, 'kick hat open pad bass chords'),
+          ('Evoluzione', 32, 'kick hat open pad bass chords perc'),
+          ('Breakdown dub', 16, 'pad chords'),
+          ('Ritorno', 32, 'kick hat open pad bass chords perc'),
+          ('Outro', 16, 'kick pad')],
+ 'dubstep': [('Intro', 16, 'hat pad leadl'),
+          ('Build-up', 16, 'hat pad roll'),
+          ('Drop 1', 16, 'kick hat clap bass fill'),
+          ('Mid-section', 16, 'kick hat clap perc bass arpl'),
+          ('Breakdown', 16, 'pad lead'),
+          ('Build 2', 16, 'kick hat pad roll'),
+          ('Drop 2', 32, 'kick hat clap perc bass pad lead arp fill'),
+          ('Outro', 16, 'pad')],
+ 'edm_2000s': [('Intro', 16, 'kick hat arpl'),
+          ('Build 1', 16, 'kick hat pad arpl roll'),
+          ('Drop 1', 32, 'kick hat clap open perc bass chords lead fill'),
+          ('Breakdown', 16, 'pad lead'),
+          ('Build 2', 16, 'kick hat pad chords roll'),
+          ('Drop 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'kick hat bass')],
+ 'elettronico': [('Intro', 16, 'kick hat'),
+          ('Build', 16, 'kick hat clap open bass'),
+          ('Main / Drop', 32, 'kick hat clap open perc bass pad chords lead'),
+          ('Breakdown', 16, 'pad chordsl'),
+          ('Build 2', 16, 'hat pad chords arp roll'),
+          ('Drop 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'kick hat bass')],
+ 'funk': [('Intro', 8, 'kick hat clap chords'),
+          ('Riff principale', 8, 'kick hat clap bass chords lead'),
+          ('Strofa', 16, 'kick hat clap bass chords leadl'),
+          ('Ritornello / Vamp', 16, 'kick hat clap perc bass chords lead arp fill'),
+          ('Strofa 2', 16, 'kick hat clap perc bass chords leadl'),
+          ('Bridge', 8, 'bass chords'),
+          ('Assolo', 8, 'kick hat clap bass chords lead'),
+          ('Finale', 16, 'kick hat clap open perc bass chords arp lead fill')],
+ 'future_bass': [('Intro', 8, 'pad bassl leadl'),
+          ('Build-up', 8, 'hat pad chordsl roll'),
+          ('Drop 1', 8, 'kick hat clap bass pad chords lead arp fill'),
+          ('Breakdown / Verse', 16, 'pad lead'),
+          ('Build 2', 8, 'hat pad chords roll'),
+          ('Drop 2', 24, 'kick hat clap perc bass pad chords arp lead fill'),
+          ('Outro', 8, 'pad')],
+ 'glitch': [('Intro', 8, 'hat arpl'),
+          ('Beat', 8, 'kick hat clap perc fill'),
+          ('Evoluzione', 16, 'kick hat clap perc bass arp'),
+          ('Breakdown', 8, 'pad arpl'),
+          ('Ritorno', 16, 'kick hat clap perc bass arp lead fill')],
+ 'hardstyle': [('Intro noise', 16, 'kick hat pad'),
+          ('Melodic section', 32, 'kick hat clap bass pad arp lead'),
+          ('Build-up', 16, 'hat pad arp lead roll'),
+          ('Pausa', 8, ''),
+          ('Climax / Drop', 24, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro noise', 16, 'kick pad')],
+ 'harsh_noise': [('Wall 1', 16, 'pad arp'),
+          ('Wall 2', 16, 'pad bass arp lead'),
+          ('Blocco dinamico', 16, 'bass lead'),
+          ('Wall finale', 16, 'pad bass arp lead chords')],
+ 'hip_hop': [('Intro', 4, 'hat chordsl'),
+          ('Beat completo', 4, 'kick hat clap bass'),
+          ('Strofa 1', 16, 'kick hat clap bass chordsl leadl'),
+          ('Hook', 8, 'kick hat clap bass pad chords lead'),
+          ('Strofa 2', 16, 'kick hat clap perc bass chordsl leadl'),
+          ('Hook 2', 8, 'kick hat clap bass pad chords lead fill'),
+          ('Bridge', 8, 'pad chordsl'),
+          ('Strofa 3 / Hook', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'pad chordsl')],
+ 'house_90s': [('Intro DJ', 16, 'kick hat perc'),
+          ('Groove base', 16, 'kick hat clap open bass'),
+          ('Strofe', 16, 'kick hat clap open bass pad chords lead'),
+          ('Ritornello', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Midsection', 16, 'kick hat clap open bass pad'),
+          ('Ritornello 2', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro DJ', 16, 'kick hat')],
+ 'hyperpop': [('Intro', 8, 'pad leadl hat'),
+          ('Blocco 1', 8, 'kick hat clap perc bass fill'),
+          ('Blocco 2', 8, 'hat clap perc arpl lead'),
+          ('Momento pop', 8, 'kick hat clap bass pad chords lead'),
+          ('Climax', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Dissoluzione', 8, 'arpl hat')],
+ 'idm': [('Intro', 8, 'pad arpl'),
+          ('Sezione 1', 8, 'kick hat clap perc'),
+          ('Sezione 2', 16, 'kick hat clap perc bass arp lead'),
+          ('Breakdown', 8, 'pad arpl'),
+          ('Sezione 3', 16, 'kick hat clap perc bass arp lead fill')],
+ 'industrial': [('Intro', 16, 'kick hat arpl'),
+          ('Verse', 16, 'kick hat clap bass'),
+          ('Chorus', 16, 'kick hat clap open perc bass chords lead arp'),
+          ('Bridge', 16, 'pad bassl'),
+          ('Finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'jungle': [('Intro', 16, 'pad chordsl leadl'),
+          ('Build', 16, 'hat perc roll'),
+          ('Drop 1', 32, 'kick hat clap perc bass fill'),
+          ('Sezione dub', 16, 'pad chords perc'),
+          ('Build 2', 16, 'hat perc roll'),
+          ('Drop 2', 32, 'kick hat clap perc bass arp lead fill'),
+          ('Outro', 16, 'pad')],
+ 'lowercase': [('Silenzio', 8, ''),
+          ('Evento 1', 1, 'event'),
+          ('Silenzio 2', 15, ''),
+          ('Eventi ravvicinati', 2, 'event'),
+          ('Silenzio 3', 22, ''),
+          ('Evento 2', 2, 'event')],
+ 'microsound': [('Nube 1', 16, 'arpl'),
+          ('Aumento densita', 16, 'arp'),
+          ('Nube 2', 16, 'arp lead'),
+          ('Dissolvenza', 16, 'arpl')],
+ 'minimal': [('Cellula 1', 16, 'kick hat bass'),
+          ('Cellula 2', 16, 'kick hat bass arpl'),
+          ('Addizione', 16, 'kick hat clap bass arp'),
+          ('Sottrazione', 16, 'kick hat bass arpl'),
+          ('Ritorno', 16, 'kick hat clap bass arp')],
+ 'minimal_techno': [('Intro loop', 32, 'kick hat'),
+          ('Evoluzione 1', 32, 'kick hat perc bass'),
+          ('Evoluzione 2', 32, 'kick hat perc bass arpl'),
+          ('Evoluzione 3', 32, 'kick hat clap perc bass arp'),
+          ('Outro loop', 32, 'kick hat')],
+ 'minimalismo_ritmico': [('Pattern 1', 15, 'kick hat'),
+          ('Pattern 2', 15, 'kick hat perc bass'),
+          ('Pattern 3', 15, 'kick hat clap perc bass arpl'),
+          ('Trasformazione', 15, 'kick hat clap perc bass arp lead'),
+          ('Dissoluzione', 15, 'kick hat bass arpl')],
+ 'musique_concrete': [('Materiale A', 16, 'arpl event'),
+          ('Trasformazione', 16, 'arp leadl'),
+          ('Sovrapposizione', 16, 'arp lead pad'),
+          ('Montaggio', 16, 'leadl event'),
+          ('Dissoluzione', 16, 'arpl event')],
+ 'noise': [('Texture 1', 16, 'pad'),
+          ('Texture 2', 16, 'pad bass arpl'),
+          ('Muro di rumore', 16, 'pad bass arp lead'),
+          ('Silenzio', 8, ''),
+          ('Texture 3', 16, 'pad arpl')],
+ 'onkyo': [('Silenzio', 8, ''),
+          ('Gesto 1', 1, 'event'),
+          ('Silenzio 2', 11, ''),
+          ('Gesto 2 + risposta', 2, 'event'),
+          ('Silenzio 3', 18, ''),
+          ('Dialogo', 4, 'event arpl')],
+ 'psytrance': [('Intro ipnotica', 32, 'kick hat bass pad arpl'),
+          ('Build 1', 32, 'kick hat open bass pad arp roll'),
+          ('Drop 1', 32, 'kick hat open perc bass pad arp lead fill'),
+          ('Sezione centrale', 32, 'kick hat open perc bass pad arp lead'),
+          ('Build 2', 32, 'kick hat open bass pad arp roll'),
+          ('Drop 2', 32, 'kick hat open perc bass pad chords arp lead fill'),
+          ('Outro', 32, 'kick hat bass')],
+ 'r&b': [('Intro', 8, 'pad chordsl'),
+          ('Strofa 1', 16, 'kick hat clap bass chords leadl'),
+          ('Pre-chorus', 8, 'kick hat clap bass pad rolls'),
+          ('Ritornello', 12, 'kick hat clap open perc bass pad chords arp lead'),
+          ('Strofa 2', 16, 'kick hat clap perc bass chords leadl arpl'),
+          ('Ritornello 2', 12, 'kick hat clap open perc bass pad chords arp lead'),
+          ('Bridge', 8, 'pad chordsl bassl'),
+          ('Ritornello finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'reggae': [('Intro', 4, 'kick hat bass chords'),
+          ('Verse 1', 16, 'kick clap hat bass chords pad leadl'),
+          ('Chorus', 8, 'kick clap hat perc bass chords pad arp lead'),
+          ('Verse 2', 16, 'kick clap hat bass chords pad leadl'),
+          ('Chorus 2', 8, 'kick clap hat perc bass chords pad arp lead'),
+          ('Bridge / Dub', 8, 'kick clap hat bass'),
+          ('Chorus finale', 8, 'kick clap hat perc bass chords pad arp lead fill')],
+ 'reggaeton': [('Intro', 8, 'kick clap hat'),
+          ('Beat completo', 8, 'kick clap hat perc bass'),
+          ('Strofa 1', 8, 'kick clap hat bass chordsl leadl'),
+          ('Hook', 8, 'kick clap hat perc bass pad chords lead'),
+          ('Strofa 2', 8, 'kick clap hat perc bass chordsl leadl'),
+          ('Hook 2', 8, 'kick clap hat perc bass pad chords lead fill'),
+          ('Bridge', 8, 'clap hat pad bassl'),
+          ('Hook finale', 16, 'kick clap hat open perc bass pad chords arp lead fill'),
+          ('Outro', 24, 'kick clap hat')],
+ 'soul': [('Intro', 4, 'kick hat clap bass chords'),
+          ('Strofa 1', 16, 'kick hat clap bass chords leadl arpl'),
+          ('Pre-chorus', 8, 'kick hat clap bass chords arp rolls'),
+          ('Ritornello', 12, 'kick hat clap perc bass pad chords arp lead'),
+          ('Strofa 2', 16, 'kick hat clap perc bass chords leadl arpl'),
+          ('Ritornello 2', 12, 'kick hat clap perc bass pad chords arp lead'),
+          ('Bridge / Vamp', 12, 'kick hat clap bass pad chords arp'),
           ('Finale', 16, 'kick hat clap perc bass pad chords arp lead fill')],
- 'synthpop': [('Intro', 8, 'kick hat leadl arpl'), ('Verse 1', 8, 'kick hat clap bass arp leadl'), ('Chorus', 16, 'kick hat clap open perc bass chords arp lead fill'),
-              ('Verse 2', 16, 'kick hat clap bass arp leadl chordsl'), ('Chorus 2', 8, 'kick hat clap open perc bass chords arp lead fill'),
-              ('Bridge', 8, 'pad chordsl bassl'), ('Chorus finale', 8, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 8, 'kick hat bass')],
- # Famiglia 3: generi sperimentali e d'avanguardia
- 'ambient': [('Fade in', 32, 'pad'), ('Evoluzione 1', 32, 'pad chordsl'), ('Trasformazione', 32, 'chordsl leadl'), ('Sovrapposizione', 32, 'pad chordsl arp leadl'),
-             ('Fade out', 32, 'pad')],
- 'breakcore': [('Intro', 8, 'hat perc arpl leadl'), ('Sezione A', 16, 'kick hat clap perc bass fill'), ('Sezione B', 8, 'kick hat clap perc bass arpl fill'),
-               ('Transizione', 8, 'hat clap perc bass rolls'), ('Sezione C', 16, 'kick hat clap perc bass arp lead fill'),
-               ('Finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
- 'drone': [('Tono fondamentale', 32, 'pad'), ('Armoniche', 32, 'pad chordsl'), ('Morphing', 32, 'pad bass chordsl'), ('Dissolvenza', 32, 'pad')],
- 'glitch': [('Intro', 8, 'hat arpl'), ('Beat', 8, 'kick hat clap perc fill'), ('Evoluzione', 16, 'kick hat clap perc bass arp'), ('Breakdown', 8, 'pad arpl'),
-            ('Ritorno', 16, 'kick hat clap perc bass arp lead fill')],
- 'idm': [('Intro', 8, 'pad arpl'), ('Sezione 1', 8, 'kick hat clap perc'), ('Sezione 2', 16, 'kick hat clap perc bass arp lead'), ('Breakdown', 8, 'pad arpl'),
-         ('Sezione 3', 16, 'kick hat clap perc bass arp lead fill')],
- 'lowercase': [('Silenzio', 8, ''), ('Evento 1', 1, 'event'), ('Silenzio 2', 15, ''), ('Eventi ravvicinati', 2, 'event'), ('Silenzio 3', 22, ''), ('Evento 2', 2, 'event')],
- 'microsound': [('Nube 1', 16, 'arpl'), ('Aumento densita', 16, 'arp'), ('Nube 2', 16, 'arp lead'), ('Dissolvenza', 16, 'arpl')],
- 'minimal': [('Cellula 1', 16, 'kick hat bass'), ('Cellula 2', 16, 'kick hat bass arpl'), ('Addizione', 16, 'kick hat clap bass arp'),
-             ('Sottrazione', 16, 'kick hat bass arpl'), ('Ritorno', 16, 'kick hat clap bass arp')],
- 'minimalismo_ritmico': [('Pattern 1', 15, 'kick hat'), ('Pattern 2', 15, 'kick hat perc bass'), ('Pattern 3', 15, 'kick hat clap perc bass arpl'),
-                         ('Trasformazione', 15, 'kick hat clap perc bass arp lead'), ('Dissoluzione', 15, 'kick hat bass arpl')],
- 'noise': [('Texture 1', 16, 'pad'), ('Texture 2', 16, 'pad bass arpl'), ('Muro di rumore', 16, 'pad bass arp lead'), ('Silenzio', 8, ''), ('Texture 3', 16, 'pad arpl')],
- 'onkyo': [('Silenzio', 8, ''), ('Gesto 1', 1, 'event'), ('Silenzio 2', 11, ''), ('Gesto 2 + risposta', 2, 'event'), ('Silenzio 3', 18, ''), ('Dialogo', 4, 'event arpl')],
- 'sperimentale': [('Processo 1', 8, 'hat arpl'), ('Processo 2', 8, 'kick clap bass arpl'), ('Processo 3', 8, 'hat perc bass arp lead'), ('Dissoluzione', 8, 'arpl')],
- 'underground': [('Intro', 8, 'pad leadl bassl'), ('Beat drill', 8, 'kick hat clap bass'), ('Strofa 1', 16, 'kick hat clap bass pad leadl'),
-                 ('Hook', 8, 'kick hat clap perc bass pad chords lead arp'), ('Strofa 2', 16, 'kick hat clap perc bass pad leadl'),
-                 ('Hook 2', 8, 'kick hat clap perc bass pad chords lead arp fill'), ('Bridge', 8, 'pad chordsl bassl'),
-                 ('Hook finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
- # Famiglia 4: noise e glitch (approfondimento)
- 'harsh_noise': [('Wall 1', 16, 'pad arp'), ('Wall 2', 16, 'pad bass arp lead'), ('Blocco dinamico', 16, 'bass lead'), ('Wall finale', 16, 'pad bass arp lead chords')],
- 'industrial': [('Intro', 16, 'kick hat arpl'), ('Verse', 16, 'kick hat clap bass'), ('Chorus', 16, 'kick hat clap open perc bass chords lead arp'),
-                ('Bridge', 16, 'pad bassl'), ('Finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
- 'armonico': [('Intro armonica', 8, 'pad chordsl'), ('Sezione A', 16, 'kick hat clap bass chords leadl'), ("Sezione A'", 8, 'kick hat clap bass pad chords lead arpl'),
-              ('Sezione B', 16, 'kick hat clap bass chords lead arp'), ('Bridge / modulazione', 8, 'pad chordsl leadl'),
-              ('Ritorno tema', 16, 'kick hat clap bass pad chords lead arp'), ('Outro', 24, 'pad chordsl')],
- 'elettronico': [('Intro', 16, 'kick hat'), ('Build', 16, 'kick hat clap open bass'), ('Main / Drop', 32, 'kick hat clap open perc bass pad chords lead'),
-                 ('Breakdown', 16, 'pad chordsl'), ('Build 2', 16, 'hat pad chords arp roll'),
-                 ('Drop 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'), ('Outro', 16, 'kick hat bass')],
+ 'soulful_house': [('Intro DJ', 32, 'kick pad chordsl leadl'),
+          ('Verse 1', 16, 'kick hat clap open bass pad chords leadl'),
+          ('Pre-chorus', 8, 'kick hat clap bass pad chordsl arpl rolls'),
+          ('Chorus', 16, 'kick hat clap open perc bass pad chords arp lead'),
+          ('Verse 2', 16, 'kick hat clap open bass pad chords leadl arpl'),
+          ('Breakdown', 8, 'pad chordsl lead'),
+          ('Rebuild / Drop', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Chorus finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'space_disco': [('Intro vamp', 32, 'kick hat open bass arpl'),
+          ('Verse', 16, 'kick hat open clap bass chords arp leadl'),
+          ('Chorus', 16, 'kick hat open clap perc bass pad chords arp lead fill'),
+          ('Verse 2', 16, 'kick hat open clap bass chords arp leadl'),
+          ('Breakdown strumentale', 16, 'kick hat open bass pad chords arp'),
+          ('Chorus finale', 16, 'kick hat open clap perc bass pad chords arp lead fill'),
+          ('Outro vamp', 16, 'kick hat open bass')],
+ 'sperimentale': [('Processo 1', 8, 'hat arpl'),
+          ('Processo 2', 8, 'kick clap bass arpl'),
+          ('Processo 3', 8, 'hat perc bass arp lead'),
+          ('Dissoluzione', 8, 'arpl')],
+ 'synthpop': [('Intro', 8, 'kick hat leadl arpl'),
+          ('Verse 1', 8, 'kick hat clap bass arp leadl'),
+          ('Chorus', 16, 'kick hat clap open perc bass chords arp lead fill'),
+          ('Verse 2', 16, 'kick hat clap bass arp leadl chordsl'),
+          ('Chorus 2', 8, 'kick hat clap open perc bass chords arp lead fill'),
+          ('Bridge', 8, 'pad chordsl bassl'),
+          ('Chorus finale', 8, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 8, 'kick hat bass')],
+ 'synthwave': [('Intro', 8, 'kick hat arpl pad'),
+          ('Verse', 16, 'kick hat clap bass arp lead'),
+          ('Chorus', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Verse 2', 16, 'kick hat clap bass pad arp leadl'),
+          ('Bridge', 8, 'pad arp'),
+          ('Chorus finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'techno': [('Intro DJ', 32, 'kick hat'),
+          ('Build', 32, 'kick hat clap open bass'),
+          ('Main 1', 32, 'kick hat clap open perc bass chords arp'),
+          ('Breakdown', 16, 'pad'),
+          ('Build-up', 16, 'hat pad roll'),
+          ('Drop / Main 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 32, 'kick hat')],
+ 'trance': [('Intro lunga', 64, 'kick hat pad arpl'),
+          ('Main 1', 32, 'kick hat clap open bass pad arpl lead'),
+          ('Breakdown', 32, 'pad chordsl lead'),
+          ('Build', 16, 'hat pad chords arp roll'),
+          ('Drop', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'pad')],
+ 'trap': [('Intro', 8, 'pad leadl bassl'),
+          ('Hook', 8, 'kick hat clap perc bass pad lead'),
+          ('Strofa 1', 16, 'kick hat clap bass pad leadl'),
+          ('Hook 2', 16, 'kick hat clap perc bass pad lead arp fill'),
+          ('Strofa 2', 16, 'kick hat clap bass pad leadl'),
+          ('Bridge', 8, 'pad leadl'),
+          ('Hook finale', 16, 'kick hat clap perc bass pad lead arp fill'),
+          ('Outro', 8, 'pad leadl bassl')],
+ 'trip_hop': [('Intro', 8, 'kick hat pad chordsl'),
+          ('Verse 1', 16, 'kick hat clap bass chords leadl'),
+          ('Pre-chorus', 8, 'kick hat clap bass pad chordsl arpl rolls'),
+          ('Chorus', 16, 'kick hat clap perc bass pad chords arp lead'),
+          ('Verse 2', 16, 'kick hat clap perc bass chords leadl'),
+          ('Bridge', 8, 'pad lead'),
+          ('Chorus finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'uk_garage': [('Intro', 8, 'hat pad leadl'),
+          ('Verse 1', 16, 'kick hat clap bass leadl'),
+          ('Pre-chorus', 8, 'kick hat clap bass pad arp rolls'),
+          ('Chorus', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Verse 2', 16, 'kick hat clap perc bass leadl arpl'),
+          ('Bridge', 8, 'pad arp'),
+          ('Chorus finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'underground': [('Intro', 8, 'pad leadl bassl'),
+          ('Beat drill', 8, 'kick hat clap bass'),
+          ('Strofa 1', 16, 'kick hat clap bass pad leadl'),
+          ('Hook', 8, 'kick hat clap perc bass pad chords lead arp'),
+          ('Strofa 2', 16, 'kick hat clap perc bass pad leadl'),
+          ('Hook 2', 8, 'kick hat clap perc bass pad chords lead arp fill'),
+          ('Bridge', 8, 'pad chordsl bassl'),
+          ('Hook finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
+ 'vaporwave': [('Intro', 16, 'pad leadl'),
+          ('Sezione A', 16, 'kick hat clap bass pad chords lead'),
+          ('Sezione B', 16, 'kick hat clap bass pad chords arp lead'),
+          ('Ritorno A', 16, 'kick hat clap bass pad chords arp lead')],
 }
 
 def _parse_timeline(rows):
@@ -272,19 +535,49 @@ for _k, _v in GENRES.items():
 #   reese: note sostenute + seconda traccia leggermente scordata (pitch bend) con filtro che si muove (DnB)
 #   rolling: basso fisso sulla tonica tra i kick (techno) | offbeat: basso sui levare (trance) | sync: sincopato (deep)
 GENRE_STYLE = {
-    'deep': dict(seventh=1.0, ninth=0.6, bass_style='sync'), 'dub_techno': dict(seventh=0.9, ninth=0.2), 'r&b': dict(seventh=0.95, ninth=0.5),
-    'soul': dict(seventh=0.95, ninth=0.5), 'funk': dict(seventh=0.9, ninth=0.3), 'disco': dict(seventh=0.8, ninth=0.2, bass_style='octave'),
-    'armonico': dict(seventh=0.8, ninth=0.4), 'hip_hop': dict(seventh=0.6, ninth=0.2), 'synthpop': dict(seventh=0.15), 'trance': dict(seventh=0.0, bass_style='offbeat'),
-    'techno': dict(seventh=0.1, bass_style='rolling'), 'edm_2000s': dict(seventh=0.0), 'minimal_techno': dict(seventh=0.2), 'acid': dict(seventh=0.5, bass_style='acid'),
-    'trap': dict(seventh=0.3, bass_style='long'), 'drum_n_bass': dict(seventh=0.4, bass_style='reese'), 'reggaeton': dict(seventh=0.3), 'elettronico': dict(seventh=0.35), 'commerciale_90s': dict(seventh=0.3),
+    'acid': dict(seventh=0.5, bass_style='acid'),
+    'afro_house': dict(seventh=0.5),
+    'amapiano': dict(seventh=0.6, ninth=0.2, bass_style='logdrum'),
+    'armonico': dict(seventh=0.8, ninth=0.4, bass_style='walk'),
+    'chiptune': dict(seventh=0.0, bass_style='rolling'),
+    'commerciale_90s': dict(seventh=0.3),
+    'deep': dict(seventh=1.0, ninth=0.6, bass_style='sync'),
+    'disco': dict(seventh=0.8, ninth=0.2, bass_style='octave'),
+    'drum_n_bass': dict(seventh=0.4, bass_style='reese'),
+    'dub_techno': dict(seventh=0.9, ninth=0.2, bass_style='dubsub'),
+    'dubstep': dict(seventh=0.2, bass_style='wobble'),
+    'edm_2000s': dict(seventh=0.0, bass_style='offbeat'),
+    'elettronico': dict(seventh=0.35),
+    'funk': dict(seventh=0.9, ninth=0.3, bass_style='funk'),
+    'future_bass': dict(seventh=0.7, ninth=0.3, bass_style='long'),
+    'hardstyle': dict(seventh=0.0, bass_style='offbeat'),
+    'hip_hop': dict(seventh=0.6, ninth=0.2, bass_style='long'),
+    'house_90s': dict(seventh=0.5, ninth=0.1),
+    'hyperpop': dict(seventh=0.3),
+    'industrial': dict(seventh=0.1, bass_style='rolling'),
+    'jungle': dict(seventh=0.3, bass_style='rollacc'),
+    'minimal_techno': dict(seventh=0.2),
+    'musique_concrete': dict(seventh=0.3),
+    'psytrance': dict(seventh=0.0, bass_style='rollacc'),
+    'r&b': dict(seventh=0.95, ninth=0.5, bass_style='long'),
+    'reggae': dict(seventh=0.3, bass_style='walk'),
+    'reggaeton': dict(seventh=0.3, bass_style='long'),
+    'soul': dict(seventh=0.95, ninth=0.5, bass_style='walk'),
+    'soulful_house': dict(seventh=1.0, ninth=0.7, bass_style='sync'),
+    'space_disco': dict(seventh=0.9, ninth=0.3, bass_style='fretless'),
+    'synthpop': dict(seventh=0.15, bass_style='arp'),
+    'synthwave': dict(seventh=0.4, bass_style='octave'),
+    'techno': dict(seventh=0.1, bass_style='rolling'),
+    'trance': dict(seventh=0.0, bass_style='offbeat'),
+    'trap': dict(seventh=0.3, bass_style='long'),
+    'trip_hop': dict(seventh=0.8, ninth=0.3, bass_style='dubsub'),
+    'uk_garage': dict(seventh=0.5, bass_style='long'),
+    'vaporwave': dict(seventh=0.9, ninth=0.5, bass_style='long'),
 }
 for _k, _s in GENRE_STYLE.items(): GENRES[_k].update(_s)
-#   funk: slap/pop (ottave staccate e ghost) | walk: giro sulle note dell'accordo | arp: arpeggio | dubsub: sub sostenuto solo sulla tonica
-STYLE_EXTRA = {'funk': dict(bass_style='funk'), 'soul': dict(bass_style='walk'), 'armonico': dict(bass_style='walk'), 'synthpop': dict(bass_style='arp'),
-               'r&b': dict(bass_style='long'), 'hip_hop': dict(bass_style='long'), 'reggaeton': dict(bass_style='long'), 'dub_techno': dict(bass_style='dubsub'),
-               'industrial': dict(seventh=0.1, bass_style='rolling'), 'edm_2000s': dict(bass_style='offbeat')}
-for _k, _s in STYLE_EXTRA.items(): GENRES[_k].update(_s)
-BASS_ROOT_P = {'rolling': 0.97, 'offbeat': 0.92, 'acid': 0.7, 'octave': 0.9, 'long': 0.85, 'reese': 0.9, 'dubsub': 0.98, 'funk': 0.8}
+#   funk: slap/pop | walk: giro sulle note dell'accordo | arp: arpeggio | dubsub: sub sostenuto sulla tonica | wobble: sub sostenuto + LFO sul filtro (dubstep)
+#   rollacc: 16esimi tra i kick con accento sui levare (psytrance, jungle) | fretless: 8vi con glide (space disco) | logdrum: colpi brevi con glide (amapiano) | long: 808 lungo con glide | rolling / offbeat / octave / sync / acid / reese: vedi sopra
+BASS_ROOT_P = {'rollacc': 0.97, 'fretless': 0.85, 'rolling': 0.97, 'offbeat': 0.92, 'acid': 0.7, 'octave': 0.9, 'long': 0.85, 'reese': 0.9, 'dubsub': 0.98, 'funk': 0.8, 'wobble': 0.95, 'logdrum': 0.75}
 
 def _bass_pc(style, hit, cpcs, rpc, root_p):
     """Nota (classe di altezza) del basso: arp = arpeggio sull'accordo (synthpop), walk = giro sulle note dell'accordo (soul, armonico)."""
@@ -292,13 +585,15 @@ def _bass_pc(style, hit, cpcs, rpc, root_p):
     if style == 'walk': return cpcs[(0, 1, 2, 1)[hit % 4] % len(cpcs)]
     return rpc if random.random() < root_p else random.choice(cpcs[1:])
 
-def _bass_shape(style, hit, gap, room):
+def _bass_shape(style, hit, gap, room, step=0):
     """(ottava extra, durata in step, velocity extra) per una nota di basso secondo lo stile del genere."""
     if style == 'acid':
         return (12 if random.random() < 0.2 else 0), (gap + 1 if random.random() < 0.35 else gap), (22 if random.random() < 0.3 else 0)
     if style == 'octave': return (12 if hit % 2 else 0), gap, 0
+    if style == 'rollacc': return 0, gap, (14 if step % 4 == 2 else -16)          # 16esimi tra i kick: accento sui levare (3, 7, 11, 15)
     if style == 'long': return (12 if random.random() < 0.12 else 0), min(gap * 2, room), 0
-    if style in ('reese', 'dubsub'): return 0, min(gap * 2, room), 0          # note lunghe e sostenute
+    if style in ('reese', 'dubsub', 'wobble'): return 0, min(gap * 2, room), 0          # note lunghe e sostenute
+    if style == 'logdrum': return (12 if random.random() < 0.15 else 0), (1 if random.random() < 0.7 else 2), (10 if random.random() < 0.3 else 0)   # colpi brevi
     if style == 'funk':                                             # slap/pop: ottave staccate e note fantasma
         r = random.random()
         if r < 0.25: return 12, 1, 12
@@ -385,6 +680,8 @@ def compute_structure(bars, timeline=None, seed=None):
 # "piegato" sul raggruppamento: ogni gruppo prende i 4 step di un battito del 4/4 (+ i primi step del battito dopo).
 METERS = {
     '4/4':   ((4, 4),   [4, 4, 4, 4]),
+    '3/4':   ((3, 4),   [4, 4, 4]),
+    '5/4':   ((5, 4),   [4, 4, 4, 4, 4]),
     '5/16':  ((5, 16),  [3, 2]),
     '7/16':  ((7, 16),  [4, 3]),
     '7/8':   ((7, 8),   [4, 4, 6]),
@@ -396,13 +693,17 @@ METERS = {
     '29/16': ((29, 16), [5, 6, 6, 6, 6]),
 }
 
-def plan_meter(g, bars, odd=True):
+def plan_meter(g, bars, odd=True, seed=None):
     """Una voce per battuta: start (tick), L (sedicesimi), idx (step -> indice nel pattern a 16), gstarts, ends, sig, key.
     odd=False forza il 4/4 (usato quando si riarrangia un MIDI esistente, che e' in 4/4)."""
     keys = g.get('meter', ['4/4']) if odd else ['4/4']
+    ms, sec_keys = (g.get('meter_sections') if odd else None), None
+    if ms and g.get('timeline') and len(ms) == len(g['timeline']):      # metro per sezione (Hyperpop: 7/8 nel blocco 2, 3/4 nel momento pop)
+        _, secs_ = compute_structure(bars, g['timeline'], seed)
+        sec_keys = [ms[i] for i, (_n, _s, l_, _ls) in enumerate(secs_) for _ in range(l_)]
     q, plan, pos = TICKS_BEAT // 4, [], 0
     for b in range(bars):
-        key = keys[b % len(keys)]
+        key = sec_keys[b] if sec_keys and b < len(sec_keys) else keys[b % len(keys)]
         sig, groups = METERS[key]
         idx, gstarts, ends, c = [], [], [], 0
         for gi, gs in enumerate(groups):
@@ -419,6 +720,9 @@ def uses_odd_meter(mode, submode, has_notes):
     return submode == 'generative'
 
 def avg_bar_sixteenths(g, odd=True):
+    ms, tl = (g.get('meter_sections') if odd else None), g.get('timeline')
+    if ms and tl and len(ms) == len(tl):     # metro per sezione: media pesata sulle battute
+        return sum(sum(METERS[k][1]) * b for k, (_n, b, _l) in zip(ms, tl)) / sum(b for _n, b, _l in tl)
     keys = g.get('meter', ['4/4']) if odd else ['4/4']
     return sum(sum(METERS[k][1]) for k in keys) / len(keys)
 
@@ -489,6 +793,26 @@ def _answer(motif):
 def _thin(motif, p=0.25):
     return [None if (v is not None and random.random() < p) else v for v in motif]
 
+def _trip_motif(n, count):
+    """Motivo in terzine (Hardstyle): arpeggio minore su e giu' (es. La-Sol-Mi-Do-Mi-Sol), 6 note (terzine di quarti) o 12 (terzine di ottavi)."""
+    tpl = random.choice([[0, 6, 4, 2, 4, 6], [0, 2, 4, 6, 4, 2], [4, 2, 0, 2, 4, 6], [0, 4, 2, 6, 4, 2], [6, 4, 2, 0, 2, 4]])
+    if count == 12: tpl = tpl + [x + random.choice([0, 1, 2]) for x in tpl]
+    return tpl
+
+def _free_time(tracks, amount):
+    """Niente quantizzazione (Musique Concrete): ogni nota delle tracce non-drum si sposta di +-amount tick, insieme al suo note-off."""
+    rs = random.Random(12345 + len(tracks))
+    for k, evs in tracks.items():
+        if k.startswith('drum'): continue
+        evs.sort(key=lambda e: (e['tick'], e['type'] != 'off'))
+        open_ = {}
+        for e in evs:
+            if e['type'] == 'on':
+                d = max(rs.randint(-amount, amount), -e['tick']); open_.setdefault(e['pitch'], []).append(d); e['tick'] += d
+            else:
+                st_ = open_.get(e['pitch']); e['tick'] = max(0, e['tick'] + (st_.pop(0) if st_ else 0))
+        evs.sort(key=lambda e: (e['tick'], e['type'] != 'off'))
+
 def _gaps(steps, size=16, cap=4):
     steps = sorted(steps)
     out = {}
@@ -515,17 +839,68 @@ def _fold(p, lo=60, hi=83):
 # Ogni genere ha un'identita' (ancore: kick sul battere, backbeat, dembow...) e il seed sposta/aggiunge/toglie il resto,
 # cosi' due brani dello stesso genere hanno batteria, basso e armonia diversi.
 BPM_RANGES = {
-    'acid': [(135, 150)], 'ambient': [(60, 90)], 'armonico': [(60, 120)], 'breakcore': [(170, 230)],
-    'commerciale_90s': [(105, 128)], 'deep': [(118, 126)], 'disco': [(110, 130)], 'drone': [(60, 100)],
-    'drum_n_bass': [(160, 180)], 'dub_techno': [(112, 130)], 'edm_2000s': [(126, 130)], 'elettronico': [(95, 140)],
-    'funk': [(95, 120)], 'glitch': [(80, 115), (128, 148)], 'harsh_noise': [(60, 120)], 'hip_hop': [(85, 95)],
-    'idm': [(100, 140)], 'industrial': [(110, 140)], 'lowercase': [(104, 162)], 'microsound': [(80, 100)],
-    'minimal': [(110, 130)], 'minimal_techno': [(125, 132)], 'minimalismo_ritmico': [(100, 130)], 'noise': [(60, 154)],
-    'onkyo': [(50, 90)], 'r&b': [(60, 110)], 'reggaeton': [(90, 100)], 'sperimentale': [(88, 132)], 'soul': [(60, 110)],
-    'synthpop': [(111, 127)], 'techno': [(125, 135)], 'trap': [(130, 150)], 'trance': [(120, 150)], 'underground': [(72, 150)],
+    'acid': [(135, 150)],
+    'afro_house': [(120, 125)],
+    'amapiano': [(110, 115)],
+    'ambient': [(60, 90)],
+    'armonico': [(60, 120)],
+    'breakcore': [(170, 230)],
+    'chiptune': [(112, 128)],
+    'commerciale_90s': [(105, 128)],
+    'deep': [(118, 126)],
+    'disco': [(110, 130)],
+    'drone': [(60, 100)],
+    'drum_n_bass': [(160, 180)],
+    'dub_techno': [(112, 130)],
+    'dubstep': [(138, 142)],
+    'edm_2000s': [(126, 130)],
+    'elettronico': [(95, 140)],
+    'funk': [(95, 120)],
+    'future_bass': [(140, 160)],
+    'glitch': [(80, 115), (128, 148)],
+    'hardstyle': [(145, 155)],
+    'harsh_noise': [(60, 120)],
+    'hip_hop': [(85, 95)],
+    'house_90s': [(118, 125)],
+    'hyperpop': [(120, 170)],
+    'idm': [(100, 140)],
+    'industrial': [(110, 140)],
+    'jungle': [(160, 170)],
+    'lowercase': [(104, 162)],
+    'microsound': [(80, 100)],
+    'minimal': [(110, 130)],
+    'minimal_techno': [(125, 132)],
+    'minimalismo_ritmico': [(100, 130)],
+    'musique_concrete': [(60, 90)],
+    'noise': [(60, 154)],
+    'onkyo': [(50, 90)],
+    'psytrance': [(140, 150)],
+    'r&b': [(60, 110)],
+    'reggae': [(70, 90)],
+    'reggaeton': [(90, 100)],
+    'soul': [(60, 110)],
+    'soulful_house': [(120, 125)],
+    'space_disco': [(110, 130)],
+    'sperimentale': [(88, 132)],
+    'synthpop': [(111, 127)],
+    'synthwave': [(80, 110)],
+    'techno': [(125, 135)],
+    'trance': [(120, 150)],
+    'trap': [(130, 150)],
+    'trip_hop': [(70, 90)],
+    'uk_garage': [(128, 135)],
+    'underground': [(72, 150)],
+    'vaporwave': [(60, 80)],
 }
-LOOSE_SNARE = {'breakcore', 'idm', 'sperimentale', 'glitch', 'minimalismo_ritmico'}   # snare non vincolato al backbeat
-FIXED_KICK = {'reggaeton'}                                                           # il kick e' identita' del genere
+LOOSE_SNARE = {'breakcore', 'glitch', 'hyperpop', 'idm', 'minimalismo_ritmico', 'sperimentale'}   # snare non vincolato al backbeat
+FIXED_KICK = {'dubstep', 'future_bass', 'jungle', 'reggae', 'reggaeton', 'uk_garage'}   # il kick e' identita' del genere
+BASS_FIXED = {'amapiano', 'hardstyle', 'jungle', 'psytrance', 'uk_garage'}   # il pattern di basso e' l'identita' del genere
+GHOST_FIXED = {'jungle', 'trip_hop'}   # i ghost snare sono identita' del genere (Amen: 8, 10, 16)
+
+def _default_bpm(name, g, seed):
+    """BPM di default: se il genere ha un piano di tempo (Hyperpop) il valore centrale, altrimenti un BPM nel range del genere scelto dal seed."""
+    plan = g.get('tempo_plan')
+    return sorted(plan)[len(plan) // 2] if plan else seeded_bpm(name, g, seed)
 
 def seeded_bpm(name, g, seed):
     rs = random.Random(int(seed) * 17 + 3)
@@ -567,66 +942,141 @@ def _pat(s, binary=False):
     return [1 if v else 0 for v in out] if binary else out
 
 PATTERN_LIB = {
- 'acid': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxXx xxXx xxXx xxXx', '-x-X -x-X -x-X -x-X', 'x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg'],
-          'bass': ['x-xx -x-x x-x- xx-x', 'x-x- xx-x x-xx -x-x', 'xx-x -xx- x-x- xx-x', 'x--x -x-x x-xx -x--']},
+ 'acid': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['xxXx xxXx xxXx xxXx', '-x-X -x-X -x-X -x-X', 'x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg'],
+      'bass': ['x-xx -x-x x-x- xx-x', 'x-x- xx-x x-xx -x-x', 'xx-x -xx- x-x- xx-x', 'x--x -x-x x-xx -x--']},
+ 'afro_house': {'hat': ['xgxg xgxg xgxg xgxg', 'xgxx xgxg xgxx xgxg', '-gxg -gxg -gxg -gxg'],
+      'bass': ['--x- --x- --x- --x-', '--x- --x- --x- -xx-', 'x-x- --x- x-x- --x-', '-xx- -xx- -xx- -xx-'],
+      'clap': ['---- x--- ---- x---', '---- x--- ---- x--x']},
+ 'amapiano': {'kick': ['x--- x--- x--- x---', 'x--- x--- x--- x---', 'x--- x--- x--- x---', 'x--- ---- x--- ----'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'x-xg x-xg x-xg x-xg', 'xgx- xgxg xgx- xgxg'],
+      'bass': ['--x- -xx- --x- -x--', '--x- -x-- --x- x-x-', '--x- -xx- --x- -x-x', '--x- -xx- ---x -x--'],
+      'clap': ['---- x--- ---- x---', '---- x--- ---- x--x']},
+ 'armonico': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx'],
+      'bass': ['x--- ---- x--- ----', 'x--- --x- x--- --x-', 'x-x- x-x- x-x- x-x-']},
  'breakcore': {'kick': ['x--- --x- -x-- x-x-', 'x-x- --x- ---x x--x', 'x--x --x- x--- -x-x', 'x-x- x--- -x-x --x-'],
-               'hat': ['xxxx xxxx xxxx xxxx', 'xgxx xgxx xgxx xgxx', 'x-xx -xx- xx-x x-xx'], 'bass': ['x--- x--- -x-- x-x-', 'x-x- --x- x--x -x--']},
- 'commerciale_90s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
-                     'bass': ['x-x- x-x- x-x- x-x-', 'x--x --x- x--x --x-', 'x-xx -x-x x-xx -x-x']},
- 'deep': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'], 'hat': ['x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg', 'x-Xg x-Xg x-Xg x-Xg'],
-          'bass': ['x--- --x- ---- --x-', 'x--x --x- --x- -x--', 'x-x- ---x --x- x---', 'x--- -x-- --x- x--x']},
- 'disco': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- ---x x---'], 'hat': ['xxXx xxXx xxXx xxXx', 'x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg'],
-           'bass': ['x-xx -xx- x-xx -xx-', 'x--x x-x- x--x x-x-', 'xx-x xx-x xx-x xx-x', 'x-x- xx-x x-x- xx-x']},
- 'drum_n_bass': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'], 'kick': ['x--- ---- --x- ----', 'x--- --x- --x- ----', 'x--- ---- --x- --x-', 'x--x ---- --x- ----'],
-                 'hat': ['xxxx xxxx xxxx xxxx', 'xgxg xgxg xgxg xgxg', 'x-xx x-xx x-xx x-xx'],
-                 'bass': ['x--- ---x --x- ----', 'x--x ---- x--- --x-', 'x--- --x- ---x ----', 'x-x- ---- --x- x---']},
- 'dub_techno': {'clap': ['---- x--- ---- x---', '---- ---- ---- x---', '---- x--- ---- ----'], 'hat': ['--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-', '--X- ---- --X- ----'],
-                'bass': ['x--- ---- x--- ----', 'x--- ---x ---- x---', 'x--- ---- x--x ----', 'x--- --x- ---- ----']},
- 'edm_2000s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
-               'bass': ['--x- --x- --x- --x-', 'x-x- x-x- x-x- x-x-', '-xx- -xx- -xx- -xx-', 'xxxx xxxx xxxx xxxx']},
- 'elettronico': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
-                 'bass': ['x--x --x- x--x --x-', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--x -x--']},
- 'funk': {'snare': ['---- x--- ---- x---', '---- x--x ---- x---', '---- x--- ---x x---', '---- x--- ---- x-x-'], 'kick': ['x--x ---- x-x- ----', 'x--- --x- x--x ----', 'x-x- --x- x--- -x--', 'x--x -x-- x-x- ----'],
-          'hat': ['Xxxx Xxxx Xxxx Xxxx', 'xgxg xgxg xgxg xgxg', 'Xxgx Xxgx Xxgx Xxgx'],
-          'bass': ['x--x -x-x x--- x-x-', 'x-x- -x-x x--x --x-', 'x--x x--- x-x- -x--', 'x-xx --x- x--x -x--']},
- 'glitch': {'snare': ['---- ---- x--- ----', 'x--- ---- x--- ----', '---- ---- x--- --x-'], 'kick': ['x--- ---- x--- ----', 'x--- ---x x--- ----', 'x--- ---- x-x- ----'],
-            'hat': ['xxxx xxxx xxxx xxxx', 'x-xx -xx- x-xx -xxx', 'xgxx xgxg xxgx xgxx'], 'bass': ['x--- x--- x-x- ----', 'x-x- ---- x--x ----']},
- 'hip_hop': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---', '---- x--x ---- x---'], 'kick': ['x--- --x- x--- ----', 'x--- --x- x-x- ----', 'x-x- ---- x--- --x-', 'x--- ---x x--- -x--'],
-             'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgxg xgx- xgxx'],
-             'bass': ['x--- --x- x--- --x-', 'x--- ---x x--x ----', 'x-x- --x- x--- -x--']},
+      'hat': ['xxxx xxxx xxxx xxxx', 'xgxx xgxx xgxx xgxx', 'x-xx -xx- xx-x x-xx'],
+      'bass': ['x--- x--- -x-- x-x-', 'x-x- --x- x--x -x--']},
+ 'chiptune': {'hat': ['--x- --x- --x- --x-', 'x-x- x-x- x-x- x-x-'],
+      'bass': ['x--- ---- x--- ----', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--- x---']},
+ 'commerciale_90s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
+      'bass': ['x-x- x-x- x-x- x-x-', 'x--x --x- x--x --x-', 'x-xx -x-x x-xx -x-x']},
+ 'deep': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'],
+      'hat': ['x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg', 'x-Xg x-Xg x-Xg x-Xg'],
+      'bass': ['x--- --x- ---- --x-', 'x--x --x- --x- -x--', 'x-x- ---x --x- x---', 'x--- -x-- --x- x--x']},
+ 'disco': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- ---x x---'],
+      'hat': ['xxXx xxXx xxXx xxXx', 'x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg'],
+      'bass': ['x-xx -xx- x-xx -xx-', 'x--x x-x- x--x x-x-', 'xx-x xx-x xx-x xx-x', 'x-x- xx-x x-x- xx-x']},
+ 'drum_n_bass': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'],
+      'kick': ['x--- ---- --x- ----', 'x--- --x- --x- ----', 'x--- ---- --x- --x-', 'x--x ---- --x- ----'],
+      'hat': ['xxxx xxxx xxxx xxxx', 'xgxg xgxg xgxg xgxg', 'x-xx x-xx x-xx x-xx'],
+      'bass': ['x--- ---x --x- ----', 'x--x ---- x--- --x-', 'x--- --x- ---x ----', 'x-x- ---- --x- x---']},
+ 'dub_techno': {'clap': ['---- x--- ---- x---', '---- ---- ---- x---', '---- x--- ---- ----'],
+      'hat': ['--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-', '--X- ---- --X- ----'],
+      'bass': ['x--- ---- x--- ----', 'x--- ---x ---- x---', 'x--- ---- x--x ----', 'x--- --x- ---- ----']},
+ 'dubstep': {'kick': ['x--- ---- ---- ----', 'x--- --x- --x- ----', 'x--- ---- --x- ----', 'x--- --x- ---- ----', 'x--- ---- x--- ----'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'x-xg x-xg x-xg x-xg'],
+      'bass': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--x ----', 'x--x ---- x--- ----']},
+ 'edm_2000s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
+      'bass': ['--x- --x- --x- --x-', 'x-x- x-x- x-x- x-x-', '-xx- -xx- -xx- -xx-', 'xxxx xxxx xxxx xxxx']},
+ 'elettronico': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
+      'bass': ['x--x --x- x--x --x-', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--x -x--']},
+ 'funk': {'snare': ['---- x--- ---- x---', '---- x--x ---- x---', '---- x--- ---x x---', '---- x--- ---- x-x-'],
+      'kick': ['x--x ---- x-x- ----', 'x--- --x- x--x ----', 'x-x- --x- x--- -x--', 'x--x -x-- x-x- ----'],
+      'hat': ['Xxxx Xxxx Xxxx Xxxx', 'xgxg xgxg xgxg xgxg', 'Xxgx Xxgx Xxgx Xxgx'],
+      'bass': ['x--x -x-x x--- x-x-', 'x-x- -x-x x--x --x-', 'x--x x--- x-x- -x--', 'x-xx --x- x--x -x--']},
+ 'future_bass': {'kick': ['x--- ---- x--- ----', 'x--- x--- x--- x---', 'x--- ---- x--- --x-', 'x--x ---- x--- ----'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'xxxx xxxx xxxx xxxx', 'x-xx x-xx x-xx x-xx'],
+      'bass': ['x--- ---- x--- ----', 'x--- ---- x--x ----', 'x--- --x- x--- ----']},
+ 'glitch': {'snare': ['---- ---- x--- ----', 'x--- ---- x--- ----', '---- ---- x--- --x-'],
+      'kick': ['x--- ---- x--- ----', 'x--- ---x x--- ----', 'x--- ---- x-x- ----'],
+      'hat': ['xxxx xxxx xxxx xxxx', 'x-xx -xx- x-xx -xxx', 'xgxx xgxg xxgx xgxx'],
+      'bass': ['x--- x--- x-x- ----', 'x-x- ---- x--x ----']},
+ 'hardstyle': {'hat': ['--x- --x- --x- --x-', '--X- --X- --X- --X-'],
+      'bass': ['--x- --x- --x- --x-'],
+      'clap': ['---- x--- ---- x---', '---- x--- ---- x--x']},
+ 'hip_hop': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---', '---- x--x ---- x---'],
+      'kick': ['x--- --x- x--- ----', 'x--- --x- x-x- ----', 'x-x- ---- x--- --x-', 'x--- ---x x--- -x--'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgxg xgx- xgxx'],
+      'bass': ['x--- --x- x--- --x-', 'x--- ---x x--x ----', 'x-x- --x- x--- -x--']},
+ 'house_90s': {'hat': ['--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
+      'bass': ['--x- --x- --x- --x-', '--x- --x- --xx --x-', 'x-x- --x- --x- x---'],
+      'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---']},
+ 'hyperpop': {'kick': ['x--- ---- x--- ----', 'x-x- --x- x--x ----', 'x--x --x- --x- x-x-', 'x-x- x--- --x- -x-x', 'x--- -x-x x--x ----'],
+      'hat': ['xxxx x-xx xxx- xxxx', 'x-xx -xxx x-x- xxxx', 'xgxx xgxg xxxg xxgx'],
+      'bass': ['x--- ---- x--- ----', 'x--x -x-- x-x- --x-', 'x--- ---x x--- -x--']},
  'idm': {'kick': ['x--x -x-x ---x --x-', 'x-x- -x-- x--x -x--', 'x--x --x- -x-x x---', 'x-x- --x- x--x --x-'],
-         'hat': ['x-xg xgx- gxxg x-xg', 'xxgx -xgx xgxx gx-x', 'x-x- xxg- x-xg -xxx'], 'bass': ['x--x -x-- x-x- -x--', 'x-x- --x- x--x x---']},
- 'industrial': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxxx xxxx xxxx xxxx', 'x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx'],
-                'bass': ['xxxx xxxx xxxx xxxx', 'x-x- x-x- x-x- x-x-', 'x--x x--x x-x- x-x-']},
+      'hat': ['x-xg xgx- gxxg x-xg', 'xxgx -xgx xgxx gx-x', 'x-x- xxg- x-xg -xxx'],
+      'bass': ['x--x -x-- x-x- -x--', 'x-x- --x- x--x x---']},
+ 'industrial': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['xxxx xxxx xxxx xxxx', 'x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx'],
+      'bass': ['xxxx xxxx xxxx xxxx', 'x-x- x-x- x-x- x-x-', 'x--x x--x x-x- x-x-']},
+ 'jungle': {'kick': ['x--- --x- --x- ----', 'x--x --x- --x- ----', 'x--- --x- --x- --x-'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'x-xg x-xg x-xg x-xg', 'xxxx xxxx xxxx xxxx'],
+      'bass': ['-xxx -xxx -xxx -xxx', '-xxx -xxx -xxx -xx-', '-xxx -xxx -xx- -xxx']},
  'minimal': {'hat': ['xxxx xxxx xxxx xxxx', 'x-x- x-x- x-x- x-x-', 'x-xg x-xg x-xg x-xg'],
-             'bass': ['x--- ---- x--- ----', 'x--x ---- x--- -x--', 'x-x- ---- x--- ----']},
+      'bass': ['x--- ---- x--- ----', 'x--x ---- x--- -x--', 'x-x- ---- x--- ----']},
  'minimal_techno': {'hat': ['xxxx xxxx xxxx xxxx', 'x-xx x-xx x-xx x-xx', 'xgxx xgxx xgxx xgxx', 'x-X- x-X- x-X- x-X-'],
-                    'bass': ['x--x --x- --x- x---', 'x--- x--- --x- ----', 'x-x- ---x --x- ----', 'x--- --x- x--- ---x']},
+      'bass': ['x--x --x- --x- x---', 'x--- x--- --x- ----', 'x-x- ---x --x- ----', 'x--- --x- x--- ---x']},
  'minimalismo_ritmico': {'kick': ['x--x --x- --x- x---', 'x--- x--x --x- --x-', 'x-x- --x- x--- x-x-'],
-                         'hat': ['xxxx xxxx xxxx xxxx', 'x-x- xx-x x-x- xx-x'], 'bass': ['x--x --x- --x- x---', 'x-x- x--x --x- ----']},
- 'r&b': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---'], 'kick': ['x--- --x- x--- ----', 'x--- --x- x--- -x--', 'x--- ---x x--- --x-', 'x-x- ---- x--- --x-'],
-         'hat': ['xgxg xgxg xgxg xgxg', 'xgXg xgxg xgXg xgxg', 'x-xg x-xg x-xg x-xx'],
-         'bass': ['x--- --x- x--- --x-', 'x--- ---x --x- x---', 'x-x- --x- x--- ----']},
+      'hat': ['xxxx xxxx xxxx xxxx', 'x-x- xx-x x-x- xx-x'],
+      'bass': ['x--x --x- --x- x---', 'x-x- x--x --x- ----']},
+ 'psytrance': {'hat': ['--x- --x- --x- --x-', '--X- --X- --X- --X-', 'x-x- x-x- x-x- x-x-'],
+      'bass': ['-xxx -xxx -xxx -xxx', '-xxx -xxx -xxx -xx-', '-xxx -xxx -xxx -x-x']},
+ 'r&b': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---'],
+      'kick': ['x--- --x- x--- ----', 'x--- --x- x--- -x--', 'x--- ---x x--- --x-', 'x-x- ---- x--- --x-'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'xgXg xgxg xgXg xgxg', 'x-xg x-xg x-xg x-xx'],
+      'bass': ['x--- --x- x--- --x-', 'x--- ---x --x- x---', 'x-x- --x- x--- ----']},
+ 'reggae': {'hat': ['g-x- x-x- x-x- x-x-', 'x-x- x-x- x-x- x-x-', 'g-x- x-x- g-x- x-xg'],
+      'bass': ['x--- ---- x--- ----', 'x--x ---- x--x ----', '---- --x- x--x --x-', 'x--- --x- x--- -x--']},
  'reggaeton': {'hat': ['x-x- x-x- x-x- x-x-', '--x- --x- --x- --x-', 'x-xx x-xx x-xx x-xx', 'x-x- x-xx x-x- x-xx'],
-               'bass': ['x--x --x- x--- ----', 'x--x --x- x--x --x-', 'x--- --x- x--x ----']},
+      'bass': ['x--x --x- x--- ----', 'x--x --x- x--x --x-', 'x--- --x- x--x ----']},
+ 'soul': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'kick': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--- -x--'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgx- xgx- xgxg'],
+      'bass': ['x--- ---- x--- --x-', 'x--- --x- x--- ----', 'x-x- ---- x--- --x-']},
+ 'soulful_house': {'hat': ['xgXg xgXg xgXg xgXg', 'x-Xg x-Xg x-Xg x-Xg'],
+      'bass': ['--x- --x- --x- --x-', '--x- --x- -xx- --x-', 'x-x- --x- --x- x---'],
+      'clap': ['---- x--- ---- x---', '---- x--- ---- x--x']},
+ 'space_disco': {'hat': ['xxXx xxXx xxXx xxXx', 'x-X- x-X- x-X- x-X-'],
+      'bass': ['x-x- x-x- x-x- x-x-', 'x-x- x-x- x-xx x-x-', 'x-xx x-x- x-xx x-x-'],
+      'snare': ['---- x--- ---- x---', '---- x--- ---- x--x']},
  'sperimentale': {'kick': ['x--- ---x --x- ----', 'x-x- --x- ---- x---', 'x--x ---- -x-- x---'],
-                  'hat': ['x-x- -xx- x--x -x--', 'xxxx ---- xxxx ----', 'x-xx -x-x x-x- xx--'], 'bass': ['x--- x--x ---x ----', 'x-x- ---- x--x -x--']},
- 'soul': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'kick': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--- -x--'],
-          'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgx- xgx- xgxg'],
-          'bass': ['x--- ---- x--- --x-', 'x--- --x- x--- ----', 'x-x- ---- x--- --x-']},
- 'synthpop': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', 'x-x- x-x- x-x- x-x-'],
-              'bass': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x--x x--x x--x x--x']},
- 'techno': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- ---- ---- x---'], 'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-', '-xXx -xXx -xXx -xXx'],
-            'bass': ['-xxx -xxx -xxx -xxx', '-x-x -x-x -x-x -x-x', '-xx- -xx- -xx- -xx-', '-xxx -x-x -xxx -x-x']},
- 'trance': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
-            'bass': ['--x- --x- --x- --x-', '-xx- -xx- -xx- -xx-', '--x- --xx --x- --xx', '-x-x -x-x -x-x -x-x']},
+      'hat': ['x-x- -xx- x--x -x--', 'xxxx ---- xxxx ----', 'x-xx -x-x x-x- xx--'],
+      'bass': ['x--- x--x ---x ----', 'x-x- ---- x--x -x--']},
+ 'synthpop': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', 'x-x- x-x- x-x- x-x-'],
+      'bass': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x--x x--x x--x x--x']},
+ 'synthwave': {'hat': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x-X- x-X- x-X- x-X-'],
+      'bass': ['xxxx xxxx xxxx xxxx', 'x-x- x-x- x-x- x-x-', 'x-xx x-xx x-xx x-xx'],
+      'snare': ['---- x--- ---- x---', '---- x--- ---- x--x']},
+ 'techno': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- ---- ---- x---'],
+      'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-', '-xXx -xXx -xXx -xXx'],
+      'bass': ['-xxx -xxx -xxx -xxx', '-x-x -x-x -x-x -x-x', '-xx- -xx- -xx- -xx-', '-xxx -x-x -xxx -x-x']},
+ 'trance': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
+      'bass': ['--x- --x- --x- --x-', '-xx- -xx- -xx- -xx-', '--x- --xx --x- --xx', '-x-x -x-x -x-x -x-x']},
  'trap': {'kick': ['x--- --x- ---- ----', 'x--- --x- --x- ----', 'x--x ---- --x- ----', 'x--- ---- -x-- x---'],
-          'hat': ['xxxx xxxx xxxx xxxx', 'x-xx x-xx xxxx x-xx', 'xxgx xxgx xxxg xxgx'],
-          'bass': ['x--- ---- ---- ----', 'x--- --x- ---- ----', 'x--- ---- --x- ----', 'x--x ---- --x- ----']},
+      'hat': ['xxxx xxxx xxxx xxxx', 'x-xx x-xx xxxx x-xx', 'xxgx xxgx xxxg xxgx'],
+      'bass': ['x--- ---- ---- ----', 'x--- --x- ---- ----', 'x--- ---- --x- ----', 'x--x ---- --x- ----']},
+ 'trip_hop': {'kick': ['x--- --x- ---- ----', 'x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- --x- ---- x---'],
+      'hat': ['x-g- x-g- x-g- x-g-', 'xgxg xgxg xgxg xgxg', 'x--g x--g x--g x-xg'],
+      'bass': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--- --x-'],
+      'snare': ['---- x--- ---- x---', '---- x--- ---- x--x']},
+ 'uk_garage': {'kick': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--- --x-', 'x--- --x- x--- --x-'],
+      'hat': ['xgxg xgxg xgxg xgxg', 'x-xg x-xg x-xg x-xg', 'xgxx xgxg xgxx xgxg'],
+      'bass': ['--x- --x- --x- --x-', '--x- --x- ---x --x-', '--x- x-x- --x- ----', 'x-x- --x- --x- x---'],
+      'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---']},
  'underground': {'kick': ['x--- ---- x--- ----', 'x--- ---x x--- ----', 'x--- --x- x--- ----'],
-                 'hat': ['x--x --x- x--x --x-', 'x--x --x- x--x --xx', 'x--x -xx- x--x -xx-'],
-                 'bass': ['x--x --x- x--x --x-', 'x--x --x- x--x -x--', 'x--x -xx- x--x -xx-']},
- 'armonico': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'], 'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx'], 'bass': ['x--- ---- x--- ----', 'x--- --x- x--- --x-', 'x-x- x-x- x-x- x-x-']},
+      'hat': ['x--x --x- x--x --x-', 'x--x --x- x--x --xx', 'x--x -xx- x--x -xx-'],
+      'bass': ['x--x --x- x--x --x-', 'x--x --x- x--x -x--', 'x--x -xx- x--x -xx-']},
+ 'vaporwave': {'kick': ['x--- ---- x--- ----', 'x--- ---- x--- -x--'],
+      'hat': ['g-g- g-g- g-g- g-g-', 'x-g- x-g- x-g- x-g-'],
+      'bass': ['x--- ---- x--- ----', 'x--- ---- x--x ----']},
 }
 for _g, _d in PATTERN_LIB.items():            # controllo all'avvio: ogni pattern deve avere 16 step
     assert _g in GENRES, _g
@@ -653,11 +1103,11 @@ def vary_genre(g, seed, name=None):
     if any(snare) and name in LOOSE_SNARE:
         snare = _mutate(snare, rs, {s for s in range(0, 16, 4) if snare[s]}, [2, 3, 6, 7, 10, 11, 14, 15], 0.3, 0.1, 0.3, 2)
     ghost = list(g.get('ghost', [0] * 16))
-    if any(ghost):
+    if any(ghost) and name not in GHOST_FIXED:
         cand = [s for s in range(16) if s % 4 and not snare[s]]
         ghost = [0] * 16
         for s in rs.sample(cand, rs.randint(2, min(5, len(cand)))): ghost[s] = 1
-    if any(bass):
+    if any(bass) and name not in BASS_FIXED:
         bass = _mutate(bass, rs, {0}, [2, 3, 6, 7, 10, 11, 14, 15], 0.15 if four else 0.3, 0.1 if four else 0.15, 0.2 if four else 0.35, 1 if four else 2)
     hat = _vary_hat(hat_src, rs, groove, 0.10 if four else 0.2) if any(g['hat']) else list(g['hat'])
     g2.update(kick=kick, snare=snare, clap=clap, ghost=ghost, bass=bass, hat=hat)
@@ -684,7 +1134,7 @@ def vary_genre(g, seed, name=None):
 GM_CRASH, GM_REVERSE = 49, 119
 TOMS = (50, 48, 47, 45)
 # Generi con transizioni "forti" (pausa di un beat + reverse prima del drop); gli altri hanno transizioni morbide (crash leggero, fill piccoli)
-BIG_TRANSITIONS = frozenset({'techno', 'trance', 'edm_2000s', 'drum_n_bass', 'acid', 'elettronico', 'commerciale_90s', 'trap', 'breakcore', 'industrial', 'synthpop'})
+BIG_TRANSITIONS = frozenset({'acid', 'breakcore', 'commerciale_90s', 'drum_n_bass', 'dubstep', 'edm_2000s', 'elettronico', 'future_bass', 'hardstyle', 'hyperpop', 'industrial', 'jungle', 'psytrance', 'synthpop', 'techno', 'trance', 'trap'})
 
 def _entry_strong(layers, prev):
     """Una sezione 'forte': entra il backbeat (clap) o rientra il kick."""
@@ -753,6 +1203,7 @@ def build_drum_events(g, secmap, bm=None):
             tfill = _transition_fill(L, big)
         fill_set = {x[0] for x in tfill}
         fill_bar = 'fill' in layers and idx % 8 == 7 and not tfill
+        trip_bar = bool(g.get('hat_triplet')) and 'clap' in layers and idx % 4 == 3 and L >= 8
         for s in range(L):
             if pause_from is not None and s >= pause_from: continue
             p = pi[s]
@@ -767,19 +1218,27 @@ def build_drum_events(g, secmap, bm=None):
             # HI-HAT (con 'open': open hat sui levare al posto del chiuso)
             hat_on = 'hat' in layers and P['hat'][p]
             op = 'open' in layers and s in open_steps
+            if trip_bar and s >= L - 4:                                  # roll di hi-hat in terzine (1/8T) nell'ultimo beat ogni 4 battute
+                if s == L - 4:
+                    for i_ in range(3): _note(ev, tick + i_ * (4 * q // 3), 4 * q // 3 - 10, GM_HAT_CLOSED, 68 + i_ * 14 + R(0, 8), DRUM_CH)
+                hat_on = op = False
             if hat_on or op:
                 hv = (75 + R(0, 20)) if energy else (62 + R(0, 14))
                 if hat_on: hv += {2: 18, 3: -28}.get(P['hat'][p], 0)    # 2 = accento, 3 = ghost
                 if hv:
                     _note(ev, tick + sw, (TICKS_BEAT // 2) if op else q // 2, GM_HAT_OPEN if op else GM_HAT_CLOSED, hv + (15 if op else 0), DRUM_CH)
+                    if g.get('hat_sub') and not op and random.random() < 0.35:     # stutter 1/32 (hyperpop)
+                        _note(ev, tick + sw + q // 2, q // 4, GM_HAT_CLOSED, max(20, hv - 18), DRUM_CH)
             # SNARE / CLAP / ROLL / FILL
             if in_roll:
                 if s % roll_skip == 0:
                     _note(ev, tick, q // 2, GM_SNARE, 55 + int(roll_amp * (rr * L + s) / (N * L)), DRUM_CH)
+                if g.get('roll32') and rr == N - 1 and s >= (pause_from - 4 if pause_from is not None else L - 4) and (pause_from is None or s < pause_from):   # ultima battuta della rullata: 1/32 (un beat prima se c'e' la pausa)
+                    _note(ev, tick + q // 2, q // 4, GM_SNARE, 70 + R(0, 30), DRUM_CH)
             elif fill_bar and s >= L - 4:
                 _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - (L - 4)) * 15, DRUM_CH)
             elif 'clap' in layers and s not in fill_set:
-                if P['snare'][(p - sn_shift) % 16]: _note(ev, tick + sw + lazy, q // 2, GM_SNARE, (90 if roll_any else 105) + R(0, 10), DRUM_CH)
+                if P['snare'][(p - sn_shift) % 16]: _note(ev, tick + sw + lazy, q // 2, g.get('snare_note', GM_SNARE), (90 if roll_any else 105) + R(0, 10), DRUM_CH)
                 elif P['ghost'][p] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 28 + R(0, 16), DRUM_CH)
                 if P['clap'][p]: _note(ev, tick + sw + lazy, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
             # PERCUSSIONI
@@ -824,7 +1283,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
     root, scale = dna or extract_dna(notes_data)
     n = len(scale)
     remix = (submode == 'extract') and bool(notes_data)
-    bm = plan_meter(g, bars, not remix)
+    bm = plan_meter(g, bars, not remix, seed)
     tracks = {'bass': [], 'arp': [], 'drums': build_drum_events(g, secmap, bm)}
     bass_gap = _gaps([s for s in range(16) if g['bass'][s]]) if any(g['bass']) else {}
 
@@ -882,7 +1341,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
                 else:
                     pc = (root + scale[(bass_prog[bar % 4] if random.random() < 0.8 else pick()) % n]) % 12
                 gap = bass_gap[p] if L == 16 else min(bass_gap[p], L - s)
-                oc, dur, vx = _bass_shape(g.get('bass_style'), hit, gap, L - s); hit += 1
+                oc, dur, vx = _bass_shape(g.get('bass_style'), hit, gap, L - s, s); hit += 1
                 _note(tracks['bass'], tick, dur * q - 15, _bass_pitch(pc) + oc, min(127, max(1, int(((95 if bass_full else 82) + (5 if s in gst else 0) + vx) * fb))), 0)
 
             # SYNTH / ARP
@@ -898,7 +1357,9 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
             elif m_cur[p] is not None and random.random() < factor:
                 _note(tracks['arp'], tick + sw, q - 20, _pc_pitch((root + scale[m_cur[p] % n]) % 12, arp_base), av, 1)
 
-    return {k: v for k, v in tracks.items() if v}, root, scale
+    tr_ = {k: v for k, v in tracks.items() if v}
+    if g.get('free_time'): _free_time(tr_, g['free_time'])
+    return tr_, root, scale
 
 # ================= GENERAZIONE MULTITRACK =================
 
@@ -1029,7 +1490,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     use7 = random.random() < g.get('seventh', 0.35)       # accordi di settima (Deep, Soul, R&B... quasi sempre)
     use9 = random.random() < g.get('ninth', 0.0)          # con la nona
     bass_style = g.get('bass_style')
-    chord_off = random.choice([0, 1, 2, 2, 3])           # dove cadono gli stab degli accordi nel gruppo
+    chord_off = g['chord_off'] if 'chord_off' in g else random.choice([0, 1, 2, 2, 3])   # dove cadono gli stab degli accordi nel gruppo (reggae: sempre sul levare)
     arp_base, lead_oct = random.choice([60, 67, 72]), random.choice([67, 72])
     bass_root_p, lead_p = BASS_ROOT_P.get(bass_style, random.uniform(0.6, 0.9)), random.uniform(0.3, 0.6)
     bass_steps = [s for s in range(16) if g['bass'][s]]
@@ -1037,6 +1498,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     lead_base = [random.randrange(n) if random.random() < lead_p else None for _ in range(16)]
     lead = lead_base
     lead_q, lead_a = _question(lead_base, n), _answer(lead_base)
+    trip_n, trip_mot = 6, None
     arp_mode, R = 'up', random.randint
 
     for bar, B in enumerate(secmap):
@@ -1072,7 +1534,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
                 if soft and s not in gst: continue
                 pc = _bass_pc(bass_style, hit, cpcs, rpc, bass_root_p)
                 gap = bass_gap[pi[s]] if L == 16 else min(bass_gap[pi[s]], L - s)
-                oc, dur, vx = _bass_shape(bass_style, hit, gap, L - s); hit += 1
+                oc, dur, vx = _bass_shape(bass_style, hit, gap, L - s, s); hit += 1
                 _note(tracks['bassline'], base + s * q, dur * q - 15, _pc_pitch(pc, 36) + oc, min(127, max(1, int(((82 if soft else 95) + (5 if s in gst else 0) + vx) * fb))), 1)
 
         # PAD: accordo lungo
@@ -1102,10 +1564,21 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
                         k = s % (2 * (NT - 1)); i = k if k < NT else 2 * (NT - 1) - k
                     else: i = random.randrange(NT)
                     sw = int(g['swing'] * q) if s % 2 == 1 else 0
-                    _note(tracks['arp'], base + s * q + sw, q - 10, tones[i], int((a_vel + R(0, 8)) * af), 4)
+                    sub_ = bool(g.get('arp_sub'))       # chiptune: arpeggi rapidi a 1/32
+                    _note(tracks['arp'], base + s * q + sw, (q // 2 - 5) if sub_ else (q - 10), tones[i], int((a_vel + R(0, 8)) * af), 4)
+                    if sub_: _note(tracks['arp'], base + s * q + sw + q // 2, q // 2 - 5, tones[(i + 1) % NT], int((a_vel - 8 + R(0, 8)) * af), 4)
 
         # LEAD: motivo pieno (lead) o versione rada sui battiti (leadl)
-        l_steps = [s for s, v in enumerate(lead) if v is not None]
+        trip = bool(g.get('lead_triplet')) and ('lead' in layers or 'leadl' in layers)
+        if trip:        # Hardstyle: melodia in terzine, griglia 1/8T (12 posizioni per battuta)
+            if idx == 0: trip_n = 12 if (energy and random.random() < 0.5) else 6
+            if idx == 0 or bar % 2 == 0 or trip_mot is None: trip_mot = _trip_motif(n, trip_n)
+            full_t, lf_t, step_t = 'lead' in layers, _fade(B, 'lead'), (L * q) // 12
+            for j in range(12):
+                if trip_n == 6 and j % 2: continue
+                if not full_t and j % 3: continue
+                _note(tracks['lead'], base + j * step_t, step_t - 10, _pc_pitch(pc_of(trip_mot[j // (12 // trip_n)]), lead_oct), int((88 if full_t else 70) * lf_t), 5)
+        l_steps = [] if trip else [s for s, v in enumerate(lead) if v is not None]
         if ('lead' in layers or 'leadl' in layers) and l_steps:
             full, lf, gaps = 'lead' in layers, _fade(B, 'lead'), _gaps(l_steps)
             for s in range(L):
@@ -1132,7 +1605,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
     g = vary_genre(g, seed, g.get('_name'))
     bars, sections = compute_structure(bars, g.get('timeline'), seed)
     secmap = section_map(sections, bars)
-    bm = plan_meter(g, bars, submode != 'faithful')
+    bm = plan_meter(g, bars, submode != 'faithful', seed)
     mid = mido.MidiFile(file=mid_file_bytes)
     all_notes = notes_from_midi(mid)
     if not all_notes:
@@ -1147,6 +1620,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
     drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
+    if g.get('free_time'): _free_time(tracks, g['free_time'])
     if split_drums and 'drums' in tracks:
         tracks = split_drum_track(tracks)
     return tracks, root, scale, headers, bars
@@ -1159,12 +1633,13 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     bars, sections = compute_structure(bars, g.get('timeline'), seed)
     secmap = section_map(sections, bars)
     tracks, headers = {}, {}
-    bm = plan_meter(g, bars, True)
+    bm = plan_meter(g, bars, True, seed)
     _arrange_generative(g, root, scale, secmap, tracks, bm)
     _add_reese(g, tracks)
     drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
     tracks = {k: v for k, v in tracks.items() if v}
+    if g.get('free_time'): _free_time(tracks, g['free_time'])
     if split_drums and 'drums' in tracks: tracks = split_drum_track(tracks)
     return tracks, root, scale, headers, bars
 
@@ -1199,6 +1674,61 @@ def _events_to_notes(events):
 # ================= MARKER DI SEZIONE + AUTOMAZIONI FILTRO (CC74) =================
 import unicodedata
 
+GENRE_LABELS = {
+    'acid': 'Acid',
+    'afro_house': 'Afro House',
+    'amapiano': 'Amapiano',
+    'ambient': 'Ambient',
+    'armonico': 'Armonico',
+    'breakcore': 'Breakcore',
+    'chiptune': 'Chiptune',
+    'commerciale_90s': "Commerciale anni '90",
+    'deep': 'Deep House',
+    'disco': 'Disco',
+    'drone': 'Drone',
+    'drum_n_bass': "Drum 'n' Bass",
+    'dub_techno': 'Dub Techno',
+    'dubstep': 'Dubstep',
+    'edm_2000s': 'EDM anni 2000',
+    'elettronico': 'Elettronico',
+    'funk': 'Funk',
+    'future_bass': 'Future Bass',
+    'glitch': 'Glitch',
+    'hardstyle': 'Hardstyle / Hardcore',
+    'harsh_noise': 'Harsh Noise',
+    'hip_hop': 'Hip Hop',
+    'house_90s': "House anni '90",
+    'hyperpop': 'Hyperpop / Deconstructed Club',
+    'idm': 'IDM',
+    'industrial': 'Industrial',
+    'jungle': 'Jungle',
+    'lowercase': 'Lowercase',
+    'microsound': 'Microsound',
+    'minimal': 'Minimal',
+    'minimal_techno': 'Minimal Techno',
+    'minimalismo_ritmico': 'Minimalismo Ritmico',
+    'musique_concrete': 'Musique Concrète',
+    'noise': 'Noise',
+    'onkyo': 'Onkyo',
+    'psytrance': 'Psytrance / Goa Trance',
+    'r&b': 'R&B',
+    'reggae': 'Reggae',
+    'reggaeton': 'Reggaeton',
+    'soul': 'Soul',
+    'soulful_house': 'Soulful House',
+    'space_disco': 'Space Disco',
+    'sperimentale': 'Sperimentale',
+    'synthpop': 'Synthpop',
+    'synthwave': 'Synthwave',
+    'techno': 'Techno',
+    'trance': 'Trance',
+    'trap': 'Trap',
+    'trip_hop': 'Trip Hop / Downtempo',
+    'uk_garage': 'UK Garage / 2-Step',
+    'underground': 'Underground',
+    'vaporwave': 'Vaporwave',
+}
+
 def _ascii(s):
     return unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode('ascii')
 
@@ -1213,6 +1743,15 @@ def section_markers(sections, bm):
     return out
 
 _SYNTH_MIN = frozenset({'arp', 'arpl', 'lead', 'leadl', 'chords', 'chordsl', 'pad'})
+
+def tempo_events(g, sections, bm):
+    """[(tick, bpm)] se il genere ha un piano di tempo per sezione (Hyperpop: 70 -> 140 -> 94 -> ...), altrimenti None."""
+    plan = g.get('tempo_plan')
+    if not plan or len(plan) != len(sections): return None
+    return [(bm[start]['start'], plan[i]) for i, (_n, start, _l, _ls) in enumerate(sections)]
+
+def _tempo_line(tempo_ev):
+    return "   Tempo variabile: " + " -> ".join(str(b) for _t, b in tempo_ev) + " BPM (un cambio di tempo per sezione, scritto nel MIDI)"
 
 def build_automation(sections, bm, tracks, style=None):
     """CC74 (cutoff/brightness) per le tracce melodiche: uno strato che entra apre il filtro in 4 battute (25 -> livello della sezione),
@@ -1259,8 +1798,8 @@ def build_automation(sections, bm, tracks, style=None):
         prev = layers
     out = {k: [(t, 74, v) for t, v in sorted(p.items())] for k, p in pts.items() if p}
     # glide (pitch bend) tra note vicine del basso: 808 lungo (trap) e slide dell'acid. Range del bend = 12 semitoni (RPN 0).
-    if style in ('long', 'acid'):
-        max_gap, max_glen = (3840, 360) if style == 'long' else (240, 100)
+    if style in ('long', 'acid', 'logdrum', 'fretless'):
+        max_gap, max_glen = {'long': (3840, 360), 'acid': (240, 100), 'logdrum': (480, 180), 'fretless': (480, 120)}[style]
         for k in ('sub_bass', 'bassline', 'bass'):
             if k not in tracks: continue
             ons = sorted([e for e in tracks[k] if e['type'] == 'on'], key=lambda e: e['tick'])
@@ -1274,6 +1813,27 @@ def build_automation(sections, bm, tracks, style=None):
             if glide:
                 rpn = [(0, 101, 0), (0, 100, 0), (0, 6, 12), (0, 38, 0), (0, 101, 127), (0, 100, 127)]
                 out[k] = rpn + sorted(out.get(k, []) + glide, key=lambda x: x[0])
+    # Wobble (dubstep): nei drop il cutoff del basso oscilla con un LFO sincronizzato (1/4, 1/8, 1/16 o 1/8T: cambia a ogni drop) e
+    # ogni nota di basso parte con un tuffo di pitch bend (il "yoy", range 12 semitoni)
+    if style == 'wobble':
+        import math
+        rates = (480, 240, 120, 160)
+        for k in ('bassline', 'bass'):
+            if k not in tracks: continue
+            pk, drop_i = list(out.get(k, [])), 0
+            ons_ = [e for e in tracks[k] if e['type'] == 'on']
+            for name_, start_, length_, layers_ in sections:
+                if 'bass' not in layers_ or 'clap' not in layers_: continue
+                t0_ = bm[start_]['start']; te_ = bm[start_ + length_ - 1]['start'] + bm[start_ + length_ - 1]['L'] * q
+                per = rates[drop_i % 4]; drop_i += 1
+                pk = [x for x in pk if not (x[1] == 74 and t0_ <= x[0] < te_)]
+                for t_ in range(t0_, te_, 30):
+                    pk.append((t_, 74, int(70 + 50 * math.sin(2 * math.pi * (t_ - t0_) / per))))
+                for e in ons_:
+                    if t0_ <= e['tick'] < te_:
+                        for i_ in range(6): pk.append((e['tick'] + i_ * 40, 'pb', int(4096 * (1 - i_ / 6))))
+                        pk.append((e['tick'] + 240, 'pb', 0))
+            out[k] = [(0, 101, 0), (0, 100, 0), (0, 6, 12), (0, 38, 0), (0, 101, 127), (0, 100, 127)] + sorted(pk, key=lambda x: x[0])
     # Reese: seconda traccia scordata (+0.17 semitoni) e cutoff che si muove lentamente (periodo 8 battute)
     if 'reese' in tracks:
         import math
@@ -1286,7 +1846,7 @@ def _show_html(html, height):
     if hasattr(st, 'iframe'): st.iframe(html, height=height)
     else: components.html(html, height=height)
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None):
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None, tempo_events=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -1297,7 +1857,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
     mid = mido.MidiFile(type=1, ticks_per_beat=TICKS_BEAT)
     total_end = max((nt[1] for _, notes in notes_by_track.values() for nt in notes), default=0)
     t_tempo = mido.MidiTrack()
-    t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(bpm), time=0))
+    t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(tempo_events[0][1] if tempo_events else bpm), time=0))
     ts_changes, prev_sig = [], None
     for m in (meter_plan or []):
         if m['sig'] != prev_sig: ts_changes.append((m['start'], m['sig'])); prev_sig = m['sig']
@@ -1309,11 +1869,12 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
     if label:
         text = ("MIDI Forge - " + label).encode('ascii', 'ignore').decode('ascii')[:120]
         t_tempo.append(mido.MetaMessage('marker', text=text, time=0))
-    timed = [(tk, 0, 'ts', sig) for tk, sig in ts_changes[1:]] + [(tk, 1, 'mk', txt) for tk, txt in (markers or [])]
+    timed = [(tk, 0, 'ts', sig) for tk, sig in ts_changes[1:]] + [(tk, 1, 'mk', txt) for tk, txt in (markers or [])] + [(tk, -1, 'tp', b_) for tk, b_ in (tempo_events or [])[1:]]
     timed.sort(key=lambda x: (x[0], x[1]))
     last = 0
     for tk, _o, kind, val in timed:
         if kind == 'ts': t_tempo.append(mido.MetaMessage('time_signature', numerator=val[0], denominator=val[1], time=tk - last))
+        elif kind == 'tp': t_tempo.append(mido.MetaMessage('set_tempo', tempo=mido.bpm2tempo(val), time=tk - last))
         else: t_tempo.append(mido.MetaMessage('marker', text=val, time=tk - last))
         last = tk
     t_tempo.append(mido.MetaMessage('end_of_track', time=max(0, total_end - last)))
@@ -1379,13 +1940,17 @@ def _meter_line(meter_plan):
     if len(c) == 1: return f"   {next(iter(c))} (tutto il brano)"
     return "   Ciclo: " + " | ".join(f"{k} x{n}" for k, n in c.items()) + "  (cambi di time signature scritti nel MIDI)"
 
-def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename, meter_plan=None, g_used=None, cc_markers=(False, False)):
+def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, duration_mode, duration_seconds, original_filename, meter_plan=None, g_used=None, cc_markers=(False, False), tempo_ev=None):
     report = ["=" * 60, "MIDI FORGE UNIVERSALE - REPORT DI GENERAZIONE", "=" * 60, "", "DATA E ORA", f"   Generato il: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", "", "PARAMETRI GENERAZIONE", f"   File originale: {original_filename}", f"   Modalità: {mode.upper()}", f"   Sotto-modalità: {submode.upper()}", f"   Genere: {genre.upper()}", f"   Seed: {seed}", f"   BPM: {bpm}", f"   Battute: {bars}"]
     if duration_mode == "Minuti:Secondi" and duration_seconds:
         report.append(f"   Durata target: {duration_seconds // 60}:{duration_seconds % 60:02d}")
     total_q = sum(m['L'] for m in meter_plan) if meter_plan else bars * 16
-    duration_actual = (total_q / 4 * 60) / bpm
-    report.extend([f"   Durata effettiva: {int(duration_actual)}:{int((duration_actual - int(duration_actual)) * 60):02d}", "", "METRO", _meter_line(meter_plan), "", "STILE BASSO / ARMONIA", _style_line(g_used or GENRES[genre]), "", "ANALISI TONALE", f"   Tonica rilevata: {NOTE_NAMES[root]}", f"   Scala: {' - '.join([NOTE_NAMES[(root + i) % 12] for i in scale])}", f"   Intervalli: {scale}", ""])
+    if tempo_ev:
+        end_t = total_q * (TICKS_BEAT // 4)
+        duration_actual = sum(((tempo_ev[i + 1][0] if i + 1 < len(tempo_ev) else end_t) - tk) / TICKS_BEAT * 60 / b_ for i, (tk, b_) in enumerate(tempo_ev))
+    else:
+        duration_actual = (total_q / 4 * 60) / bpm
+    report.extend([f"   Durata effettiva: {int(duration_actual // 60)}:{int(duration_actual % 60):02d}", "", "METRO", _meter_line(meter_plan), *([_tempo_line(tempo_ev)] if tempo_ev else []), "", "STILE BASSO / ARMONIA", _style_line(g_used or GENRES[genre]), "", "ANALISI TONALE", f"   Tonica rilevata: {NOTE_NAMES[root]}", f"   Scala: {' - '.join([NOTE_NAMES[(root + i) % 12] for i in scale])}", f"   Intervalli: {scale}", ""])
     g = g_used or GENRES[genre]
     report.extend(["PATTERN RITMICI (16 step, adattati ai gruppi del metro)", f"   Kick (GM 36):  {''.join(['#' if x else '.' for x in g['kick']])}", f"   Snare (GM 38): {''.join(['#' if x else '.' for x in g.get('snare', [0]*16)])}"])
     if 'clap' in g: report.append(f"   Clap (GM 39):  {''.join(['#' if x else '.' for x in g['clap']])}")
@@ -1505,7 +2070,7 @@ if 'generated' not in st.session_state:
     st.session_state.generated = {'tracks': None, 'root': None, 'scale': None, 'headers': None, 'bars': None, 'bpm': None, 'midi_bytes': None, 'report_text': '', 'label': None, 'mode': None, 'submode': None, 'genre': None, 'duration_mode': None, 'duration_seconds': None, 'original_filename': None}
 
 st.title("MIDI Forge Universale")
-st.markdown("Trasforma qualsiasi file MIDI in 30+ generi musicali. Ogni genere ha la sua struttura a strati, con ingressi e uscite graduali (intro DJ, groove, main, breakdown, outro)")
+st.markdown("Trasforma qualsiasi file MIDI in 50+ generi musicali. Ogni genere ha la sua struttura a strati, con ingressi e uscite graduali (intro DJ, groove, main, breakdown, outro)")
 
 col1, col2 = st.columns([1, 1])
 
@@ -1539,8 +2104,8 @@ with col2:
         st.download_button("Scarica le timeline attuali (JSON)", data=timelines_to_json(), file_name="midi_forge_timelines.json", mime="application/json")
         if TIMELINE_FILE_MSG: st.caption(TIMELINE_FILE_MSG)
         st.caption("Formato: {\"deep\": [[\"Intro DJ\", 16, \"kick hat pad\"], ...]}. Strati: " + " ".join(LAYER_ORDER) + ". Un file midi_forge_timelines.json accanto allo script viene caricato in automatico.")
-    genre_list = sorted(GENRES.keys())
-    genre = st.selectbox("Genere Musicale", genre_list, index=genre_list.index("techno"))
+    genre_list = sorted(GENRES.keys(), key=lambda k: _ascii(GENRE_LABELS.get(k, k)).lower())   # ordine alfabetico per nome
+    genre = st.selectbox("Genere Musicale", genre_list, index=genre_list.index("techno"), format_func=lambda k: GENRE_LABELS.get(k, k))
     g_defaults = GENRES[genre]
     st.caption('Struttura tipica (' + str(g_defaults['bars_default']) + ' battute):' + _structure_line(g_defaults['bars_default'], g_defaults.get('timeline')))
     with st.expander("Anteprima struttura e strati"):
@@ -1568,11 +2133,25 @@ with col2:
                 seconds = st.number_input("Secondi", min_value=0, max_value=59, value=0)
             duration_seconds = (minutes * 60) + seconds
             bars = None
-    seed = st.number_input("Seed", min_value=1, max_value=99999, value=42)
+    st.session_state.setdefault('seed', 42)
+    seed = st.number_input("Seed", min_value=1, max_value=99999, key='seed', help="Stesso seed = stesso brano (utile per ritrovarne uno). Per averne uno diverso usa il pulsante Rigenera.")
 
 st.markdown("---")
 
-if st.button("Genera MIDI", type="primary", use_container_width=True):
+def _regen():
+    """Rigenera: nuovo seed casuale (SystemRandom, indipendente dal random.seed del generatore) e generazione immediata."""
+    st.session_state['seed'] = random.SystemRandom().randint(1, 99999)
+    st.session_state['_regen_run'] = True
+
+def _restore_seed(s):
+    st.session_state['seed'] = int(s)
+    st.session_state['_regen_run'] = True
+
+_bc1, _bc2 = st.columns([3, 1])
+_gen_clicked = _bc1.button("Genera MIDI", type="primary", use_container_width=True)
+_bc2.button("Rigenera 🎲", use_container_width=True, on_click=_regen, help="Brano diverso: sceglie un nuovo seed e rigenera subito con le stesse impostazioni")
+_regen_flag = st.session_state.pop('_regen_run', False)
+if _gen_clicked or _regen_flag:
     if not scratch and not uploaded_file:
         st.error("Carica prima un file MIDI!")
     else:
@@ -1592,10 +2171,14 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                 if not scratch and not notes_data:
                     st.error("Il file MIDI non contiene note melodiche (i canali batteria vengono ignorati).")
                 else:
-                    final_bpm = seeded_bpm(genre, g_defaults, seed) if use_default_bpm else bpm
+                    final_bpm = _default_bpm(genre, g_defaults, seed) if use_default_bpm else bpm
                     if duration_mode == "Minuti:Secondi" and duration_seconds:
                         odd_ok = uses_odd_meter(mode, submode, bool(notes_data))
-                        raw_bars = (duration_seconds * final_bpm) / 60 * 4 / avg_bar_sixteenths(g_defaults, odd_ok)
+                        _plan = g_defaults.get('tempo_plan') if use_default_bpm else None
+                        if _plan and len(_plan) == len(g_defaults['timeline']):
+                            raw_bars = g_defaults['bars_default'] * duration_seconds / sum(b_ * 240 / bp_ for (_n, b_, _l), bp_ in zip(g_defaults['timeline'], _plan))
+                        else:
+                            raw_bars = (duration_seconds * final_bpm) / 60 * 4 / avg_bar_sixteenths(g_defaults, odd_ok)
                         _u = timeline_unit(g_defaults['timeline'])
                         final_bars = int(round(raw_bars / _u) * _u)  # arrotonda all'unita' della struttura
                         final_bars = max(min_bars(g_defaults), final_bars)
@@ -1623,22 +2206,25 @@ if st.button("Genera MIDI", type="primary", use_container_width=True):
                             st.info(f"Durata allineata: {final_bars} battute (richieste: {requested_bars})")
 
                     label = f"{genre} - {mode}/{submode}"
-                    meter_plan = plan_meter(g_defaults, final_bars, uses_odd_meter(mode, submode, bool(notes_data)))
+                    meter_plan = plan_meter(g_run, final_bars, uses_odd_meter(mode, submode, bool(notes_data)), seed)
                     _, sections_now = compute_structure(final_bars, g_run.get('timeline'), seed)
                     use_cc = auto_cc and not (mode == 'multitrack' and submode == 'faithful')   # in Faithful le tracce sono quelle originali
                     automation = build_automation(sections_now, meter_plan, tracks, g_defaults.get('bass_style')) if use_cc else None
                     markers = section_markers(sections_now, meter_plan) if add_markers else None
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers)
-                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_run, seed, genre), (bool(use_cc), bool(add_markers)))
+                    tempo_ev = tempo_events(g_run, sections_now, meter_plan) if use_default_bpm else None
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev)
+                    report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_run, seed, genre), (bool(use_cc), bool(add_markers)), tempo_ev)
 
                     st.session_state.generated = {
                         'tracks': tracks, 'root': root, 'scale': scale, 'headers': headers,
                         'bars': final_bars, 'bpm': final_bpm, 'midi_bytes': midi_buffer.getvalue(),
                         'report_text': report_text, 'label': label, 'mode': mode,
                         'submode': submode, 'genre': genre, 'duration_mode': duration_mode,
-                        'duration_seconds': duration_seconds, 'original_filename': src_name
+                        'duration_seconds': duration_seconds, 'original_filename': src_name, 'seed': seed
                     }
-                    st.success(f"Completato! (Tonica: {NOTE_NAMES[root]}, BPM: {final_bpm})")
+                    _h = [x for x in st.session_state.get('seed_history', []) if x['seed'] != seed]
+                    st.session_state['seed_history'] = ([{'seed': seed, 'genre': genre, 'bpm': final_bpm, 'mode': f"{mode}/{submode}"}] + _h)[:10]
+                    st.success(f"Completato! (Tonica: {NOTE_NAMES[root]}, BPM: " + (f"variabile {min(b_ for _t, b_ in tempo_ev)}-{max(b_ for _t, b_ in tempo_ev)}" if tempo_ev else str(final_bpm)) + f", Seed: {seed})")
             except Exception as e:
                 st.error(f"Errore: {str(e)}")
 
@@ -1648,13 +2234,19 @@ if g and g.get('midi_bytes') is not None and g.get('report_text'):
     render_midi_player(g['tracks'], g['bpm'])
     col_dl1, col_dl2 = st.columns(2)
     with col_dl1:
-        st.download_button(label="Scarica MIDI", data=g['midi_bytes'], file_name=f"midi_forge_{g['genre']}_{g['mode']}_{g['submode']}.mid", mime="audio/midi", use_container_width=True)
+        st.download_button(label="Scarica MIDI", data=g['midi_bytes'], file_name=f"midi_forge_{g['genre']}_{g['mode']}_{g['submode']}_seed{g.get('seed', '')}.mid", mime="audio/midi", use_container_width=True)
     with col_dl2:
-        st.download_button(label="Scarica Report TXT", data=g['report_text'].encode('utf-8'), file_name=f"report_{g['genre']}_{g['mode']}_{g['submode']}.txt", mime="text/plain", use_container_width=True)
+        st.download_button(label="Scarica Report TXT", data=g['report_text'].encode('utf-8'), file_name=f"report_{g['genre']}_{g['mode']}_{g['submode']}_seed{g.get('seed', '')}.txt", mime="text/plain", use_container_width=True)
     with st.expander("Visualizza Report"):
         st.code(g['report_text'], language=None)
 else:
     st.info("Carica un MIDI e clicca 'Genera' per iniziare.")
+
+if st.session_state.get('seed_history'):
+    with st.expander("Cronologia seed (per tornare a un brano precedente)"):
+        st.caption("Per ritrovare lo stesso brano seleziona lo stesso genere e le stesse impostazioni, poi clicca il seed.")
+        for i_, h_ in enumerate(st.session_state['seed_history']):
+            st.button(f"Seed {h_['seed']} - {GENRE_LABELS.get(h_['genre'], h_['genre'])} - {h_['bpm']} BPM ({h_['mode']})", key=f"hist_{i_}", on_click=_restore_seed, args=(h_['seed'],))
 
 st.markdown("---")
 st.caption("MIDI Forge Universale | Standard General MIDI | Struttura per genere a strati | 100% Open Source & Free")
