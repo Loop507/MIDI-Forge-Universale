@@ -4,6 +4,8 @@ import mido
 import random
 import io
 import json
+import re
+from pathlib import Path
 from datetime import datetime
 from collections import Counter
 
@@ -96,20 +98,24 @@ def _compute_key_signature(root, scale):
     # nomi validi per il meta-evento key_signature di mido
     return (_KEY_MINOR if _is_minor_scale(scale) else _KEY_MAJOR)[root % 12]
 
-def _compute_note_durations(events):
-    pending = {}
-    notes = []
-    for e in sorted(events, key=lambda x: x['tick']):
-        key = (e['pitch'], e.get('channel', 0))
+def _pair_events(events):
+    """Accoppia note-on/note-off per (canale, altezza) in ordine FIFO. Funziona anche con eventi riordinati per tick (humanize)
+    e con note sovrapposte sulla stessa altezza. Ritorna [(start, end, pitch, vel, channel)]."""
+    pending, out = {}, []
+    for e in sorted(events, key=lambda x: (x['tick'], x['type'] != 'off')):
+        key = (e.get('channel', 0), e['pitch'])
         if e['type'] == 'on':
-            pending[key] = e
-        elif e['type'] == 'off' and key in pending:
-            start = pending[key]['tick']
-            dur = e['tick'] - start
-            vel = pending[key]['vel']
-            notes.append({'tick': start, 'dur': max(1, dur), 'pitch': e['pitch'], 'vel': vel, 'channel': e.get('channel', 0)})
-            del pending[key]
-    return notes
+            pending.setdefault(key, []).append(e)
+        else:
+            q = pending.get(key)
+            if q:
+                on = q.pop(0)
+                s = int(on['tick'])
+                out.append((s, max(int(e['tick']), s + 1), key[1], on['vel'], key[0]))
+    return out
+
+def _compute_note_durations(events):
+    return [{'tick': s, 'dur': en - s, 'pitch': p, 'vel': v, 'channel': ch} for s, en, p, v, ch in _pair_events(events)]
 
 def notes_from_midi(mid):
     """Note melodiche (canale batteria escluso) con durata; tick scalati a TICKS_BEAT."""
@@ -1675,19 +1681,7 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     return tracks, root, scale, headers, bars
 
 def _events_to_notes(events):
-    notes = []
-    i, n = 0, len(events)
-    while i < n:
-        e = events[i]
-        if e['type'] == 'on' and i + 1 < n and events[i + 1]['type'] == 'off' and events[i + 1]['pitch'] == e['pitch']:
-            start = int(e['tick'])
-            end = max(int(events[i + 1]['tick']), start + 1)
-            pitch = max(0, min(127, int(e['pitch'])))
-            vel = max(1, min(127, int(e['vel'])))
-            notes.append([start, end, pitch, vel])
-            i += 2
-        else:
-            i += 1
+    notes = [[s, en, max(0, min(127, int(p))), max(1, min(127, int(v)))] for s, en, p, v, _ch in _pair_events(events)]
     by_pitch = {}
     for nt in notes: by_pitch.setdefault(nt[2], []).append(nt)
     cleaned_all = []
@@ -1695,12 +1689,578 @@ def _events_to_notes(events):
         lst.sort(key=lambda x: (x[0], -x[3]))
         cleaned = []
         for nt in lst:
-            if cleaned and nt[0] == cleaned[-1][0]: cleaned[-1][1] = max(cleaned[-1][1], nt[1]); continue
+            if cleaned and nt[0] - cleaned[-1][0] < 24: cleaned[-1][1] = max(cleaned[-1][1], nt[1]); continue   # stesso attacco (anche con humanize): una nota sola
             if cleaned and cleaned[-1][1] > nt[0]: cleaned[-1][1] = nt[0]
             cleaned.append(nt)
         cleaned_all.extend(cleaned)
     cleaned_all.sort(key=lambda x: (x[0], x[2]))
     return cleaned_all
+
+
+# ================= GUIDA LOGIC PRO X: PRESET E CATENE DI SEGNALE PER GENERE =================
+GUIDE_TEXT = """
+ACID
+1. Sub Bass: ES2 (Sine Sub) -> Channel EQ (HPF 30Hz) -> Compressor (Sidechain)
+2. Bassline: Retro Synth (Tube Acid Bass) -> Channel EQ -> Compressor -> Overdrive -> AutoFilter (Resonance alta)
+3. Chords: Alchemy (Dub Chords) -> Channel EQ -> Step FX (Gating)
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Chorus -> Send: ChromaVerb
+5. Arp: Retro Synth (Sync Arp) -> Channel EQ -> Stereo Delay (Ping-Pong)
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Presence) -> Stereo Delay -> Send: ChromaVerb
+7. FX Perc: Alchemy (White Noise Riser) -> Channel EQ -> AutoFilter
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Compressor -> Phat FX (sul Kick)
+
+AFRO_HOUSE
+1. Sub Bass: Alchemy (Warm Sub) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Session) -> Channel EQ -> Compressor (Vintage FET)
+3. Chords: Alchemy (Marimba) -> Channel EQ -> Chorus
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Kalimba) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Steel Drums o Flute) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Percussive FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Tuned Urban) -> Channel EQ -> Enveloper -> Compressor
+
+AMAPIANO
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Log Drum Bass) -> Channel EQ -> Compressor -> Phat FX (Saturation)
+3. Chords: Alchemy (Soft Keys) -> Channel EQ -> Chorus
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: ChromaVerb
+5. Arp: Alchemy (Log Drum) -> Channel EQ -> AutoFilter (Lento)
+6. Lead: Alchemy (Flute) -> Channel EQ -> Stereo Delay
+7. FX Perc: Alchemy (Perc FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Percussion Kit) -> Channel EQ -> Enveloper -> Compressor
+
+DEEP
+1. Sub Bass: Retro Synth (Deep Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Deep Bass) -> Channel EQ -> Compressor (Sidechain)
+3. Chords: Vintage Electric Piano (Rhodes) -> Channel EQ -> Chorus -> Vintage EQ
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Chorus -> Send: ChromaVerb
+5. Arp: Alchemy (Lush Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Soft Lead) -> Channel EQ -> Send: Space Designer
+7. FX Perc: Alchemy (White Noise) -> Channel EQ -> AutoFilter
+8. Drums: Drum Machine Designer (LinnDrum) -> Channel EQ -> Compressor (Studio VCA)
+
+DISCO
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Session o Slap) -> Channel EQ -> Compressor -> Phat FX
+3. Chords: Vintage Clav (Wah Clav) -> Channel EQ -> AutoFilter (Wah) -> Compressor
+4. Pad: Studio Strings (Disco Strings) -> Channel EQ -> Send: Space Designer (Hall)
+5. Arp: Retro Synth (Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Studio Horns (R&B Section) -> Channel EQ -> Compressor -> Send: ChromaVerb
+7. FX Perc: Alchemy (Perc FX) -> Channel EQ
+8. Drums: Drum Kit Designer (SoCal) -> Channel EQ -> Compressor
+
+DUB_TECHNO
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Dub Sub Bass) -> Channel EQ -> Compressor -> Tape Delay
+3. Chords: Alchemy (Dub Chords) -> Channel EQ -> Tape Delay (Feedback alto) -> Send: ChromaVerb (Dark)
+4. Pad: Alchemy (Textures) -> Channel EQ -> Send: Space Designer (Coda lunghissima)
+5. Arp: Alchemy (Delay Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Dub Lead) -> Channel EQ -> Tape Delay -> Send: ChromaVerb
+7. FX Perc: Alchemy (Tape Delay FX) -> Channel EQ
+8. Drums: Drum Machine Designer (LinnDrum) -> Channel EQ -> Compressor -> Send: Tape Delay (Snare)
+
+HOUSE_90S
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Warm Bass) -> Channel EQ -> Compressor
+3. Chords: Vintage B3 Organ (Leslie) -> Channel EQ -> Compressor (Opto)
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Chorus -> Send: Space Designer
+5. Arp: Alchemy (Piano Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Vintage Electric Piano (Rhodes) -> Channel EQ -> Chorus -> Send: ChromaVerb
+7. FX Perc: Alchemy (Noise Sweep) -> Channel EQ
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Compressor
+
+MINIMAL
+1. Sub Bass: Retro Synth (Analog Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Deep Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Blips) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Minimal Pad) -> Channel EQ -> Send: ChromaVerb
+5. Arp: Alchemy (Bleep Sequence) -> Channel EQ -> Stereo Delay (Breve)
+6. Lead: Alchemy (Minimal Lead) -> Channel EQ -> Send: Space Designer
+7. FX Perc: Alchemy (Click) -> Channel EQ
+8. Drums: Drum Machine Designer (Minimal Kit) -> Channel EQ -> Enveloper -> Compressor
+
+MINIMAL_TECHNO
+1. Sub Bass: Retro Synth (Analog Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Synced Metal Bass) -> Channel EQ -> Compressor -> Phat FX (Drive)
+3. Chords: Alchemy (Dub Chords) -> Channel EQ -> Step FX (Modulazione filtro)
+4. Pad: Alchemy (Textures) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Sync Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Soft Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Glitch FX) -> Channel EQ
+8. Drums: Drum Machine Designer (LinnDrum) -> Channel EQ -> Compressor
+
+PSYTRANCE
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Rolling Bass) -> Channel EQ -> Compressor -> Overdrive
+3. Chords: Alchemy (Psy Stab) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Psy Pad) -> Channel EQ -> Send: Space Designer (Lungo)
+5. Arp: Alchemy (Psy Arp) -> Channel EQ -> Stereo Delay (Ping-Pong) -> Send: ChromaVerb
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Drive) -> Stereo Delay
+7. FX Perc: Alchemy (Riser) -> Channel EQ -> AutoFilter
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Compressor
+
+SOULFUL_HOUSE
+1. Sub Bass: Alchemy (Warm Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Warm Bass) -> Channel EQ -> Compressor (Sidechain)
+3. Chords: Vintage Electric Piano (Funk Piano) -> Channel EQ -> Chorus -> Overdrive
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Chorus -> Send: Space Designer
+5. Arp: Alchemy (Lush Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Vintage Electric Piano (Rhodes) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Noise Sweep) -> Channel EQ
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Compressor
+
+SPACE_DISCO
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Fretless) -> Channel EQ -> Chorus -> Compressor
+3. Chords: Retro Synth (Arp) -> Channel EQ -> Step FX
+4. Pad: Studio Strings (Disco Strings) -> Channel EQ -> Send: Space Designer
+5. Arp: Retro Synth (Sync Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Space Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (LinnDrum) -> Channel EQ -> Compressor
+
+TECHNO
+1. Sub Bass: ES2 (Sine Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Synced Metal Bass) -> Channel EQ -> Compressor -> Phat FX (Distortion)
+3. Chords: Alchemy (Dub Chords) -> Channel EQ -> Step FX (Gating ritmico)
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Retro Synth (Sync Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Drive) -> Stereo Delay
+7. FX Perc: Alchemy (Impact) -> Channel EQ
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Enveloper -> Compressor
+
+TRANCE
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Offbeat Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Trance Gate Pad) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Lush Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Trance Gate Arp) -> Channel EQ -> Stereo Delay -> Send: ChromaVerb
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Drive) -> Stereo Delay
+7. FX Perc: Alchemy (Riser) -> Channel EQ -> AutoFilter
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Compressor
+
+ARMONICO
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Session) -> Channel EQ -> Compressor
+3. Chords: Vintage Electric Piano (Stage Piano) -> Channel EQ -> Chorus
+4. Pad: Studio Strings (Singer Songwriter) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Soft Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Studio Strings (Small Section) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Soft Riser) -> Channel EQ
+8. Drums: Drum Kit Designer (Studio Kit) -> Channel EQ -> Compressor
+
+FUNK
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Session - Slap) -> Channel EQ -> Compressor -> Phat FX
+3. Chords: Vintage Clav (Wah Clav) -> Channel EQ -> AutoFilter (Wah) -> Compressor
+4. Pad: Vintage B3 Organ (Leslie) -> Channel EQ -> Chorus
+5. Arp: Vintage Electric Piano (Funk Piano) -> Channel EQ -> Chorus -> Send: ChromaVerb
+6. Lead: Studio Horns (Memphis Blast) -> Channel EQ -> Compressor -> Send: Space Designer
+7. FX Perc: Alchemy (Perc FX) -> Channel EQ
+8. Drums: Drum Kit Designer (SoCal) -> Channel EQ -> Enveloper -> Compressor
+
+HIP_HOP
+1. Sub Bass: Alchemy (808 Sub Bass) -> Channel EQ -> Compressor -> Phat FX (Soft Saturation)
+2. Bassline: Studio Bass (Session) -> Channel EQ -> Compressor
+3. Chords: Vintage Electric Piano (Funk Piano) -> Channel EQ -> Chorus -> Vintage EQ
+4. Pad: Alchemy (Lush Pad) -> Channel EQ -> Send: ChromaVerb
+5. Arp: Alchemy (Pluck) -> Channel EQ -> Stereo Delay
+6. Lead: ES2 (Flute Lead) -> Channel EQ -> Chorus -> Send: Space Designer
+7. FX Perc: Alchemy (Vinyl Noise) -> Channel EQ -> Bitcrusher
+8. Drums: Drum Machine Designer (Trap 808) -> Channel EQ -> Bitcrusher -> Compressor
+
+R&B
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Session) -> Channel EQ -> Compressor
+3. Chords: Vintage Electric Piano (Rhodes) -> Channel EQ -> Chorus
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Soft Pluck) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Soft Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Sweep) -> Channel EQ
+8. Drums: Drum Machine Designer (R&B Kit) -> Channel EQ -> Compressor
+
+REGGAE
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Classic) -> Channel EQ -> Compressor (Opto)
+3. Chords: Vintage B3 Organ (Leslie) -> Channel EQ -> Compressor
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Pluck) -> Channel EQ -> Stereo Delay
+6. Lead: Studio Horns (R&B Section) -> Channel EQ -> Tape Delay -> Send: ChromaVerb
+7. FX Perc: Alchemy (Dub Delay FX) -> Channel EQ -> Tape Delay
+8. Drums: Drum Kit Designer (Portland) -> Channel EQ -> Compressor
+
+REGGAETON
+1. Sub Bass: Alchemy (Dembow Sub) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Pads) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: ChromaVerb
+5. Arp: Alchemy (Pluck) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Bell Lead) -> Channel EQ -> Send: Space Designer
+7. FX Perc: Alchemy (Perc FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Tuned Urban) -> Channel EQ -> Enveloper -> Compressor
+
+SOUL
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Studio Bass (Session) -> Channel EQ -> Compressor
+3. Chords: Vintage Electric Piano (Rhodes) -> Channel EQ -> Chorus
+4. Pad: Studio Strings (Small Section) -> Channel EQ -> Send: Space Designer
+5. Arp: Vintage Electric Piano (Funk Piano) -> Channel EQ -> Chorus
+6. Lead: Studio Horns (Memphis Blast) -> Channel EQ -> Compressor -> Send: ChromaVerb
+7. FX Perc: Alchemy (Perc FX) -> Channel EQ
+8. Drums: Drum Kit Designer (Motown Revisited) -> Channel EQ -> Compressor
+
+TRAP
+1. Sub Bass: Alchemy (808 Sub Bass) -> Channel EQ -> Compressor -> Phat FX (Distortion)
+2. Bassline: Alchemy (808 Sub Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Dark Pad) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Send: ChromaVerb
+5. Arp: Alchemy (Bell Lead) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Pluck) -> Channel EQ -> Send: Space Designer
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (808 Flex) -> Channel EQ -> Bitcrusher -> Compressor
+
+TRIP_HOP
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Reese Bass) -> Channel EQ -> Compressor
+3. Chords: Vintage Electric Piano (Wurlitzer) -> Channel EQ -> Chorus -> Overdrive
+4. Pad: Alchemy (Dusty Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Pluck) -> Channel EQ -> Stereo Delay
+6. Lead: ES2 (Flute Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Vinyl Noise) -> Channel EQ -> Bitcrusher
+8. Drums: Drum Machine Designer (Dusty) -> Channel EQ -> Bitcrusher -> Compressor
+
+UNDERGROUND
+1. Sub Bass: Alchemy (808 Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Dark Pad) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Pluck) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Dark Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Impact) -> Channel EQ
+8. Drums: Drum Machine Designer (Dark Hip-Hop) -> Channel EQ -> Compressor
+
+VAPORWAVE
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+3. Chords: Vintage Electric Piano (Rhodes) -> Channel EQ -> Chorus -> Tape Delay
+4. Pad: Alchemy (70s Space Pad) -> Channel EQ -> Send: Space Designer (Lungo)
+5. Arp: Alchemy (Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Soft Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (VHS Noise) -> Channel EQ -> Bitcrusher
+8. Drums: Drum Machine Designer (808 Flex Gated) -> Channel EQ -> Compressor
+
+BREAKCORE
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Reese Bass) -> Channel EQ -> Phat FX (Distortion) -> Compressor
+3. Chords: Alchemy (Glitch Chords) -> Channel EQ -> Bitcrusher
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Glitch Arp) -> Channel EQ -> Step FX
+6. Lead: ES2 (Glitch Lead) -> Channel EQ -> Bitcrusher -> Stereo Delay
+7. FX Perc: Alchemy (Glitch FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Breakbeat) -> Channel EQ -> Enveloper -> Compressor (Vintage FET)
+
+DRUM_N_BASS
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ (HPF 30Hz) -> Compressor
+2. Bassline: Alchemy (Reese Bass) -> Channel EQ -> Phat FX (Filtro Drive Alto) -> Compressor
+3. Chords: Alchemy (Future Chords) -> Channel EQ -> Chorus -> Step FX
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Pluck Sequence) -> Channel EQ -> Stereo Delay
+6. Lead: ES2 (Sharp Lead) -> Channel EQ -> Phat FX -> Stereo Delay -> Send: ChromaVerb
+7. FX Perc: Alchemy (Noise Riser) -> Channel EQ -> AutoFilter
+8. Drums: Drum Machine Designer (Amen Break) -> Channel EQ -> Enveloper -> Compressor
+
+DUBSTEP
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Growl Bass) -> Channel EQ -> Step FX (LFO Cutoff) -> Phat FX -> Compressor
+3. Chords: Alchemy (Dark Chords) -> Channel EQ -> Step FX (Gating)
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Send: ChromaVerb
+5. Arp: Alchemy (Glitch Arp) -> Channel EQ -> Bitcrusher
+6. Lead: Retro Synth (Sync Lead) -> Channel EQ -> Phat FX -> Stereo Delay
+7. FX Perc: Alchemy (Impact) -> Channel EQ -> Space Designer
+8. Drums: Drum Machine Designer (Dubstep Kit) -> Channel EQ -> Compressor
+
+FUTURE_BASS
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Growl Bass) -> Channel EQ -> Phat FX -> Compressor
+3. Chords: Alchemy (Future Chords) -> Channel EQ -> Chorus -> Step FX
+4. Pad: Alchemy (Bright Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Pluck) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Bright Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (Trap/Future) -> Channel EQ -> Compressor
+
+GLITCH
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Glitch Chords) -> Channel EQ -> Bitcrusher
+4. Pad: Alchemy (Textures) -> Channel EQ -> Send: Space Designer
+5. Arp: ES2 (Glitch Sequences) -> Channel EQ -> Step FX -> Stereo Delay
+6. Lead: ES2 (Glitch Lead) -> Channel EQ -> Bitcrusher -> Send: ChromaVerb
+7. FX Perc: Alchemy (Glitch FX) -> Channel EQ -> AutoFilter
+8. Drums: Drum Machine Designer (Glitch Kit) -> Channel EQ -> Bitcrusher -> Compressor
+
+IDM
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Textures) -> Channel EQ -> Ringshifter
+4. Pad: Alchemy (Textures) -> Channel EQ -> Send: Space Designer (Lungo)
+5. Arp: Alchemy (Glitch Arp) -> Channel EQ -> Bitcrusher
+6. Lead: Alchemy (Glitch Lead) -> Channel EQ -> AutoFilter -> Send: ChromaVerb
+7. FX Perc: Alchemy (Glitch FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Chopped Breaks) -> Channel EQ -> Enveloper -> Compressor
+
+JUNGLE
+1. Sub Bass: Alchemy (Clean Sub) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Reese Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Dub Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Textures) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Arp) -> Channel EQ -> Stereo Delay
+6. Lead: ES2 (Sharp Lead) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (Amen Break) -> Channel EQ -> Enveloper -> Compressor
+
+UK_GARAGE
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Reese Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Future Chords) -> Channel EQ -> Chorus -> Step FX
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Vocal Chops) -> Channel EQ -> Stereo Delay
+6. Lead: Alchemy (Pluck) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (2-Step) -> Channel EQ -> Compressor
+
+CHIPTUNE
+1. Sub Bass: ES2 (Square Sub) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Square Bass) -> Channel EQ -> Compressor
+3. Chords: ES2 (Chip Chords) -> Channel EQ -> Bitcrusher
+4. Pad: ES2 (Chip Pad) -> Channel EQ -> Send: ChromaVerb
+5. Arp: ES2 (Chip Arp) -> Channel EQ -> Step FX
+6. Lead: ES2 (LD Lake Lead) -> Channel EQ -> Bitcrusher -> Stereo Delay
+7. FX Perc: ES2 (Chip FX) -> Channel EQ
+8. Drums: Drum Machine Designer (8-bit) -> Channel EQ -> Bitcrusher -> Compressor
+
+COMMERCIALE_90S
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Saw Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Pop Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Bright Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Retro Synth (Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX -> Stereo Delay
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Compressor
+
+EDM_2000S
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Offbeat Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (EDM Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Bright Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Retro Synth (Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Drive) -> Stereo Delay
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (TR-909) -> Channel EQ -> Compressor
+
+ELETTRONICO
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Synced Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Dub Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Retro Synth (Sync Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX -> Stereo Delay
+7. FX Perc: Alchemy (Sweep) -> Channel EQ
+8. Drums: Drum Machine Designer (LinnDrum) -> Channel EQ -> Compressor
+
+HARDSTYLE
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Saw Bass) -> Channel EQ -> Phat FX (Distortion) -> Compressor
+3. Chords: Alchemy (Hard Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Dark Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Hard Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Drive) -> Stereo Delay
+7. FX Perc: Alchemy (Impact) -> Channel EQ
+8. Drums: Drum Machine Designer (Distorted Kick) -> Phat FX -> Channel EQ -> Compressor
+
+HYPERPOP
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Growl Bass) -> Channel EQ -> Phat FX -> Compressor
+3. Chords: Alchemy (Bright Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Bright Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: ES2 (Glitch Arp) -> Channel EQ -> Stereo Delay
+6. Lead: ES2 (Glitch Lead) -> Channel EQ -> Bitcrusher -> Stereo Delay
+7. FX Perc: Alchemy (Glitch FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Hard Kick) -> Channel EQ -> Bitcrusher -> Compressor
+
+INDUSTRIAL
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Metallic Bass) -> Channel EQ -> Phat FX -> Compressor
+3. Chords: Alchemy (Metallic Chords) -> Channel EQ -> Bitcrusher
+4. Pad: Alchemy (Metallic Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Metallic Arp) -> Channel EQ -> Ringshifter
+6. Lead: Alchemy (Metallic Lead) -> Channel EQ -> Bitcrusher -> Send: ChromaVerb
+7. FX Perc: Alchemy (Industrial FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Distorted) -> Channel EQ -> Bitcrusher -> Compressor
+
+MINIMALISMO_RITMICO
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Marimba) -> Channel EQ -> Chorus
+4. Pad: Alchemy (Warm Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Marimba) -> Channel EQ -> Stereo Delay (Breve)
+6. Lead: Alchemy (Koto) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Perc FX) -> Channel EQ
+8. Drums: Drum Machine Designer (Tuned Percussion) -> Channel EQ -> Compressor
+
+SYNTHPOP
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Saw Bass) -> Channel EQ -> Compressor
+3. Chords: Alchemy (Pop Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (Bright Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Presence) -> Stereo Delay
+7. FX Perc: Alchemy (Sweep) -> Channel EQ
+8. Drums: Drum Machine Designer (808 Flex) -> Channel EQ -> Compressor
+
+SYNTHWAVE
+1. Sub Bass: Alchemy (Sub Bass) -> Channel EQ -> Compressor
+2. Bassline: Retro Synth (Warm Bass) -> Channel EQ -> Compressor -> Overdrive
+3. Chords: Alchemy (80s Chords) -> Channel EQ -> Step FX
+4. Pad: Alchemy (70s Space Pad) -> Channel EQ -> Send: Space Designer
+5. Arp: Retro Synth (Arp) -> Channel EQ -> Stereo Delay
+6. Lead: Retro Synth (Saw Lead) -> Channel EQ -> Phat FX (Presence) -> Stereo Delay
+7. FX Perc: Alchemy (Riser) -> Channel EQ
+8. Drums: Drum Machine Designer (LinnDrum) -> Channel EQ -> Compressor
+
+AMBIENT
+1. Sub Bass: Alchemy (Sub Drone) -> Channel EQ -> Send: Space Designer (100% Wet)
+2. Bassline: Alchemy (Sub Drone) -> Channel EQ -> Send: Space Designer
+3. Chords: Alchemy (Evolving Chords) -> Channel EQ -> Chorus -> Send: Space Designer
+4. Pad: Alchemy (Atmospheres) -> Channel EQ -> Chorus -> Tape Delay -> Send: Space Designer
+5. Arp: Alchemy (Soft Arp) -> Channel EQ -> AutoFilter -> Send: ChromaVerb
+6. Lead: Sculpture (Bowed String) -> Channel EQ -> Ringshifter -> Send: Space Designer
+7. FX Perc: Alchemy (Granular FX) -> Channel EQ -> Send: Space Designer
+
+DRONE
+1. Sub Bass: Alchemy (Sub Drone) -> Channel EQ -> Send: Space Designer
+2. Bassline: Alchemy (Sub Drone) -> Channel EQ -> Send: Space Designer
+3. Chords: Alchemy (Long Chords) -> Channel EQ -> Send: Space Designer
+4. Pad: Alchemy (Motion Drone Pad) -> Channel EQ -> AutoFilter (Lento) -> Send: Space Designer
+5. Arp: Alchemy (Slow Arp) -> Channel EQ -> AutoFilter -> Send: ChromaVerb
+6. Lead: Sculpture (Physical Modeling) -> Channel EQ -> Ringshifter -> Send: Space Designer
+7. FX Perc: Alchemy (Textures) -> Channel EQ -> Send: Space Designer
+
+HARSH_NOISE
+1. Sub Bass: Alchemy (Noise Bass) -> Channel EQ -> Phat FX -> Compressor
+2. Bassline: Alchemy (Noise Bass) -> Channel EQ -> Bitcrusher
+3. Chords: Alchemy (Noise Chords) -> Channel EQ -> Ringshifter
+4. Pad: Alchemy (Noise Textures) -> Channel EQ -> Phat FX -> Send: Space Designer
+5. Arp: Alchemy (Noise Arp) -> Channel EQ -> Step FX
+6. Lead: Sculpture (Noise Textures) -> Channel EQ -> Bitcrusher -> Send: Space Designer
+7. FX Perc: Alchemy (Sound FX) -> Channel EQ -> AutoFilter
+8. Drums: Drum Machine Designer (Noise Samples) -> Channel EQ -> Bitcrusher -> Compressor
+
+LOWERCASE
+1. Sub Bass: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+2. Bassline: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+3. Chords: Alchemy (Micro-sounds) -> Channel EQ -> AutoFilter
+4. Pad: Alchemy (Textures) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Micro-sounds) -> Channel EQ -> Ringshifter
+6. Lead: Alchemy (Micro-sounds) -> Channel EQ -> Send: ChromaVerb
+7. FX Perc: Alchemy (Micro-sounds) -> Channel EQ
+
+MICROSOUND
+1. Sub Bass: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+2. Bassline: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+3. Chords: Alchemy (Granular Textures) -> Channel EQ -> Ringshifter
+4. Pad: Alchemy (Granular Textures) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Granular Textures) -> Channel EQ -> AutoFilter
+6. Lead: Sculpture (Physical Modeling) -> Channel EQ -> Bitcrusher -> Send: Space Designer
+7. FX Perc: Alchemy (Granular FX) -> Channel EQ -> Send: Space Designer
+
+MUSIQUE_CONCRETE
+1. Sub Bass: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+2. Bassline: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+3. Chords: Sculpture (Physical Modeling) -> Channel EQ -> Ringshifter
+4. Pad: Sculpture (Physical Modeling) -> Channel EQ -> Send: Space Designer
+5. Arp: Sculpture (Physical Modeling) -> Channel EQ -> AutoFilter
+6. Lead: Sculpture (Physical Modeling) -> Channel EQ -> Send: Space Designer
+7. FX Perc: Alchemy (Granular FX) -> Channel EQ -> Tape Delay -> Send: Space Designer
+
+NOISE
+1. Sub Bass: Alchemy (Noise) -> Channel EQ -> Phat FX
+2. Bassline: Alchemy (Noise) -> Channel EQ -> Bitcrusher
+3. Chords: Alchemy (White Noise) -> Channel EQ -> Ringshifter
+4. Pad: Alchemy (White Noise) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (White Noise) -> Channel EQ -> AutoFilter
+6. Lead: Alchemy (Sound FX) -> Channel EQ -> Bitcrusher -> Send: Space Designer
+7. FX Perc: Alchemy (Sound FX) -> Channel EQ -> Send: Space Designer
+
+ONKYO
+1. Sub Bass: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+2. Bassline: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+3. Chords: Alchemy (Micro-sounds) -> Channel EQ -> AutoFilter
+4. Pad: Alchemy (Micro-sounds) -> Channel EQ -> Send: Space Designer
+5. Arp: Alchemy (Micro-sounds) -> Channel EQ -> Ringshifter
+6. Lead: Sculpture (Physical Modeling) -> Channel EQ -> Send: Space Designer
+7. FX Perc: Alchemy (Micro-sounds) -> Channel EQ
+
+SPERIMENTALE
+1. Sub Bass: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+2. Bassline: Alchemy (Sub) -> Channel EQ -> Send: Space Designer
+3. Chords: Sculpture (Physical Modeling) -> Channel EQ -> Ringshifter
+4. Pad: Sculpture (Physical Modeling) -> Channel EQ -> Send: Space Designer
+5. Arp: Sculpture (Physical Modeling) -> Channel EQ -> AutoFilter
+6. Lead: Sculpture (Physical Modeling) -> Channel EQ -> Send: Space Designer
+7. FX Perc: Alchemy (Textures) -> Channel EQ -> Send: Space Designer
+8. Drums: Drum Machine Designer (Random Hits) -> Channel EQ -> Bitcrusher -> Compressor
+"""
+
+def _parse_guide(text):
+    out, cur = {}, None
+    for ln in text.splitlines():
+        s = ln.strip()
+        if not s: continue
+        m = re.match(r'^\d+\. ([^:]+): (.+)$', s)
+        if m and cur: out[cur].append((m.group(1).strip(), m.group(2).strip()))
+        elif re.match(r'^[A-Za-z0-9_&]+$', s): cur = s.lower(); out[cur] = []
+    return out
+
+GUIDE = _parse_guide(GUIDE_TEXT)
+GUIDE_FILE_MSG = ''
+try:
+    _gp = Path(__file__).with_name('guida_logic_pro.txt')   # facoltativo: una guida aggiornata accanto allo script sostituisce quella interna
+    if _gp.exists():
+        _g2 = _parse_guide(_gp.read_text(encoding='utf-8'))
+        GUIDE.update({k: v for k, v in _g2.items() if v}); GUIDE_FILE_MSG = f"Guida Logic caricata da {_gp.name} ({len(_g2)} generi)"
+except Exception as _e: GUIDE_FILE_MSG = f"guida_logic_pro.txt ignorata: {_e}"
+
+GUIDE_ROLE = {'sub_bass': 'Sub Bass', 'bassline': 'Bassline', 'bass': 'Bassline', 'reese': 'Bassline', 'chords': 'Chords', 'pad': 'Pad',
+              'arp': 'Arp', 'lead': 'Lead', 'fx_perc': 'FX Perc'}
+
+def guide_entry(genre, track_key):
+    """(ruolo, catena completa) della guida per una traccia MIDI generata, oppure None."""
+    role = 'Drums' if track_key in DRUM_TRACK_NAMES else GUIDE_ROLE.get(track_key)
+    for r, chain in GUIDE.get(genre, []):
+        if r == role: return r, chain
+    return None
+
+def guide_preset_names(genre, tracks):
+    """{chiave_traccia: strumento} (primo elemento della catena), per scriverlo nel nome della traccia."""
+    out = {}
+    for k in tracks:
+        e = guide_entry(genre, k)
+        if e: out[k] = e[1].split(' -> ')[0]
+    return out
+
+def guide_report_block(genre, tracks):
+    rows = GUIDE.get(genre)
+    if not rows: return []
+    lines = ["CATENA DI SEGNALE E PRESET (LOGIC PRO X) - " + GENRE_LABELS.get(genre, genre), ""]
+    lines += [f"   {i}. {r}: {c}" for i, (r, c) in enumerate(rows, 1)]
+    mapped = [(k, guide_entry(genre, k)) for k in tracks]
+    mapped = [(k, e) for k, e in mapped if e]
+    if mapped:
+        lines += ["", "   Tracce di questo MIDI -> riga della guida:"]
+        lines += [f"   - {DRUM_TRACK_NAMES.get(k, k.replace('_', ' ').title())} -> {e[0]}: {e[1].split(' -> ')[0]}" for k, e in mapped]
+    return lines + [""]
 
 # ================= MARKER DI SEZIONE + AUTOMAZIONI FILTRO (CC74) =================
 import unicodedata
@@ -1877,7 +2437,7 @@ def _show_html(html, height):
     if hasattr(st, 'iframe'): st.iframe(html, height=height)
     else: components.html(html, height=height)
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None, tempo_events=None):
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None, tempo_events=None, preset_names=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -1931,6 +2491,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
         elif faithful: name = key
         else: name = {'bass': 'Bass', 'arp': 'Synth', 'sub_bass': 'Sub Bass', 'bassline': 'Bass', 'pad': 'Pad', 'chords': 'Piano', 'lead': 'Lead', 'fx_perc': 'Percussion', 'drums': 'Drums', 'reese': 'Reese Bass'}.get(key, key.replace('_', ' ').title())
         
+        if preset_names and key in preset_names: name = _ascii(f"{name} - {preset_names[key]}")[:60]
         used_names[name] += 1
         if used_names[name] > 1: name = f'{name} {used_names[name]}'
         
@@ -1992,7 +2553,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
         elif track_key.startswith('instrument_'): report.append(f"   {track_idx}. {track_key} (Canale melodico)")
         else: report.append(f"   {track_idx}. {track_key.replace('_', ' ').title()} (Canale melodico)")
         track_idx += 1
-    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa): solo cosi' Logic carica anche marker, cambi di tempo e di metro; se importi in un progetto esistente rispondi Si' a \"importa informazioni di tempo\", altrimenti le battute non coincidono", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", *(["   - Automazioni CC74 (filtro): mappa CC74 sul cutoff del synth di ogni traccia; gli strati che entrano aprono il filtro in 4 battute, il build lo apre fino in fondo"] if cc_markers[0] else []), *(["   - Marker di sezione nel file: in Logic li trovi nella Marker List (Navigate > Open Marker List) e sulla timeline, con gli strati che entrano"] if cc_markers[1] else []), *(["   - Transizioni: crash (nota 49) e reverse cymbal (nota 119) sono nella traccia Crash / FX; se il tuo drum kit non mappa la 119 sostituiscila con un riser. Prima del drop, nei generi forti, c'e' un beat di pausa"] if any(e.get('pitch') in (49, 119) for k_ in ('drum_fx', 'drums') for e in tracks.get(k_, [])) else []), "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
+    report.extend(["", "STATISTICHE MIDI", f"   Note totali generate: {sum(1 for events in tracks.values() for e in events if e['type'] == 'on')}", f"   Tracce MIDI: {len(tracks) + 1}", "", *guide_report_block(genre, tracks), "NOTE PER LOGIC PRO", "   - Apri con File > Apri (non Importa): solo cosi' Logic carica anche marker, cambi di tempo e di metro; se importi in un progetto esistente rispondi Si' a \"importa informazioni di tempo\", altrimenti le battute non coincidono", "   - Intro e outro seguono la timeline del genere (di solito pochi strati, per il mix DJ)", "   - Ogni traccia ha nome e program change al tick 0", *(["   - Automazioni CC74 (filtro): mappa CC74 sul cutoff del synth di ogni traccia; gli strati che entrano aprono il filtro in 4 battute, il build lo apre fino in fondo"] if cc_markers[0] else []), *(["   - Marker di sezione nel file: in Logic li trovi nella Marker List (Navigate > Open Marker List) e sulla timeline, con gli strati che entrano"] if cc_markers[1] else []), *(["   - Transizioni: crash (nota 49) e reverse cymbal (nota 119) sono nella traccia Crash / FX; se il tuo drum kit non mappa la 119 sostituiscila con un riser. Prima del drop, nei generi forti, c'e' un beat di pausa"] if any(e.get('pitch') in (49, 119) for k_ in ('drum_fx', 'drums') for e in tracks.get(k_, [])) else []), "   - Batteria su canale 10: assegna Drum Kit Designer se necessario", "", "=" * 60, "Generato con MIDI Forge Universale | 100% Free & Open Source", "=" * 60])
     return "\n".join(report)
 
 def render_midi_player(tracks, bpm):
@@ -2127,6 +2688,7 @@ with col1:
     use_trans = st.checkbox("Transizioni (crash, reverse, pausa prima del drop, fill)", value=True)
     rev_note = st.selectbox("Nota del reverse cymbal", [119, 57, None], format_func=lambda n: {119: "119 - Reverse Cymbal (Roland GS)", 57: "57 - Crash 2 (GM)", None: "Nessuno"}[n]) if use_trans else GM_REVERSE
     use_human = st.checkbox("Humanize (micro-timing e velocity nei generi organici)", value=True)
+    use_preset_names = st.checkbox("Nome traccia con il preset della guida Logic (es. \"Bass - Retro Synth (Deep Bass)\")", value=False)
 
 with col2:
     with st.expander("Timeline personalizzate (JSON)"):
@@ -2136,6 +2698,7 @@ with col2:
             except Exception as _e: st.error(f"JSON non valido: {_e}")
         st.download_button("Scarica le timeline attuali (JSON)", data=timelines_to_json(), file_name="midi_forge_timelines.json", mime="application/json")
         if TIMELINE_FILE_MSG: st.caption(TIMELINE_FILE_MSG)
+        if GUIDE_FILE_MSG: st.caption(GUIDE_FILE_MSG)
         st.caption("Formato: {\"deep\": [[\"Intro DJ\", 16, \"kick hat pad\"], ...]}. Strati: " + " ".join(LAYER_ORDER) + ". Un file midi_forge_timelines.json accanto allo script viene caricato in automatico.")
     genre_list = sorted(GENRES.keys(), key=lambda k: _ascii(GENRE_LABELS.get(k, k)).lower())   # ordine alfabetico per nome
     st.session_state.setdefault('genre', 'techno')
@@ -2287,7 +2850,7 @@ if _gen_clicked or _regen_flag:
                     automation = build_automation(sections_now, meter_plan, tracks, g_defaults.get('bass_style')) if use_cc else None
                     markers = section_markers(sections_now, meter_plan) if add_markers else None
                     tempo_ev = tempo_events(g_run, sections_now, meter_plan) if use_default_bpm else None
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev)
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev, preset_names=guide_preset_names(genre, tracks) if use_preset_names else None)
                     report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_run, seed, genre), (bool(use_cc), bool(add_markers)), tempo_ev)
 
                     _preset = {'genre': genre, 'mode': mode, 'submode': submode, 'seed': int(seed), 'source': source, 'key_choice': globals().get('key_choice', 'Random'), 'scale_choice': globals().get('scale_choice', 'Random'), 'bpm': final_bpm}
