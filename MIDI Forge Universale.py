@@ -2259,7 +2259,10 @@ def guide_report_block(genre, tracks):
     mapped = [(k, e) for k, e in mapped if e]
     if mapped:
         lines += ["", "   Tracce di questo MIDI -> riga della guida:"]
-        lines += [f"   - {DRUM_TRACK_NAMES.get(k, k.replace('_', ' ').title())} -> {e[0]}: {e[1].split(' -> ')[0]}" for k, e in mapped]
+        def _lp(k):
+            pg = None if k in DRUM_TRACK_NAMES else role_program(genre, k)
+            return f"  [Logic carica: {LOGIC_PATCH.get(pg, 'program ' + str(pg))}]" if pg is not None else ''
+        lines += [f"   - {DRUM_TRACK_NAMES.get(k, k.replace('_', ' ').title())} -> {e[0]}: {e[1].split(' -> ')[0]}{_lp(k)}" for k, e in mapped]
     return lines + [""]
 
 # Program change della batteria (canale 10) secondo il GM: 0 Standard, 8 Room, 16 Power, 24 Electronic, 25 TR-808, 32 Jazz, 40 Brush.
@@ -2268,6 +2271,50 @@ DRUM_KITS = {0: 'Standard', 8: 'Room', 16: 'Power', 24: 'Electronic', 25: 'TR-80
 _KIT_808 = {'trap', 'hip_hop', 'r&b', 'future_bass', 'reggaeton', 'vaporwave'}
 _KIT_STD = {'funk', 'disco', 'space_disco', 'soul', 'soulful_house', 'armonico', 'reggae', 'jungle', 'drum_n_bass', 'trip_hop'}
 def auto_drum_program(genre): return 25 if genre in _KIT_808 else 0 if genre in _KIT_STD else 24
+
+
+# ================= PROGRAM GM PER GENERE (patch di Logic Pro verificate con i file di prova) =================
+# Logic assegna a ogni CANALE la patch del primo program: ogni ruolo ha il suo canale, quindi il program sceglie lo strumento.
+LOGIC_PATCH = {0: 'Steinway Grand Piano', 16: 'Tonewheel Organ', 32: 'Upright Studio Bass', 33: 'Fingerstyle Bass', 34: 'Picked Bass',
+               35: 'Fretless Bass', 36: 'Picked Bass', 37: 'Picked Bass', 38: 'Pulse Bass', 39: 'Taureg Moon Bass', 40: 'Violins 1',
+               41: 'Violas', 42: 'Cellos', 43: 'Basses', 44: 'Romance Strings', 48: 'String Ensemble', 64: 'Saxophone',
+               80: 'Reverse Engineering', 81: 'The Final Lead', 82: 'Deep Organ', 83: 'Pop Brass', 84: '80s Starlight', 85: 'Dream Voice',
+               86: 'Power Fifths', 87: 'Soft Square Lead', 88: 'Glistening Pad', 89: 'Classic Pad', 90: 'Epic Cloud Formation',
+               91: 'Synthetic Choir', 92: 'Pulse Strings', 93: 'Ghost Voices', 94: 'Tidal Space', 95: 'Slow Drift', 96: 'Crystal Rain',
+               97: 'Distant Air', 98: 'Glass Sky', 99: 'Pipe Ambience', 100: 'Cosmonaut Space Capsule', 101: 'Fog Machine',
+               102: 'Backwards Metal', 103: 'Spiraling Down', 104: 'Indian Sitar', 117: 'Orchestral Kit'}
+# (sub_bass, bassline, pad, chords, arp, lead, fx_perc)
+GENRE_PROGRAMS = {
+    'techno': (39, 38, 94, 86, 80, 81, 102), 'minimal_techno': (39, 38, 94, 86, 80, 87, 101), 'minimal': (39, 38, 95, 0, 80, 87, 99),
+    'underground': (39, 38, 93, 86, 80, 81, 102), 'acid': (39, 38, 94, 86, 87, 81, 102), 'industrial': (39, 38, 93, 86, 86, 86, 102),
+    'hardstyle': (39, 38, 89, 86, 84, 81, 102), 'dub_techno': (39, 33, 95, 16, 96, 87, 99), 'deep': (39, 35, 95, 0, 96, 87, 99),
+    'house_90s': (39, 38, 88, 16, 80, 83, 102), 'soulful_house': (39, 33, 91, 0, 96, 87, 99), 'afro_house': (39, 36, 89, 0, 96, 87, 101),
+    'amapiano': (39, 39, 91, 0, 96, 87, 99), 'uk_garage': (39, 38, 91, 0, 96, 87, 102), 'trance': (39, 38, 88, 92, 84, 81, 102),
+    'psytrance': (39, 38, 94, 86, 80, 81, 102), 'edm_2000s': (39, 38, 89, 92, 84, 81, 102), 'elettronico': (39, 38, 89, 92, 80, 81, 102),
+    'synthpop': (39, 38, 89, 84, 80, 87, 96), 'synthwave': (39, 38, 88, 92, 80, 84, 96), 'commerciale_90s': (39, 38, 89, 83, 80, 87, 102),
+    'future_bass': (39, 38, 91, 92, 87, 81, 102), 'hyperpop': (39, 38, 91, 84, 96, 81, 102), 'vaporwave': (39, 35, 88, 0, 84, 87, 96),
+    'chiptune': (39, 38, 89, 87, 80, 87, 96), 'hip_hop': (39, 38, 95, 0, 96, 87, 101), 'trap': (39, 38, 93, 0, 96, 87, 102),
+    'r&b': (39, 35, 91, 0, 96, 87, 99), 'soul': (39, 33, 91, 0, 96, 83, 99), 'funk': (39, 36, 92, 16, 80, 83, 102),
+    'disco': (39, 33, 92, 0, 44, 83, 96), 'space_disco': (39, 38, 92, 44, 84, 81, 96), 'reggae': (39, 33, 99, 16, 87, 83, 99),
+    'reggaeton': (39, 38, 93, 0, 96, 87, 102), 'trip_hop': (39, 32, 95, 0, 96, 87, 101), 'drum_n_bass': (39, 38, 94, 86, 80, 81, 102),
+    'jungle': (39, 38, 93, 16, 80, 87, 101), 'dubstep': (39, 38, 93, 86, 80, 86, 102), 'breakcore': (39, 38, 93, 86, 80, 86, 102),
+    'glitch': (39, 38, 94, 84, 96, 87, 102), 'idm': (39, 38, 94, 84, 96, 87, 96), 'ambient': (39, 35, 90, 44, 96, 85, 99),
+    'drone': (39, 39, 93, 90, 94, 85, 101), 'lowercase': (39, 35, 97, 97, 96, 98, 99), 'microsound': (39, 35, 97, 97, 96, 98, 99),
+    'onkyo': (39, 35, 97, 97, 96, 98, 101), 'noise': (39, 38, 93, 86, 102, 86, 102), 'harsh_noise': (39, 38, 93, 86, 102, 86, 102),
+    'musique_concrete': (39, 35, 97, 97, 96, 98, 101), 'sperimentale': (39, 35, 94, 90, 96, 98, 101),
+    'minimalismo_ritmico': (39, 35, 95, 0, 96, 87, 99), 'armonico': (39, 33, 91, 0, 96, 85, 99)}
+_PROG_ROLES = ('sub_bass', 'bassline', 'pad', 'chords', 'arp', 'lead', 'fx_perc')
+_PROG_OLD = {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'reese': 39}
+PROG_OPTS = {'genre': True}
+
+def role_program(genre, key):
+    """Program GM per un ruolo: per-genere se attivo e se il genere e' in tabella, altrimenti la mappa fissa precedente."""
+    row = GENRE_PROGRAMS.get(genre) if PROG_OPTS.get('genre') else None
+    if row:
+        if key in _PROG_ROLES: return row[_PROG_ROLES.index(key)]
+        if key == 'bass': return row[1]
+        if key == 'reese': return row[0]
+    return _PROG_OLD.get(key)
 
 # ================= MARKER DI SEZIONE + AUTOMAZIONI FILTRO (CC74) =================
 import unicodedata
@@ -2444,7 +2491,7 @@ def _show_html(html, height):
     if hasattr(st, 'iframe'): st.iframe(html, height=height)
     else: components.html(html, height=height)
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None, tempo_events=None, preset_names=None, drum_program=0):
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None, tempo_events=None, preset_names=None, drum_program=0, genre=None):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -2485,7 +2532,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
         if not any(h['type'] == 'program_change' for h in header):
             if is_drums: pc = drum_program
             else:
-                pc = None if faithful else {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'reese': 39}.get(key)
+                pc = None if faithful else role_program(genre, key)
                 if pc is None: pc = _guess_program(key)
             header.append({'type': 'program_change', 'program': pc})
         bank = [h for h in header if h['type'] == 'control_change' and h['control'] in (0, 32)]
@@ -2696,6 +2743,8 @@ with col1:
     rev_note = st.selectbox("Nota del reverse cymbal", [119, 57, None], format_func=lambda n: {119: "119 - Reverse Cymbal (Roland GS)", 57: "57 - Crash 2 (GM)", None: "Nessuno"}[n]) if use_trans else GM_REVERSE
     use_human = st.checkbox("Humanize (micro-timing e velocity nei generi organici)", value=True)
     drum_kit_choice = st.selectbox("Kit batteria (program change)", ["Auto per genere"] + [f"{k} - {v}" for k, v in DRUM_KITS.items()], help="Logic carica il kit corrispondente al program GM della traccia drum")
+    use_genre_programs = st.checkbox("Strumenti Logic diversi per genere (program GM scelti tra le patch verificate)", value=True)
+    PROG_OPTS['genre'] = use_genre_programs
     use_preset_names = st.checkbox("Nome traccia con il preset della guida Logic (es. \"Bass - Retro Synth (Deep Bass)\")", value=False)
 
 with col2:
@@ -2858,7 +2907,7 @@ if _gen_clicked or _regen_flag:
                     automation = build_automation(sections_now, meter_plan, tracks, g_defaults.get('bass_style')) if use_cc else None
                     markers = section_markers(sections_now, meter_plan) if add_markers else None
                     tempo_ev = tempo_events(g_run, sections_now, meter_plan) if use_default_bpm else None
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev, preset_names=guide_preset_names(genre, tracks) if use_preset_names else None, drum_program=auto_drum_program(genre) if drum_kit_choice == 'Auto per genere' else int(drum_kit_choice.split(' - ')[0]))
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev, preset_names=guide_preset_names(genre, tracks) if use_preset_names else None, drum_program=auto_drum_program(genre) if drum_kit_choice == 'Auto per genere' else int(drum_kit_choice.split(' - ')[0]), genre=genre)
                     report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_run, seed, genre), (bool(use_cc), bool(add_markers)), tempo_ev)
 
                     _preset = {'genre': genre, 'mode': mode, 'submode': submode, 'seed': int(seed), 'source': source, 'key_choice': globals().get('key_choice', 'Random'), 'scale_choice': globals().get('scale_choice', 'Random'), 'bpm': final_bpm}
