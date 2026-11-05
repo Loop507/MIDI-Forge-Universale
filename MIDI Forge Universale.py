@@ -2262,6 +2262,13 @@ def guide_report_block(genre, tracks):
         lines += [f"   - {DRUM_TRACK_NAMES.get(k, k.replace('_', ' ').title())} -> {e[0]}: {e[1].split(' -> ')[0]}" for k, e in mapped]
     return lines + [""]
 
+# Program change della batteria (canale 10) secondo il GM: 0 Standard, 8 Room, 16 Power, 24 Electronic, 25 TR-808, 32 Jazz, 40 Brush.
+# Logic traduce il program in un kit di Drum Kit Designer / Drum Machine Designer (da verificare kit per kit).
+DRUM_KITS = {0: 'Standard', 8: 'Room', 16: 'Power', 24: 'Electronic', 25: 'TR-808', 32: 'Jazz', 40: 'Brush'}
+_KIT_808 = {'trap', 'hip_hop', 'r&b', 'future_bass', 'reggaeton', 'vaporwave'}
+_KIT_STD = {'funk', 'disco', 'space_disco', 'soul', 'soulful_house', 'armonico', 'reggae', 'jungle', 'drum_n_bass', 'trip_hop'}
+def auto_drum_program(genre): return 25 if genre in _KIT_808 else 0 if genre in _KIT_STD else 24
+
 # ================= MARKER DI SEZIONE + AUTOMAZIONI FILTRO (CC74) =================
 import unicodedata
 
@@ -2437,7 +2444,7 @@ def _show_html(html, height):
     if hasattr(st, 'iframe'): st.iframe(html, height=height)
     else: components.html(html, height=height)
 
-def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None, tempo_events=None, preset_names=None):
+def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_name=None, meter_plan=None, automation=None, markers=None, tempo_events=None, preset_names=None, drum_program=0):
     headers = headers or {}
     faithful = (mode == 'multitrack' and submode == 'faithful')
     notes_by_track = {}
@@ -2476,7 +2483,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
         is_drums = (ch == DRUM_CH)
         header = list(headers.get(key, []))
         if not any(h['type'] == 'program_change' for h in header):
-            if is_drums: pc = 0
+            if is_drums: pc = drum_program
             else:
                 pc = None if faithful else {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'reese': 39}.get(key)
                 if pc is None: pc = _guess_program(key)
@@ -2688,6 +2695,7 @@ with col1:
     use_trans = st.checkbox("Transizioni (crash, reverse, pausa prima del drop, fill)", value=True)
     rev_note = st.selectbox("Nota del reverse cymbal", [119, 57, None], format_func=lambda n: {119: "119 - Reverse Cymbal (Roland GS)", 57: "57 - Crash 2 (GM)", None: "Nessuno"}[n]) if use_trans else GM_REVERSE
     use_human = st.checkbox("Humanize (micro-timing e velocity nei generi organici)", value=True)
+    drum_kit_choice = st.selectbox("Kit batteria (program change)", ["Auto per genere"] + [f"{k} - {v}" for k, v in DRUM_KITS.items()], help="Logic carica il kit corrispondente al program GM della traccia drum")
     use_preset_names = st.checkbox("Nome traccia con il preset della guida Logic (es. \"Bass - Retro Synth (Deep Bass)\")", value=False)
 
 with col2:
@@ -2850,7 +2858,7 @@ if _gen_clicked or _regen_flag:
                     automation = build_automation(sections_now, meter_plan, tracks, g_defaults.get('bass_style')) if use_cc else None
                     markers = section_markers(sections_now, meter_plan) if add_markers else None
                     tempo_ev = tempo_events(g_run, sections_now, meter_plan) if use_default_bpm else None
-                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev, preset_names=guide_preset_names(genre, tracks) if use_preset_names else None)
+                    midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev, preset_names=guide_preset_names(genre, tracks) if use_preset_names else None, drum_program=auto_drum_program(genre) if drum_kit_choice == 'Auto per genere' else int(drum_kit_choice.split(' - ')[0]))
                     report_text = generate_report(tracks, genre, mode, submode, final_bpm, final_bars, seed, root, scale, duration_mode, duration_seconds, src_name, meter_plan, vary_genre(g_run, seed, genre), (bool(use_cc), bool(add_markers)), tempo_ev)
 
                     _preset = {'genre': genre, 'mode': mode, 'submode': submode, 'seed': int(seed), 'source': source, 'key_choice': globals().get('key_choice', 'Random'), 'scale_choice': globals().get('scale_choice', 'Random'), 'bpm': final_bpm}
