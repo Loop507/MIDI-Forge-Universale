@@ -798,72 +798,72 @@ def _answer(motif):
 
 # ================= CORPUS DI MOTIVI PER I GENERI DA CLUB (corpus_club_melodies.txt) =================
 CORPUS_TEXT = """
-# corpus_club_melodies.txt
+# corpus_club_melodies.txt — versione 2
 # Formato: genre,id,bpm,meter,key,mode,pattern
-# pattern: token = grado.ottava:durata (durata in sedicesimi); r = pausa
+# pattern: grado.ottava:durata (durata in sedicesimi); r = pausa
 # Ogni pattern = 2 battute 4/4 (somma durate = 32 sedicesimi)
-# NOTA: motivi originali/sintetici, non trascrizioni di brani esistenti.
+# NOTA: composizioni originali stilisticamente informate, NON trascrizioni di brani esistenti.
 genre,id,bpm,meter,key,mode,pattern
 Techno,T01,132,4/4,Am,minor,1.3:2 1.3:2 1.3:2 1.3:2 5.3:2 5.3:2 1.3:2 1.3:2 1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2
-Techno,T02,132,4/4,Am,minor,1.3:2 r:2 1.3:2 r:2 1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 1.3:2 r:2 3.3:2 r:2 5.3:2 r:2
-Techno,T03,132,4/4,Am,minor,1.3:2 1.3:2 2.3:2 1.3:2 1.3:2 1.3:2 5.3:2 5.3:2 1.3:2 1.3:2 2.3:2 1.3:2 4.3:2 4.3:2 5.3:2 5.3:2
-Techno,T04,132,4/4,Am,minor,1.3:2 5.3:2 1.3:2 5.3:2 1.3:2 5.3:2 1.3:2 5.3:2 3.3:2 5.3:2 3.3:2 5.3:2 1.3:2 5.3:2 1.3:2 5.3:2
-Techno,T05,132,4/4,Am,minor,1.3:2 1.3:2 1.3:2 4.3:2 1.3:2 1.3:2 1.3:2 5.3:2 1.3:2 1.3:2 1.3:2 3.3:2 1.3:2 1.3:2 1.3:2 5.3:2
-Techno,T06,132,4/4,Am,minor,1.3:2 r:2 3.3:2 r:2 1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 4.3:2 r:2 1.3:2 r:2 5.3:2 r:2
-Techno,T07,132,4/4,Am,minor,1.3:2 1.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 4.3:2 4.3:2 5.3:2 5.3:2 1.3:2 1.3:2
-Techno,T08,132,4/4,Am,minor,1.3:2 2.3:2 3.3:2 4.3:2 5.3:2 4.3:2 3.3:2 2.3:2 1.3:2 2.3:2 3.3:2 4.3:2 5.3:2 4.3:2 3.3:2 2.3:2
-Techno,T09,132,4/4,Am,minor,1.3:2 1.3:2 1.3:2 1.3:2 5.3:2 5.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 1.3:2
-Techno,T10,132,4/4,Am,minor,1.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 4.3:2 3.3:2 2.3:2 1.3:2 5.2:2 5.2:2 1.3:2 1.3:2
+Techno,T02,132,4/4,Am,minor,1.3:4 5.3:4 1.3:4 5.3:4 1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2
+Techno,T03,132,4/4,Em,minor,1.3:1 1.3:1 1.3:1 1.3:1 5.3:1 5.3:1 5.3:1 5.3:1 1.3:1 1.3:1 1.3:1 1.3:1 3.3:1 3.3:1 3.3:1 3.3:1 5.3:1 5.3:1 5.3:1 5.3:1 1.3:1 1.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 1.3:1 1.3:1 1.3:1 1.3:1
+Techno,T04,132,4/4,Gm,dorian,1.3:4 3.3:4 5.3:4 6.3:4 1.3:8 6.3:8
+Techno,T05,132,4/4,Dm,minor,1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2 3.3:1 3.3:1 5.3:1 5.3:1 6.3:1 6.3:1 5.3:1 5.3:1 1.3:2 3.3:2 5.3:2 1.3:2
+Techno,T06,132,4/4,Am,minor,1.3:2 1.3:2 1.3:2 1.3:2 5.3:2 5.3:2 1.3:2 1.3:2 3.3:4 5.3:4 1.3:2 3.3:2 5.3:2 1.3:2
+Techno,T07,132,4/4,Em,minor,1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 1.3:1 1.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 1.3:1 1.3:1 1.3:2 5.3:2 3.3:2 1.3:2 5.3:2 3.3:2 1.3:2 1.3:2
+Techno,T08,132,4/4,Am,minor,1.3:1 1.3:1 1.3:1 1.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 5.3:1 5.3:1 1.3:1 1.3:1 1.3:1 1.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 1.3:1 1.3:1 3.3:1 5.3:1 3.3:1 1.3:1 5.3:1 3.3:1 1.3:1 1.3:1
+Techno,T09,132,4/4,Gm,minor,1.3:4 5.3:4 1.3:4 5.3:4 1.3:2 3.3:2 5.3:2 1.3:2 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 1.3:1 1.3:1
+Techno,T10,132,4/4,Dm,dorian,1.3:2 3.3:2 5.3:2 6.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:4 5.3:4 3.3:4 1.3:4
 House,H01,124,4/4,Cmaj,major,1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 3.4:2 5.4:2 1.4:2
-House,H02,124,4/4,Cmaj,major,1.4:2 1.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 1.4:2 5.3:2 5.3:2
-House,H03,124,4/4,Cmaj,major,1.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 2.4:2 r:2 1.4:2 r:2
-House,H04,124,4/4,Cmaj,major,1.4:2 2.4:2 3.4:2 5.4:2 3.4:2 2.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:2
-House,H05,124,4/4,Cmaj,major,5.4:2 5.4:2 3.4:2 3.4:2 1.4:2 1.4:2 2.4:2 2.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 5.4:2 3.4:2 1.4:2
-House,H06,124,4/4,Cmaj,major,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 1.4:2
-House,H07,124,4/4,Cmaj,major,1.4:2 r:2 1.4:2 3.4:2 5.4:2 r:2 5.4:2 3.4:2 1.4:2 r:2 1.4:2 3.4:2 5.4:2 r:2 3.4:2 1.4:2
-House,H08,124,4/4,Cmaj,major,3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2
-House,H09,124,4/4,Cmaj,major,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 3.4:2 5.4:2 1.4:2
-House,H10,124,4/4,Cmaj,major,1.4:2 2.4:2 3.4:2 4.4:2 5.4:2 4.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 1.4:2 5.3:2 5.3:2
+House,H02,124,4/4,Fmaj,major,1.4:4 5.4:4 6.4:4 5.4:4 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 5.4:2 6.4:2 1.4:2
+House,H03,124,4/4,Am,minor,1.4:2 1.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 1.4:1 1.4:1 1.4:2 3.4:2 5.4:2 1.4:2
+House,H04,124,4/4,Gmaj,major,1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 1.4:1 1.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 1.5:1 6.4:1 5.4:1 3.4:1 2.4:1 3.4:1 1.4:1 1.4:1
+House,H05,124,4/4,Dm,minor,1.4:8 5.4:8 3.4:4 5.4:4 6.4:4 1.4:4
+House,H06,124,4/4,Cmaj,major,1.4:4 3.4:4 5.4:4 6.4:4 5.4:2 3.4:2 2.4:2 1.4:2 1.4:1 3.4:1 5.4:1 6.4:1 5.4:1 3.4:1 2.4:1 1.4:1
+House,H07,124,4/4,Fmaj,major,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 3.4:2 5.4:2 1.4:2
+House,H08,124,4/4,Am,dorian,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:4 5.4:4 3.4:4 1.4:4
+House,H09,124,4/4,Gmaj,major,1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 3.4:1 3.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 3.4:1 3.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 1.4:1 1.4:1
+House,H10,124,4/4,Cmaj,major,1.4:4 5.4:4 6.4:4 5.4:4 1.4:8 5.4:8
 Tech House,TH01,126,4/4,Fm,minor,1.3:2 1.3:2 1.3:2 5.3:2 1.3:2 1.3:2 1.3:2 6.3:2 1.3:2 1.3:2 1.3:2 5.3:2 3.3:2 3.3:2 1.3:2 1.3:2
-Tech House,TH02,126,4/4,Fm,minor,1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 6.3:2 r:2 5.3:2 r:2 1.3:2 r:2
-Tech House,TH03,126,4/4,Fm,minor,1.3:2 3.3:2 1.3:2 5.3:2 1.3:2 3.3:2 1.3:2 6.3:2 5.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 1.3:2
-Tech House,TH04,126,4/4,Fm,minor,1.3:2 1.3:2 2.3:2 2.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2 2.3:2 2.3:2 3.3:2 3.3:2 1.3:2 1.3:2
-Tech House,TH05,126,4/4,Fm,minor,5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 6.3:2 5.3:2 3.3:2 1.3:2 2.3:2 3.3:2 5.3:2 1.3:2
-Tech House,TH06,126,4/4,Fm,minor,1.3:2 r:2 1.3:2 1.3:2 5.3:2 r:2 5.3:2 5.3:2 1.3:2 r:2 1.3:2 1.3:2 6.3:2 r:2 5.3:2 1.3:2
-Tech House,TH07,126,4/4,Fm,minor,1.3:2 5.3:2 6.3:2 5.3:2 1.3:2 5.3:2 3.3:2 5.3:2 1.3:2 5.3:2 6.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:2
-Tech House,TH08,126,4/4,Fm,minor,1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 2.3:2 3.3:2 1.3:2
-Tech House,TH09,126,4/4,Fm,minor,1.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 1.3:2 3.3:2 6.3:2 5.3:2 3.3:2 1.3:2
-Tech House,TH10,126,4/4,Fm,minor,1.3:2 r:2 3.3:2 r:2 5.3:2 r:2 3.3:2 r:2 1.3:2 r:2 5.3:2 r:2 6.3:2 r:2 1.3:2 r:2
-Deep House,DH01,122,4/4,Dm,minor,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2
-Deep House,DH02,122,4/4,Dm,minor,1.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 2.4:2 r:2 1.4:2 r:2
-Deep House,DH03,122,4/4,Dm,minor,1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 1.4:2
-Deep House,DH04,122,4/4,Dm,minor,5.4:2 3.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 1.4:2
-Deep House,DH05,122,4/4,Dm,minor,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2
-Deep House,DH06,122,4/4,Dm,minor,1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 2.4:2 3.4:2 1.4:2
-Deep House,DH07,122,4/4,Dm,minor,1.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 2.4:2 r:2 1.4:2 r:2 3.4:2 r:2
-Deep House,DH08,122,4/4,Dm,minor,3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2
-Deep House,DH09,122,4/4,Dm,minor,1.4:2 1.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2
-Deep House,DH10,122,4/4,Dm,minor,1.4:2 3.4:2 2.4:2 3.4:2 1.4:2 5.3:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 1.4:2
+Tech House,TH02,126,4/4,Cm,minor,1.3:4 5.3:4 1.3:4 5.3:4 1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2
+Tech House,TH03,126,4/4,Gm,minor,1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:1 5.3:1 3.3:1 3.3:1 2.3:1 2.3:1 1.3:1 1.3:1 1.3:2 5.3:2 3.3:2 1.3:2
+Tech House,TH04,126,4/4,Fm,dorian,1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 6.3:1 6.3:1 5.3:1 5.3:1 3.3:1 3.3:1 2.3:1 2.3:1 1.3:1 1.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 6.3:1 6.3:1 1.4:1 6.3:1 5.3:1 3.3:1 2.3:1 3.3:1 1.3:1 1.3:1
+Tech House,TH05,126,4/4,Cm,minor,1.3:8 5.3:8 3.3:4 5.3:4 6.3:4 1.3:4
+Tech House,TH06,126,4/4,Gm,minor,1.3:4 3.3:4 5.3:4 6.3:4 5.3:2 3.3:2 2.3:2 1.3:2 1.3:1 3.3:1 5.3:1 6.3:1 5.3:1 3.3:1 2.3:1 1.3:1
+Tech House,TH07,126,4/4,Fm,minor,1.3:2 1.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 2.3:2 2.3:2 1.3:2 3.3:2 5.3:2 1.3:2
+Tech House,TH08,126,4/4,Cm,dorian,1.3:2 3.3:2 5.3:2 6.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:4 5.3:4 3.3:4 1.3:4
+Tech House,TH09,126,4/4,Gm,minor,1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 3.3:1 3.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 6.3:1 6.3:1 5.3:1 5.3:1 3.3:1 3.3:1 2.3:1 2.3:1 3.3:1 3.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 1.3:1 1.3:1
+Tech House,TH10,126,4/4,Fm,minor,1.3:4 5.3:4 6.3:4 5.3:4 1.3:8 5.3:8
+Deep House,DH01,122,4/4,Dm,dorian,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2
+Deep House,DH02,122,4/4,Gm,dorian,1.4:4 3.4:4 5.4:4 6.4:4 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 5.4:2 6.4:2 1.4:2
+Deep House,DH03,122,4/4,Am,minor,1.4:2 1.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 1.4:1 1.4:1 1.4:2 3.4:2 5.4:2 1.4:2
+Deep House,DH04,122,4/4,Cm,dorian,1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 1.4:1 1.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 1.5:1 6.4:1 5.4:1 3.4:1 2.4:1 3.4:1 1.4:1 1.4:1
+Deep House,DH05,122,4/4,Dm,dorian,1.4:8 5.4:8 3.4:4 5.4:4 6.4:4 1.4:4
+Deep House,DH06,122,4/4,Gm,minor,1.4:4 3.4:4 5.4:4 6.4:4 5.4:2 3.4:2 2.4:2 1.4:2 1.4:1 3.4:1 5.4:1 6.4:1 5.4:1 3.4:1 2.4:1 1.4:1
+Deep House,DH07,122,4/4,Am,dorian,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 3.4:2 5.4:2 1.4:2
+Deep House,DH08,122,4/4,Cm,minor,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:4 5.4:4 3.4:4 1.4:4
+Deep House,DH09,122,4/4,Dm,minor,1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 3.4:1 3.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 3.4:1 3.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 1.4:1 1.4:1
+Deep House,DH10,122,4/4,Gm,dorian,1.4:4 5.4:4 6.4:4 5.4:4 1.4:8 5.4:8
 Trance,TR01,138,4/4,Em,minor,1.4:2 5.4:2 6.4:2 5.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 1.4:2 5.4:2 6.4:2 1.5:2
-Trance,TR02,138,4/4,Em,minor,1.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 1.4:2
-Trance,TR03,138,4/4,Em,minor,1.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 1.5:2 r:2
-Trance,TR04,138,4/4,Em,minor,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 1.4:2
-Trance,TR05,138,4/4,Em,minor,5.4:2 6.4:2 5.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 1.4:2
-Trance,TR06,138,4/4,Em,minor,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 6.4:2 1.5:2 1.5:2
-Trance,TR07,138,4/4,Em,minor,1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 1.4:2
-Trance,TR08,138,4/4,Em,minor,1.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 1.5:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2
-Trance,TR09,138,4/4,Em,minor,1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:2
-Trance,TR10,138,4/4,Em,minor,1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:2
+Trance,TR02,138,4/4,Am,minor,1.4:4 5.4:4 6.4:4 5.4:4 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 5.4:2 6.4:2 1.4:2
+Trance,TR03,138,4/4,Bm,minor,1.4:2 1.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 1.4:1 1.4:1 1.4:2 3.4:2 5.4:2 1.4:2
+Trance,TR04,138,4/4,F#m,minor,1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 1.4:1 1.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 1.5:1 6.4:1 5.4:1 3.4:1 2.4:1 3.4:1 1.4:1 1.4:1
+Trance,TR05,138,4/4,Em,minor,1.4:8 5.4:8 3.4:4 5.4:4 6.4:4 1.4:4
+Trance,TR06,138,4/4,Am,minor,1.4:4 3.4:4 5.4:4 6.4:4 5.4:2 3.4:2 2.4:2 1.4:2 1.4:1 3.4:1 5.4:1 6.4:1 5.4:1 3.4:1 2.4:1 1.4:1
+Trance,TR07,138,4/4,Bm,minor,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 3.4:2 5.4:2 1.4:2
+Trance,TR08,138,4/4,F#m,minor,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:4 5.4:4 3.4:4 1.4:4
+Trance,TR09,138,4/4,Em,minor,1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 3.4:1 3.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 6.4:1 6.4:1 5.4:1 5.4:1 3.4:1 3.4:1 2.4:1 2.4:1 3.4:1 3.4:1 1.4:1 1.4:1 3.4:1 3.4:1 5.4:1 5.4:1 1.4:1 1.4:1
+Trance,TR10,138,4/4,Am,minor,1.4:4 5.4:4 6.4:4 5.4:4 1.4:8 5.4:8
 Electro,E01,128,4/4,Gm,minor,1.3:2 1.3:2 5.3:2 1.3:2 1.3:2 6.3:2 5.3:2 1.3:2 1.3:2 1.3:2 5.3:2 1.3:2 3.3:2 5.3:2 1.3:2 1.3:2
-Electro,E02,128,4/4,Gm,minor,1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 6.3:2 r:2 5.3:2 r:2 3.3:2 r:2 1.3:2 r:2 5.3:2 r:2
-Electro,E03,128,4/4,Gm,minor,1.3:2 3.3:2 1.3:2 5.3:2 1.3:2 3.3:2 6.3:2 5.3:2 1.3:2 3.3:2 1.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:2
-Electro,E04,128,4/4,Gm,minor,1.3:2 1.3:2 2.3:2 2.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 1.3:2
-Electro,E05,128,4/4,Gm,minor,5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 6.3:2 5.3:2 1.3:2 3.3:2 5.3:2 3.3:2 1.3:2 2.3:2 3.3:2 1.3:2
-Electro,E06,128,4/4,Gm,minor,1.3:2 r:2 1.3:2 5.3:2 1.3:2 r:2 5.3:2 3.3:2 1.3:2 r:2 1.3:2 5.3:2 6.3:2 r:2 5.3:2 1.3:2
-Electro,E07,128,4/4,Gm,minor,1.3:2 5.3:2 6.3:2 5.3:2 1.3:2 5.3:2 3.3:2 5.3:2 1.3:2 5.3:2 6.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:2
-Electro,E08,128,4/4,Gm,minor,1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 2.3:2 3.3:2 1.3:2
-Electro,E09,128,4/4,Gm,minor,1.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 1.3:2 3.3:2 6.3:2 5.3:2 3.3:2 1.3:2
-Electro,E10,128,4/4,Gm,minor,1.3:2 r:2 3.3:2 r:2 5.3:2 r:2 3.3:2 r:2 1.3:2 r:2 6.3:2 r:2 5.3:2 r:2 3.3:2 r:2
+Electro,E02,128,4/4,Cm,minor,1.3:4 5.3:4 1.3:4 5.3:4 1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2
+Electro,E03,128,4/4,Dm,minor,1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:1 5.3:1 3.3:1 3.3:1 2.3:1 2.3:1 1.3:1 1.3:1 1.3:2 5.3:2 3.3:2 1.3:2
+Electro,E04,128,4/4,Em,minor,1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 6.3:1 6.3:1 5.3:1 5.3:1 3.3:1 3.3:1 2.3:1 2.3:1 1.3:1 1.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 6.3:1 6.3:1 1.4:1 6.3:1 5.3:1 3.3:1 2.3:1 3.3:1 1.3:1 1.3:1
+Electro,E05,128,4/4,Gm,minor,1.3:8 5.3:8 3.3:4 5.3:4 6.3:4 1.3:4
+Electro,E06,128,4/4,Cm,minor,1.3:4 3.3:4 5.3:4 6.3:4 5.3:2 3.3:2 2.3:2 1.3:2 1.3:1 3.3:1 5.3:1 6.3:1 5.3:1 3.3:1 2.3:1 1.3:1
+Electro,E07,128,4/4,Dm,minor,1.3:2 1.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 2.3:2 2.3:2 1.3:2 3.3:2 5.3:2 1.3:2
+Electro,E08,128,4/4,Em,minor,1.3:2 3.3:2 5.3:2 6.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:4 5.3:4 3.3:4 1.3:4
+Electro,E09,128,4/4,Gm,minor,1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 3.3:1 3.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 6.3:1 6.3:1 5.3:1 5.3:1 3.3:1 3.3:1 2.3:1 2.3:1 3.3:1 3.3:1 1.3:1 1.3:1 3.3:1 3.3:1 5.3:1 5.3:1 1.3:1 1.3:1
+Electro,E10,128,4/4,Cm,minor,1.3:4 5.3:4 6.3:4 5.3:4 1.3:8 5.3:8
 """
 
 def _parse_corpus(text):
@@ -926,26 +926,45 @@ def _mel_template(k=16):
         out.append(sign * random.choices([0, 1, 2], weights=[1, 7, 2])[0])
     return out
 
+# Gradi "attivi" (2, 4, 6, 7) e loro risoluzione sul grado inattivo piu' vicino (Goetschius, Exercises in Melody-Writing, par. 4-6)
+_ACTIVE_RES = {6: 1, 5: -1, 3: -1, 1: -1}
+
 def _melody_bar(positions, strong, ct, root_deg, n, st, variant):
-    """Melodia di una battuta che segue l'accordo: gradi congiunti, sui tempi forti (e sulla prima nota) cade una nota dell'accordo,
-    il motivo si ripete nella battuta dopo (adattato al nuovo accordo), poi variato, e chiude sulla fondamentale dell'accordo.
-    positions = step con una nota; strong = step forti; ct = gradi dell'accordo (mod n); st = stato fra le battute; variant 0 motivo, 1 variazione, 2 chiusura."""
+    """Melodia di una battuta che segue l'accordo. Regole (Goetschius): gradi congiunti; sui tempi forti una nota dell'accordo; dopo un salto
+    ampio si torna per grado congiunto in senso opposto (par. 26); i gradi attivi (2, 4, 6, 7) si risolvono sul grado inattivo vicino (par. 4);
+    la frase comincia su una nota della triade di tonica e chiude sulla tonica (cadenza, par. 8). Il motivo si ripete nella battuta dopo
+    (adattato all'accordo), poi variato. positions = step con una nota; strong = step forti; ct = gradi dell'accordo (mod n);
+    st = stato fra le battute; variant 0 motivo, 1 variazione, 2 chiusura."""
     lo, hi = 0, n + 1
     cts = [k for k in range(lo, hi + 1) if k % n in ct] or [0]
-    near = lambda x: min(cts, key=lambda c: (abs(c - x), c))
+    tonic = [k for k in cts if k % n in (0, 2, 4)] or cts          # note della triade di tonica contenute nell'accordo
+    near = lambda x, pool=cts: min(pool, key=lambda c: (abs(c - x), c))
     tpl = st.get('tpl') or _mel_template()
     if variant == 1: tpl = [-t if random.random() < 0.3 else t for t in tpl]
     elif variant == 2: tpl = list(reversed(tpl))
-    cur = near(st['cur'] if st.get('cur') is not None else n // 2)
+    prev_end = st.get('cur')
+    cur = near(prev_end if prev_end is not None else n // 2)
+    mv = st.get('mv', 0)
+    first_of_phrase = st.get('phrase_start', False)
     out = {}
     for i, s_ in enumerate(positions):
-        x = max(lo, min(hi, cur + tpl[i % len(tpl)]))
+        step = tpl[i % len(tpl)]
+        if i > 0 and abs(mv) > 2: step = -1 if mv > 0 else 1                            # dopo un salto ampio: grado congiunto opposto
+        elif i > 0 and n >= 7 and (cur % n) in _ACTIVE_RES and random.random() < 0.75: step = _ACTIVE_RES[cur % n]   # risoluzione
+        x = max(lo, min(hi, cur + step))
         if s_ in strong or i == 0: x = near(x)
-        out[s_] = cur = x
+        if i == 0 and first_of_phrase: x = near(x, tonic)                                    # la frase parte da una nota di tonica
+        mv, cur = x - (prev_end if (i == 0 and prev_end is not None) else cur), x      # il salto fra una battuta e l'altra conta
+        out[s_] = cur
+    st['phrase_start'] = False
     if variant == 2 and positions:
-        roots = [k for k in range(lo, hi + 1) if k % n == root_deg % n]
-        if roots: out[positions[-1]] = cur = min(roots, key=lambda k: abs(k - cur))
-    st['cur'] = cur
+        fin = near(cur, tonic)
+        out[positions[-1]] = cur = fin
+        if len(positions) > 1:                                                              # penultima nota: dominante, a un grado dalla finale
+            cand = [fin - 1, fin + 1]
+            dom = [c for c in cand if lo <= c <= hi and c % n in (4, 6, 1)]
+            if positions[-2] not in strong: out[positions[-2]] = (dom or [c for c in cand if lo <= c <= hi] or [fin])[0]
+    st['cur'], st['mv'] = cur, mv
     return out
 
 def _thin(motif, p=0.25):
@@ -1517,7 +1536,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
             elif op == 'invert': motif = list(reversed(motif)); m_cur = motif
             else: m_cur = [None if random.random() < 0.3 else x for x in motif]
         if not remix:       # melodia sul basso del momento: gradi congiunti e nota dell'accordo sui tempi forti, chiusura sulla fondamentale
-            if bar % 4 == 0: mel_st['tpl'] = _mel_template()
+            if bar % 4 == 0: mel_st['tpl'] = _mel_template(); mel_st['phrase_start'] = True
             bd = bass_prog[bar % 4] % n
             mel = _melody_bar([s_ for s_ in range(L) if m_cur[pi[s_]] is not None], gst | set(range(0, L, 4)), {bd, (bd + 2) % n, (bd + 4) % n}, bd, n, mel_st,
                               0 if bar % 4 < 2 else (1 if bar % 4 == 2 else 2))
@@ -1675,6 +1694,20 @@ def _add_reese(g, tracks):
         tracks['reese'] = [dict(e, channel=7) for e in tracks['bassline']]
 
 
+# ================= SCALA "RANDOM" SCELTA IN BASE AL GENERE =================
+# Probabilita' di una scala minore. Dal Lakh clean (tonalita' dei brani unici): Techno 82%, Hip-hop 70%, Eurodance 68%, Dance/Electronic 58%,
+# Synth-pop 53%, Reggae 50%, Disco 46%, Funk 40%, R&B 34%, Soul 30%. Gli altri generi non hanno dati: valori stimati (non misurati).
+_P_MINOR = {'techno': .82, 'minimal_techno': .82, 'underground': .82, 'industrial': .85, 'acid': .8, 'hip_hop': .70, 'trap': .85, 'trance': .68,
+            'psytrance': .85, 'edm_2000s': .58, 'elettronico': .58, 'synthpop': .53, 'reggae': .50, 'disco': .46, 'space_disco': .5, 'funk': .40,
+            'r&b': .34, 'soul': .30, 'house_90s': .54, 'commerciale_90s': .5, 'ambient': .5, 'drone': .6}
+_MINOR_SCALES = (('Minore naturale', 60), ('Dorico', 20), ('Pentatonica minore', 10), ('Minore armonica', 5), ('Frigio', 5))
+_MAJOR_SCALES = (('Maggiore', 75), ('Misolidio', 25))
+
+def random_scale_for_genre(genre, rng):
+    """Scala 'Random' pesata sul genere: prima maggiore o minore (da _P_MINOR, 0.65 se il genere non ha dati), poi una scala di quella famiglia."""
+    pool = _MINOR_SCALES if rng.random() < _P_MINOR.get(genre, 0.65) else _MAJOR_SCALES
+    return rng.choices([n for n, _ in pool], weights=[w for _, w in pool])[0]
+
 # ================= GIRI DI ACCORDI PER GENERE (gradi 0-based della scala: 0=I/i, 3=IV/iv, 4=V/v, 5=VI/vi, 6=VII) =================
 _L_STATIC = [[0, 0, 0, 0], [0, 0, 0, 6], [0, 0, 3, 0], [0, 0, 5, 6]]
 _L_MINOR = {
@@ -1755,6 +1788,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
                 else: blk = _thin(lead_base, 0.3)
             lead_q, lead_a = _question(blk, n), _answer(blk)      # frase di 4 battute: domanda, domanda, domanda variata, risposta
             mel_st['tpl'] = _mel_template()                        # nuovo contorno melodico per la frase
+            mel_st['phrase_start'] = True
         lead = lead_a if bar % 4 == 3 else (_thin(lead_q) if bar % 4 == 2 else lead_q)
         d = (prog_a if (bar // 4) % 2 == 0 else prog_b)[bar % 4]
         cpcs = [pc_of(d), pc_of(d + 2), pc_of(d + 4)] + ([pc_of(d + 6)] if use7 else []) + ([pc_of(d + 8)] if use9 else [])
@@ -2993,7 +3027,7 @@ with col1:
     if scratch:
         uploaded_file = None
         key_choice = st.selectbox("Tonalità", ["Random"] + NOTE_NAMES, key='key_choice')
-        scale_choice = st.selectbox("Scala", ["Random"] + list(SCALES.keys()), key='scale_choice')
+        scale_choice = st.selectbox("Scala", ["Random"] + list(SCALES.keys()), key='scale_choice', help="Random: maggiore o minore in base al genere (dati Lakh dove disponibili)")
         mode = st.selectbox("Modalità Principale", ["minimal", "multitrack"], format_func=lambda x: {"minimal": "Minimal (3 tracce)", "multitrack": "Multitraccia (7+ tracce)"}[x], key='mode')
         submode = "generate" if mode == "minimal" else "generative"
     else:
@@ -3125,7 +3159,7 @@ if _gen_clicked or _regen_flag:
                 if scratch:
                     rng = random.Random(seed)
                     s_root = rng.randrange(12) if key_choice == "Random" else NOTE_NAMES.index(key_choice)
-                    s_name = rng.choice(list(SCALES)) if scale_choice == "Random" else scale_choice
+                    s_name = random_scale_for_genre(genre, rng) if scale_choice == "Random" else scale_choice
                     dna, file_bytes, notes_data = (s_root, SCALES[s_name]), None, []
                     src_name = f"da zero ({NOTE_NAMES[s_root]} {s_name})"
                 else:
