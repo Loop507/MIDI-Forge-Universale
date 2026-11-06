@@ -796,6 +796,158 @@ def _answer(motif):
         a[idx[-1]] = 0
     return a
 
+# ================= CORPUS DI MOTIVI PER I GENERI DA CLUB (corpus_club_melodies.txt) =================
+CORPUS_TEXT = """
+# corpus_club_melodies.txt
+# Formato: genre,id,bpm,meter,key,mode,pattern
+# pattern: token = grado.ottava:durata (durata in sedicesimi); r = pausa
+# Ogni pattern = 2 battute 4/4 (somma durate = 32 sedicesimi)
+# NOTA: motivi originali/sintetici, non trascrizioni di brani esistenti.
+genre,id,bpm,meter,key,mode,pattern
+Techno,T01,132,4/4,Am,minor,1.3:2 1.3:2 1.3:2 1.3:2 5.3:2 5.3:2 1.3:2 1.3:2 1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2
+Techno,T02,132,4/4,Am,minor,1.3:2 r:2 1.3:2 r:2 1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 1.3:2 r:2 3.3:2 r:2 5.3:2 r:2
+Techno,T03,132,4/4,Am,minor,1.3:2 1.3:2 2.3:2 1.3:2 1.3:2 1.3:2 5.3:2 5.3:2 1.3:2 1.3:2 2.3:2 1.3:2 4.3:2 4.3:2 5.3:2 5.3:2
+Techno,T04,132,4/4,Am,minor,1.3:2 5.3:2 1.3:2 5.3:2 1.3:2 5.3:2 1.3:2 5.3:2 3.3:2 5.3:2 3.3:2 5.3:2 1.3:2 5.3:2 1.3:2 5.3:2
+Techno,T05,132,4/4,Am,minor,1.3:2 1.3:2 1.3:2 4.3:2 1.3:2 1.3:2 1.3:2 5.3:2 1.3:2 1.3:2 1.3:2 3.3:2 1.3:2 1.3:2 1.3:2 5.3:2
+Techno,T06,132,4/4,Am,minor,1.3:2 r:2 3.3:2 r:2 1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 4.3:2 r:2 1.3:2 r:2 5.3:2 r:2
+Techno,T07,132,4/4,Am,minor,1.3:2 1.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 4.3:2 4.3:2 5.3:2 5.3:2 1.3:2 1.3:2
+Techno,T08,132,4/4,Am,minor,1.3:2 2.3:2 3.3:2 4.3:2 5.3:2 4.3:2 3.3:2 2.3:2 1.3:2 2.3:2 3.3:2 4.3:2 5.3:2 4.3:2 3.3:2 2.3:2
+Techno,T09,132,4/4,Am,minor,1.3:2 1.3:2 1.3:2 1.3:2 5.3:2 5.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 1.3:2
+Techno,T10,132,4/4,Am,minor,1.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 4.3:2 3.3:2 2.3:2 1.3:2 5.2:2 5.2:2 1.3:2 1.3:2
+House,H01,124,4/4,Cmaj,major,1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 3.4:2 5.4:2 1.4:2
+House,H02,124,4/4,Cmaj,major,1.4:2 1.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 1.4:2 5.3:2 5.3:2
+House,H03,124,4/4,Cmaj,major,1.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 2.4:2 r:2 1.4:2 r:2
+House,H04,124,4/4,Cmaj,major,1.4:2 2.4:2 3.4:2 5.4:2 3.4:2 2.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:2
+House,H05,124,4/4,Cmaj,major,5.4:2 5.4:2 3.4:2 3.4:2 1.4:2 1.4:2 2.4:2 2.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 5.4:2 3.4:2 1.4:2
+House,H06,124,4/4,Cmaj,major,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 1.4:2
+House,H07,124,4/4,Cmaj,major,1.4:2 r:2 1.4:2 3.4:2 5.4:2 r:2 5.4:2 3.4:2 1.4:2 r:2 1.4:2 3.4:2 5.4:2 r:2 3.4:2 1.4:2
+House,H08,124,4/4,Cmaj,major,3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2
+House,H09,124,4/4,Cmaj,major,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 3.4:2 5.4:2 1.4:2
+House,H10,124,4/4,Cmaj,major,1.4:2 2.4:2 3.4:2 4.4:2 5.4:2 4.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 1.4:2 5.3:2 5.3:2
+Tech House,TH01,126,4/4,Fm,minor,1.3:2 1.3:2 1.3:2 5.3:2 1.3:2 1.3:2 1.3:2 6.3:2 1.3:2 1.3:2 1.3:2 5.3:2 3.3:2 3.3:2 1.3:2 1.3:2
+Tech House,TH02,126,4/4,Fm,minor,1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 6.3:2 r:2 5.3:2 r:2 1.3:2 r:2
+Tech House,TH03,126,4/4,Fm,minor,1.3:2 3.3:2 1.3:2 5.3:2 1.3:2 3.3:2 1.3:2 6.3:2 5.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 1.3:2
+Tech House,TH04,126,4/4,Fm,minor,1.3:2 1.3:2 2.3:2 2.3:2 3.3:2 3.3:2 5.3:2 5.3:2 1.3:2 1.3:2 2.3:2 2.3:2 3.3:2 3.3:2 1.3:2 1.3:2
+Tech House,TH05,126,4/4,Fm,minor,5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 6.3:2 5.3:2 3.3:2 1.3:2 2.3:2 3.3:2 5.3:2 1.3:2
+Tech House,TH06,126,4/4,Fm,minor,1.3:2 r:2 1.3:2 1.3:2 5.3:2 r:2 5.3:2 5.3:2 1.3:2 r:2 1.3:2 1.3:2 6.3:2 r:2 5.3:2 1.3:2
+Tech House,TH07,126,4/4,Fm,minor,1.3:2 5.3:2 6.3:2 5.3:2 1.3:2 5.3:2 3.3:2 5.3:2 1.3:2 5.3:2 6.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:2
+Tech House,TH08,126,4/4,Fm,minor,1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 2.3:2 3.3:2 1.3:2
+Tech House,TH09,126,4/4,Fm,minor,1.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 1.3:2 3.3:2 6.3:2 5.3:2 3.3:2 1.3:2
+Tech House,TH10,126,4/4,Fm,minor,1.3:2 r:2 3.3:2 r:2 5.3:2 r:2 3.3:2 r:2 1.3:2 r:2 5.3:2 r:2 6.3:2 r:2 1.3:2 r:2
+Deep House,DH01,122,4/4,Dm,minor,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2
+Deep House,DH02,122,4/4,Dm,minor,1.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 2.4:2 r:2 1.4:2 r:2
+Deep House,DH03,122,4/4,Dm,minor,1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 1.4:2
+Deep House,DH04,122,4/4,Dm,minor,5.4:2 3.4:2 1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 1.4:2
+Deep House,DH05,122,4/4,Dm,minor,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 2.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2
+Deep House,DH06,122,4/4,Dm,minor,1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 2.4:2 3.4:2 1.4:2
+Deep House,DH07,122,4/4,Dm,minor,1.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 2.4:2 r:2 1.4:2 r:2 3.4:2 r:2
+Deep House,DH08,122,4/4,Dm,minor,3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2
+Deep House,DH09,122,4/4,Dm,minor,1.4:2 1.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 3.4:2 5.4:2 3.4:2 1.4:2
+Deep House,DH10,122,4/4,Dm,minor,1.4:2 3.4:2 2.4:2 3.4:2 1.4:2 5.3:2 1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 1.4:2
+Trance,TR01,138,4/4,Em,minor,1.4:2 5.4:2 6.4:2 5.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 1.4:2 5.4:2 6.4:2 1.5:2
+Trance,TR02,138,4/4,Em,minor,1.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 1.4:2
+Trance,TR03,138,4/4,Em,minor,1.4:2 r:2 5.4:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 1.5:2 r:2
+Trance,TR04,138,4/4,Em,minor,1.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 1.4:2
+Trance,TR05,138,4/4,Em,minor,5.4:2 6.4:2 5.4:2 3.4:2 1.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 2.4:2 3.4:2 1.4:2 1.4:2
+Trance,TR06,138,4/4,Em,minor,1.4:2 1.4:2 5.4:2 5.4:2 6.4:2 6.4:2 5.4:2 5.4:2 3.4:2 3.4:2 5.4:2 5.4:2 6.4:2 6.4:2 1.5:2 1.5:2
+Trance,TR07,138,4/4,Em,minor,1.4:2 3.4:2 5.4:2 3.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 1.5:2 6.4:2 5.4:2 3.4:2 1.4:2
+Trance,TR08,138,4/4,Em,minor,1.4:2 r:2 3.4:2 r:2 5.4:2 r:2 6.4:2 r:2 1.5:2 r:2 6.4:2 r:2 5.4:2 r:2 3.4:2 r:2
+Trance,TR09,138,4/4,Em,minor,1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 5.4:2 6.4:2 5.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:2
+Trance,TR10,138,4/4,Em,minor,1.4:2 2.4:2 3.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 5.4:2 6.4:2 5.4:2 3.4:2 2.4:2 1.4:2 1.4:2
+Electro,E01,128,4/4,Gm,minor,1.3:2 1.3:2 5.3:2 1.3:2 1.3:2 6.3:2 5.3:2 1.3:2 1.3:2 1.3:2 5.3:2 1.3:2 3.3:2 5.3:2 1.3:2 1.3:2
+Electro,E02,128,4/4,Gm,minor,1.3:2 r:2 5.3:2 r:2 1.3:2 r:2 6.3:2 r:2 5.3:2 r:2 3.3:2 r:2 1.3:2 r:2 5.3:2 r:2
+Electro,E03,128,4/4,Gm,minor,1.3:2 3.3:2 1.3:2 5.3:2 1.3:2 3.3:2 6.3:2 5.3:2 1.3:2 3.3:2 1.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:2
+Electro,E04,128,4/4,Gm,minor,1.3:2 1.3:2 2.3:2 2.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 1.3:2
+Electro,E05,128,4/4,Gm,minor,5.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 6.3:2 5.3:2 1.3:2 3.3:2 5.3:2 3.3:2 1.3:2 2.3:2 3.3:2 1.3:2
+Electro,E06,128,4/4,Gm,minor,1.3:2 r:2 1.3:2 5.3:2 1.3:2 r:2 5.3:2 3.3:2 1.3:2 r:2 1.3:2 5.3:2 6.3:2 r:2 5.3:2 1.3:2
+Electro,E07,128,4/4,Gm,minor,1.3:2 5.3:2 6.3:2 5.3:2 1.3:2 5.3:2 3.3:2 5.3:2 1.3:2 5.3:2 6.3:2 5.3:2 3.3:2 2.3:2 1.3:2 1.3:2
+Electro,E08,128,4/4,Gm,minor,1.3:2 1.3:2 3.3:2 3.3:2 5.3:2 5.3:2 6.3:2 6.3:2 5.3:2 5.3:2 3.3:2 3.3:2 1.3:2 2.3:2 3.3:2 1.3:2
+Electro,E09,128,4/4,Gm,minor,1.3:2 3.3:2 1.3:2 3.3:2 5.3:2 3.3:2 5.3:2 3.3:2 1.3:2 3.3:2 1.3:2 3.3:2 6.3:2 5.3:2 3.3:2 1.3:2
+Electro,E10,128,4/4,Gm,minor,1.3:2 r:2 3.3:2 r:2 5.3:2 r:2 3.3:2 r:2 1.3:2 r:2 6.3:2 r:2 5.3:2 r:2 3.3:2 r:2
+"""
+
+def _parse_corpus(text):
+    """{genere: [motivo]} con motivo = [(step, grado_0based, ottava_relativa, durata_in_sedicesimi)]; solo 4/4, 2 battute (32 sedicesimi)."""
+    out = {}
+    for ln in text.splitlines():
+        ln = ln.strip()
+        if not ln or ln.startswith('#') or ln.startswith('genre,'): continue
+        p = ln.split(',', 6)
+        if len(p) < 7 or p[3].strip() != '4/4': continue
+        notes, pos = [], 0
+        try:
+            for t in p[6].split():
+                a, d = t.rsplit(':', 1); d = int(d)
+                if a != 'r':
+                    g_, o_ = a.split('.'); notes.append((pos, int(g_), int(o_), d))
+                pos += d
+        except Exception: continue
+        if pos != 32 or not notes: continue
+        base_oct = Counter(o for _, _, o, _ in notes).most_common(1)[0][0]       # l'ottava piu' usata del motivo fa da riferimento
+        out.setdefault(p[0].strip(), []).append([(s_, g_ - 1, o_ - base_oct, d) for s_, g_, o_, d in notes])
+    return out
+
+CORPUS = _parse_corpus(CORPUS_TEXT)
+CORPUS_FILE_MSG = ''
+try:
+    _cp = Path(__file__).with_name('corpus_club_melodies.txt')   # facoltativo: un corpus aggiornato accanto allo script sostituisce quello interno
+    if _cp.exists():
+        _c2 = _parse_corpus(_cp.read_text(encoding='utf-8'))
+        if _c2: CORPUS = _c2; CORPUS_FILE_MSG = f"Corpus melodie caricato da {_cp.name} ({sum(len(v) for v in _c2.values())} motivi)"
+except Exception as _e: CORPUS_FILE_MSG = f"corpus_club_melodies.txt ignorato: {_e}"
+
+_CORPUS_FAMILY = {'techno': 'Techno', 'minimal_techno': 'Techno', 'industrial': 'Techno', 'underground': 'Tech House', 'minimal': 'Tech House',
+                  'house_90s': 'House', 'commerciale_90s': 'House', 'afro_house': 'House', 'deep': 'Deep House', 'dub_techno': 'Deep House',
+                  'soulful_house': 'Deep House', 'uk_garage': 'Deep House', 'trance': 'Trance', 'psytrance': 'Trance', 'edm_2000s': 'Trance',
+                  'elettronico': 'Electro', 'acid': 'Electro', 'synthwave': 'Electro', 'space_disco': 'Electro'}
+
+def _corpus_bar(g, bar, n, ct, st):
+    """Una battuta di melodia dal corpus: a ogni frase (4 battute) si scelgono due motivi (il secondo spesso e' il primo ripetuto);
+    sui tempi forti la nota si sposta sulla nota dell'accordo piu' vicina. Ritorna [(step, grado_assoluto, durata)] oppure None."""
+    pats = CORPUS.get(_CORPUS_FAMILY.get(g.get('_name')))
+    if not pats: return None
+    if bar % 4 == 0 or 'p1' not in st:
+        st['p1'] = random.choice(pats); st['p2'] = st['p1'] if random.random() < 0.4 else random.choice(pats)
+    pat, off = (st['p1'] if bar % 4 < 2 else st['p2']), 16 * (bar % 2)
+    cts = [k for k in range(-n, 2 * n + 1) if k % n in ct]
+    out = []
+    for s_, deg, octv, du in pat:
+        if not off <= s_ < off + 16: continue
+        dg = deg + n * octv
+        if (s_ - off) % 4 == 0 and dg % n not in ct: dg = min(cts, key=lambda c: (abs(c - dg), c))
+        out.append((s_ - off, dg, du))
+    return out
+
+def _mel_template(k=16):
+    """Contorno di una frase: passi per grado (prevalentemente a gradi congiunti, ogni tanto un salto di terza)."""
+    out, sign = [], random.choice([-1, 1])
+    for _ in range(k):
+        if random.random() > 0.65: sign = -sign          # inerzia: il 65% delle volte prosegue nella stessa direzione
+        out.append(sign * random.choices([0, 1, 2], weights=[1, 7, 2])[0])
+    return out
+
+def _melody_bar(positions, strong, ct, root_deg, n, st, variant):
+    """Melodia di una battuta che segue l'accordo: gradi congiunti, sui tempi forti (e sulla prima nota) cade una nota dell'accordo,
+    il motivo si ripete nella battuta dopo (adattato al nuovo accordo), poi variato, e chiude sulla fondamentale dell'accordo.
+    positions = step con una nota; strong = step forti; ct = gradi dell'accordo (mod n); st = stato fra le battute; variant 0 motivo, 1 variazione, 2 chiusura."""
+    lo, hi = 0, n + 1
+    cts = [k for k in range(lo, hi + 1) if k % n in ct] or [0]
+    near = lambda x: min(cts, key=lambda c: (abs(c - x), c))
+    tpl = st.get('tpl') or _mel_template()
+    if variant == 1: tpl = [-t if random.random() < 0.3 else t for t in tpl]
+    elif variant == 2: tpl = list(reversed(tpl))
+    cur = near(st['cur'] if st.get('cur') is not None else n // 2)
+    out = {}
+    for i, s_ in enumerate(positions):
+        x = max(lo, min(hi, cur + tpl[i % len(tpl)]))
+        if s_ in strong or i == 0: x = near(x)
+        out[s_] = cur = x
+    if variant == 2 and positions:
+        roots = [k for k in range(lo, hi + 1) if k % n == root_deg % n]
+        if roots: out[positions[-1]] = cur = min(roots, key=lambda k: abs(k - cur))
+    st['cur'] = cur
+    return out
+
 def _thin(motif, p=0.25):
     return [None if (v is not None and random.random() < p) else v for v in motif]
 
@@ -875,7 +1027,7 @@ BPM_RANGES = {
     'armonico': [(60, 120)],
     'breakcore': [(170, 230)],
     'chiptune': [(112, 128)],
-    'commerciale_90s': [(105, 128)],
+    'commerciale_90s': [(105, 128), (125, 138)],      # secondo range: Eurodance (mediana ~131 bpm nel Lakh clean)
     'deep': [(118, 126)],
     'disco': [(110, 130)],
     'drone': [(60, 100)],
@@ -907,7 +1059,7 @@ BPM_RANGES = {
     'r&b': [(60, 110)],
     'reggae': [(70, 90)],
     'reggaeton': [(90, 100)],
-    'soul': [(60, 110)],
+    'soul': [(60, 110), (95, 125)],      # soul piu' mosso (mediana ~116 bpm nel Lakh clean)
     'soulful_house': [(120, 125)],
     'space_disco': [(110, 130)],
     'sperimentale': [(88, 132)],
@@ -1334,6 +1486,10 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
             motif[random.randrange(16)] = pick()
         m_cur = motif
         bass_prog = [0, random.choice([0, pick()]), pick(), pick()]
+        loops_ = None if random.random() < 0.15 else (_L_MAJOR if 4 in scale[:3] else _L_MINOR.get(g.get('_name')))
+        if loops_:      # giro tipico del genere; fra i giri preferisce quelli che usano i gradi piu' presenti nel MIDI originale
+            bass_prog = list(random.choices(loops_, weights=[sum(w[d % n] for d in lp) + 0.1 for lp in loops_])[0])
+        mel_st = {'cur': None, 'tpl': _mel_template()}
     arp_counter = 0
     arp_base = random.choice([60, 67, 72])
 
@@ -1360,6 +1516,14 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
             if op == 'transpose': motif = [(x + 1) % n if x is not None else None for x in motif]; m_cur = motif
             elif op == 'invert': motif = list(reversed(motif)); m_cur = motif
             else: m_cur = [None if random.random() < 0.3 else x for x in motif]
+        if not remix:       # melodia sul basso del momento: gradi congiunti e nota dell'accordo sui tempi forti, chiusura sulla fondamentale
+            if bar % 4 == 0: mel_st['tpl'] = _mel_template()
+            bd = bass_prog[bar % 4] % n
+            mel = _melody_bar([s_ for s_ in range(L) if m_cur[pi[s_]] is not None], gst | set(range(0, L, 4)), {bd, (bd + 2) % n, (bd + 4) % n}, bd, n, mel_st,
+                              0 if bar % 4 < 2 else (1 if bar % 4 == 2 else 2))
+            cbm = _corpus_bar(g, bar, n, {bd, (bd + 2) % n, (bd + 4) % n}, mel_st) if L == 16 else None
+            mel_dur = {}
+            if cbm is not None: mel, mel_dur = {s_: dg_ for s_, dg_, _d in cbm}, {s_: d_ for s_, _dg, d_ in cbm}
 
         for s in range(L):
             p = pi[s]
@@ -1388,8 +1552,9 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
                 elif tones and random.random() < g['arp_density'] * 0.5 * factor:
                     _note(tracks['arp'], tick + sw, q - 15, tones[arp_counter % len(tones)], av, 1)
                     arp_counter += 1
-            elif m_cur[p] is not None and random.random() < factor:
-                _note(tracks['arp'], tick + sw, q - 20, _pc_pitch((root + scale[m_cur[p] % n]) % 12, arp_base), av, 1)
+            elif s in mel and random.random() < factor:
+                dg = mel[s]
+                _note(tracks['arp'], tick + sw, mel_dur.get(s, 1) * q - 20, _pc_pitch((root + scale[dg % n]) % 12, arp_base) + 12 * (dg // n), av, 1)
 
     tr_ = {k: v for k, v in tracks.items() if v}
     if g.get('free_time'): _free_time(tr_, g['free_time'])
@@ -1509,6 +1674,44 @@ def _add_reese(g, tracks):
     if g.get('bass_style') == 'reese' and tracks.get('bassline'):
         tracks['reese'] = [dict(e, channel=7) for e in tracks['bassline']]
 
+
+# ================= GIRI DI ACCORDI PER GENERE (gradi 0-based della scala: 0=I/i, 3=IV/iv, 4=V/v, 5=VI/vi, 6=VII) =================
+_L_STATIC = [[0, 0, 0, 0], [0, 0, 0, 6], [0, 0, 3, 0], [0, 0, 5, 6]]
+_L_MINOR = {
+    'techno': _L_STATIC, 'minimal_techno': _L_STATIC, 'minimal': _L_STATIC, 'underground': _L_STATIC, 'industrial': _L_STATIC,
+    'acid': [[0, 0, 0, 0], [0, 0, 6, 0], [0, 0, 3, 6]], 'dub_techno': [[0, 3, 0, 3], [0, 0, 0, 0], [0, 6, 0, 6]],
+    'house_90s': [[0, 6, 5, 6], [0, 5, 2, 6], [0, 3, 6, 2]], 'deep': [[0, 3, 6, 2], [3, 6, 2, 5], [0, 5, 3, 6], [5, 3, 0, 6]],
+    'soulful_house': [[0, 3, 6, 2], [3, 6, 2, 5], [0, 5, 3, 6]], 'afro_house': [[0, 6, 5, 6], [0, 3, 0, 6], [0, 5, 6, 0]],
+    'amapiano': [[0, 3, 5, 6], [0, 5, 3, 6], [0, 6, 5, 3]], 'uk_garage': [[0, 5, 3, 6], [5, 3, 0, 6], [0, 3, 6, 5]],
+    'trance': [[0, 5, 2, 6], [0, 6, 5, 4], [5, 2, 6, 0]], 'psytrance': [[0, 0, 5, 6], [0, 0, 0, 6], [0, 6, 0, 5]],
+    'edm_2000s': [[0, 5, 2, 6], [0, 6, 5, 4], [5, 2, 6, 0]], 'elettronico': [[0, 5, 2, 6], [0, 6, 5, 6], [0, 3, 5, 6]],
+    'hardstyle': [[0, 5, 2, 6], [0, 6, 5, 6], [0, 0, 5, 6]], 'commerciale_90s': [[0, 5, 2, 6], [0, 3, 5, 6], [0, 6, 5, 4]],
+    'synthpop': [[0, 5, 2, 6], [0, 3, 5, 6], [0, 6, 5, 4]], 'synthwave': [[0, 5, 2, 6], [0, 6, 5, 4], [0, 3, 6, 5]],
+    'chiptune': [[0, 5, 2, 6], [0, 6, 5, 6], [0, 3, 6, 0]], 'vaporwave': [[3, 6, 2, 5], [0, 5, 3, 6], [5, 3, 6, 0]],
+    'hyperpop': [[0, 5, 2, 6], [0, 6, 5, 4], [5, 6, 0, 0]], 'future_bass': [[5, 3, 0, 6], [0, 5, 3, 6], [3, 5, 0, 6]],
+    'trap': [[0, 5, 6, 4], [0, 5, 3, 6], [0, 6, 5, 4], [0, 0, 5, 6]], 'hip_hop': [[0, 5, 3, 6], [0, 3, 5, 6], [5, 3, 0, 6], [0, 6, 5, 6]],
+    'reggaeton': [[0, 6, 5, 6], [0, 5, 6, 0], [0, 3, 6, 5]], 'trip_hop': [[0, 5, 3, 6], [0, 3, 0, 6], [5, 3, 0, 0]],
+    'r&b': [[3, 6, 2, 5], [0, 5, 3, 6], [5, 3, 0, 6]], 'soul': [[3, 6, 2, 5], [0, 5, 3, 6], [0, 3, 6, 2]],
+    'funk': [[0, 0, 3, 3], [0, 3, 0, 6], [0, 0, 3, 6]], 'disco': [[3, 6, 2, 5], [0, 3, 6, 2], [5, 3, 0, 6]],
+    'space_disco': [[0, 3, 6, 5], [3, 6, 2, 5], [0, 5, 3, 6]], 'reggae': [[0, 3, 0, 3], [0, 6, 0, 6], [0, 3, 0, 6]],
+    'drum_n_bass': [[0, 5, 2, 6], [0, 6, 5, 6], [0, 3, 5, 6]], 'jungle': [[0, 0, 3, 0], [0, 0, 5, 6], [0, 0, 0, 0]],
+    'dubstep': [[0, 0, 0, 5], [0, 0, 6, 5], [0, 0, 5, 6]], 'breakcore': [[0, 0, 0, 0], [0, 0, 6, 0], [0, 0, 5, 6]],
+    'glitch': [[0, 3, 2, 6], [0, 5, 3, 6], [0, 0, 5, 6]], 'idm': [[0, 3, 2, 6], [0, 2, 5, 6], [0, 5, 3, 0]],
+    'ambient': [[0, 5, 3, 6], [0, 2, 5, 6], [0, 0, 5, 5]], 'drone': [[0, 0, 0, 0], [0, 0, 0, 5], [0, 0, 3, 3]],
+    'lowercase': [[0, 0, 0, 0], [0, 0, 3, 0]], 'microsound': [[0, 0, 0, 0], [0, 0, 5, 0]], 'onkyo': [[0, 0, 0, 0], [0, 0, 0, 3]],
+    'noise': [[0, 0, 0, 0], [0, 0, 6, 0]], 'harsh_noise': [[0, 0, 0, 0]], 'musique_concrete': [[0, 0, 0, 0], [0, 0, 5, 0], [0, 3, 0, 6]],
+    'sperimentale': [[0, 3, 2, 6], [0, 0, 5, 0], [0, 5, 3, 0]], 'minimalismo_ritmico': [[0, 0, 2, 0], [0, 0, 3, 0], [0, 0, 0, 5]],
+    'armonico': [[3, 6, 2, 5], [0, 5, 3, 6], [0, 3, 6, 2]]}
+_L_MAJOR = [[0, 4, 5, 3], [0, 5, 3, 4], [0, 3, 4, 3], [0, 5, 1, 4], [0, 3, 0, 4]]   # I-V-vi-IV, I-vi-IV-V, ...
+
+def _pick_loops(g, scale):
+    """Due giri (A e B) tipici del genere; se la scala ha la terza maggiore si usano giri da modo maggiore."""
+    major = 4 in scale[:3]
+    pool = _L_MAJOR if major else _L_MINOR.get(g.get('_name'))
+    if not pool or random.random() < 0.15: return None      # il 15% resta casuale per varieta'
+    a = list(random.choice(pool)); b = list(random.choice([x for x in pool if x != a] or pool))
+    return a, b
+
 def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     """GENERATIVE: ignora le note originali, usa solo tonalità/scala (DNA). 7 ruoli + batteria,
     ognuno attivo solo nelle sezioni dove ha senso."""
@@ -1521,7 +1724,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     def _rand_prog():
         head = 0 if random.random() < 0.85 else random.choice([3, 4])
         return [head] + random.choices([2, 3, 4, 5, 1, 6], weights=[2, 3, 4, 3, 1, 1], k=3)
-    prog_a, prog_b = _rand_prog(), _rand_prog()
+    prog_a, prog_b = _pick_loops(g, scale) or (_rand_prog(), _rand_prog())
     use7 = random.random() < g.get('seventh', 0.35)       # accordi di settima (Deep, Soul, R&B... quasi sempre)
     use9 = random.random() < g.get('ninth', 0.0)          # con la nona
     bass_style = g.get('bass_style')
@@ -1535,6 +1738,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     lead_q, lead_a = _question(lead_base, n), _answer(lead_base)
     trip_n, trip_mot = 6, None
     arp_mode, R = 'up', random.randint
+    mel_st = {'cur': None, 'tpl': _mel_template()}
 
     for bar, B in enumerate(secmap):
         layers, idx, length, prev = B['layers'], B['idx'], B['length'], B['prev']
@@ -1550,6 +1754,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
                 elif op == 'invert': lead_base = list(reversed(lead_base)); blk = lead_base
                 else: blk = _thin(lead_base, 0.3)
             lead_q, lead_a = _question(blk, n), _answer(blk)      # frase di 4 battute: domanda, domanda, domanda variata, risposta
+            mel_st['tpl'] = _mel_template()                        # nuovo contorno melodico per la frase
         lead = lead_a if bar % 4 == 3 else (_thin(lead_q) if bar % 4 == 2 else lead_q)
         d = (prog_a if (bar // 4) % 2 == 0 else prog_b)[bar % 4]
         cpcs = [pc_of(d), pc_of(d + 2), pc_of(d + 4)] + ([pc_of(d + 6)] if use7 else []) + ([pc_of(d + 8)] if use9 else [])
@@ -1607,22 +1812,29 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         trip = bool(g.get('lead_triplet')) and ('lead' in layers or 'leadl' in layers)
         if trip:        # Hardstyle: melodia in terzine, griglia 1/8T (12 posizioni per battuta)
             if idx == 0: trip_n = 12 if (energy and random.random() < 0.5) else 6
-            if idx == 0 or bar % 2 == 0 or trip_mot is None: trip_mot = _trip_motif(n, trip_n)
             full_t, lf_t, step_t = 'lead' in layers, _fade(B, 'lead'), (L * q) // 12
-            for j in range(12):
-                if trip_n == 6 and j % 2: continue
-                if not full_t and j % 3: continue
-                _note(tracks['lead'], base + j * step_t, step_t - 10, _pc_pitch(pc_of(trip_mot[j // (12 // trip_n)]), lead_oct), int((88 if full_t else 70) * lf_t), 5)
+            pos_t = [j for j in range(12) if not (trip_n == 6 and j % 2) and (full_t or j % 3 == 0)]
+            mel_t = _melody_bar(pos_t, {j for j in pos_t if j % 3 == 0}, {d % n, (d + 2) % n, (d + 4) % n}, d, n, mel_st, 0 if bar % 4 < 2 else (1 if bar % 4 == 2 else 2))
+            for j in pos_t:
+                _note(tracks['lead'], base + j * step_t, step_t - 10, _pc_pitch(pc_of(mel_t[j] % n), lead_oct) + 12 * (mel_t[j] // n), int((88 if full_t else 70) * lf_t), 5)
         l_steps = [] if trip else [s for s, v in enumerate(lead) if v is not None]
         if ('lead' in layers or 'leadl' in layers) and l_steps:
             full, lf, gaps = 'lead' in layers, _fade(B, 'lead'), _gaps(l_steps)
-            for s in range(L):
+            ct_deg = {d % n, (d + 2) % n, (d + 4) % n} | ({(d + 6) % n} if use7 else set())
+            mel = _melody_bar([s_ for s_ in range(L) if lead[pi[s_]] is not None and (full or s_ in gst)], gst | {x for x in range(0, L, 4)}, ct_deg, d, n, mel_st, 0 if bar % 4 < 2 else (1 if bar % 4 == 2 else 2))
+            cb = _corpus_bar(g, bar, n, ct_deg, mel_st) if L == 16 else None
+            for s, dg, du_ in (cb or ()):
+                if not full and s not in gst: continue
+                _note(tracks['lead'], base + s * q, (du_ if full else 8) * q - 10, _pc_pitch(pc_of(dg % n), lead_oct) + 12 * (dg // n), int((88 if full else 70) * lf), 5)
+            for s in (range(L) if cb is None else ()):
                 lp = pi[s]
                 if lead[lp] is None: continue
                 if not full and s not in gst: continue
                 gp = gaps[lp] if L == 16 else min(gaps[lp], L - s)
                 du = gp * q - 10 if full else 2 * TICKS_BEAT - 10
-                _note(tracks['lead'], base + s * q, du, _pc_pitch(pc_of(lead[lp]), lead_oct), int((88 if full else 70) * lf), 5)
+                dg = mel.get(s)
+                if dg is None: continue
+                _note(tracks['lead'], base + s * q, du, _pc_pitch(pc_of(dg % n), lead_oct) + 12 * (dg // n), int((88 if full else 70) * lf), 5)
 
         # FX: impatto quando entra qualcosa di nuovo + riser nelle ultime 2 battute di una sezione con rullata
         if idx == 0 and (layers - prev):
@@ -2260,24 +2472,43 @@ def guide_report_block(genre, tracks):
     if mapped:
         lines += ["", "   Tracce di questo MIDI -> riga della guida:"]
         def _lp(k):
-            pg = None if k in DRUM_TRACK_NAMES else role_program(genre, k)
-            return f"  [Logic carica: {LOGIC_PATCH.get(pg, 'program ' + str(pg))}]" if pg is not None else ''
+            if k in DRUM_TRACK_NAMES:
+                dp = PROG_OPTS.get('drum_override')
+                dp = auto_drum_program(genre) if dp is None else dp
+                return f"  [Logic carica: {DRUM_KIT_INFO.get(dp, 'kit standard (SoCal)')}]"
+            pg = role_program(genre, k)
+            return f"  [Logic carica: {LOGIC_PATCH.get(pg, 'program ' + str(pg))}" + (f" - {PATCH_PLUGIN[pg]}" if pg in PATCH_PLUGIN else '') + "]" if pg is not None else ''
         lines += [f"   - {DRUM_TRACK_NAMES.get(k, k.replace('_', ' ').title())} -> {e[0]}: {e[1].split(' -> ')[0]}{_lp(k)}" for k, e in mapped]
     return lines + [""]
 
-# Program change della batteria (canale 10) secondo il GM: 0 Standard, 8 Room, 16 Power, 24 Electronic, 25 TR-808, 32 Jazz, 40 Brush.
-# Logic traduce il program in un kit di Drum Kit Designer / Drum Machine Designer (da verificare kit per kit).
-DRUM_KITS = {0: 'Standard', 8: 'Room', 16: 'Power', 24: 'Electronic', 25: 'TR-808', 32: 'Jazz', 40: 'Brush'}
-_KIT_808 = {'trap', 'hip_hop', 'r&b', 'future_bass', 'reggaeton', 'vaporwave'}
-_KIT_STD = {'funk', 'disco', 'space_disco', 'soul', 'soulful_house', 'armonico', 'reggae', 'jungle', 'drum_n_bass', 'trip_hop'}
-def auto_drum_program(genre): return 25 if genre in _KIT_808 else 0 if genre in _KIT_STD else 24
+# Kit batteria che Logic carica con il program sul canale 10 (verificato con i file di prova; gli altri program danno SoCal o Orchestral Kit)
+DRUM_KITS = {0: 'SoCal', 8: 'Retro Rock', 16: 'Epic Electro', 25: 'Boutique 808', 32: 'Roots'}
+DRUM_KIT_INFO = {0: 'SoCal - Drum Kit Designer', 8: 'Retro Rock - Drum Kit Designer', 16: 'Epic Electro - Ultrabeat',
+                 24: 'Boutique 808 - Drum Machine Designer', 25: 'Boutique 808 - Drum Machine Designer', 32: 'Roots - Drum Kit Designer'}
+# Kit per genere: acustici dove la guida chiede Drum Kit Designer o breakbeat acustici, Epic Electro (Ultrabeat) per i generi duri e sintetici,
+# Boutique 808 (l'unico kit di Drum Machine Designer raggiungibile via MIDI) per tutti gli altri.
+_KIT_BY_GENRE = {'disco': 0, 'funk': 0, 'armonico': 0, 'soul': 8, 'jungle': 8, 'reggae': 32, 'trip_hop': 32, 'minimalismo_ritmico': 32,
+                 'industrial': 16, 'hardstyle': 16, 'breakcore': 16, 'hyperpop': 16, 'dubstep': 16, 'harsh_noise': 16, 'sperimentale': 16,
+                 'glitch': 16, 'idm': 16, 'chiptune': 16, 'drum_n_bass': 16,
+                 'trap': 25, 'hip_hop': 25, 'future_bass': 25, 'synthpop': 25, 'vaporwave': 25, 'r&b': 25, 'reggaeton': 25, 'underground': 25}
+def auto_drum_program(genre): return _KIT_BY_GENRE.get(genre, 24)
 
 
 # ================= PROGRAM GM PER GENERE (patch di Logic Pro verificate con i file di prova) =================
 # Logic assegna a ogni CANALE la patch del primo program: ogni ruolo ha il suo canale, quindi il program sceglie lo strumento.
-LOGIC_PATCH = {0: 'Steinway Grand Piano', 16: 'Tonewheel Organ', 32: 'Upright Studio Bass', 33: 'Fingerstyle Bass', 34: 'Picked Bass',
+LOGIC_PATCH = {0: 'Steinway Grand Piano', 1: 'Afro-Cuban Piano', 2: 'Yamaha Grand Piano', 3: 'Before Talkies', 4: 'Classic Electric Piano',
+               5: '80s FM Piano', 6: 'Harpsichord', 7: 'Classic D6', 8: 'Celesta', 9: 'Glockenspiel', 10: 'Mystic Vibes', 11: 'Vibraphone',
+               12: 'Marimba', 13: 'Xylophone', 14: 'Tubular Bells', 15: 'Celtic Hammered Dulcimer', 17: 'Bebop Organ', 18: 'Classic Rock Organ',
+               19: 'Wedding Organ', 20: 'Noble Organ', 21: 'Tango Accordion', 22: 'Tango Accordion', 23: 'Tango Accordion',
+               24: 'Classical Acoustic Guitar', 25: 'Steel String Acoustic', 26: 'Roots Rock', 27: 'Classic Clean', 28: 'Tweed Picked Synth',
+               29: 'British Stack Synth Lead', 30: 'Hard Rock', 31: 'Acoustic Guitar Harmonics',
+               16: 'Tonewheel Organ', 32: 'Upright Studio Bass', 33: 'Fingerstyle Bass', 34: 'Picked Bass',
                35: 'Fretless Bass', 36: 'Picked Bass', 37: 'Picked Bass', 38: 'Pulse Bass', 39: 'Taureg Moon Bass', 40: 'Violins 1',
-               41: 'Violas', 42: 'Cellos', 43: 'Basses', 44: 'Romance Strings', 48: 'String Ensemble', 64: 'Saxophone',
+               41: 'Violas', 42: 'Cellos', 43: 'Basses', 44: 'Romance Strings', 45: 'Session Strings', 46: 'Harp', 47: 'Timpani', 48: 'String Ensemble', 49: 'Romance Strings', 50: 'Vintage Synth Strings',
+               51: 'Synth Pop Strings', 52: 'Classical Ensemble', 53: 'Church Choir', 54: 'Dream Voice', 55: 'Full Brass', 56: 'Trumpets',
+               57: 'Trombones', 58: 'Tuba', 59: 'Full Brass', 60: 'French Horns', 61: 'Full Brass', 62: 'Bright Synth Brass',
+               63: 'Classic Synth Brass', 64: 'Saxophone', 65: 'Saxophone', 66: 'Saxophone', 67: 'Saxophone', 68: 'Oboe', 69: 'English Horn',
+               70: 'Bassoon Solo', 71: 'Clarinet Solo', 72: 'Piccolo', 73: 'Flute Solo', 74: 'Medieval Recorder', 75: 'Peruvian Panpipes', 76: 'Mountain Flute', 77: 'Japanese Shakuhachi Flute', 78: 'Celtic Tin Whistle', 79: 'Mountain Flute',
                80: 'Reverse Engineering', 81: 'The Final Lead', 82: 'Deep Organ', 83: 'Pop Brass', 84: '80s Starlight', 85: 'Dream Voice',
                86: 'Power Fifths', 87: 'Soft Square Lead', 88: 'Glistening Pad', 89: 'Classic Pad', 90: 'Epic Cloud Formation',
                91: 'Synthetic Choir', 92: 'Pulse Strings', 93: 'Ghost Voices', 94: 'Tidal Space', 95: 'Slow Drift', 96: 'Crystal Rain',
@@ -2305,15 +2536,51 @@ GENRE_PROGRAMS = {
     'minimalismo_ritmico': (39, 35, 95, 0, 96, 87, 99), 'armonico': (39, 33, 91, 0, 96, 85, 99)}
 _PROG_ROLES = ('sub_bass', 'bassline', 'pad', 'chords', 'arp', 'lead', 'fx_perc')
 _PROG_OLD = {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'reese': 39}
-PROG_OPTS = {'genre': True}
+PROG_OPTS = {'genre': True, 'match': True}
+
+# Plug-in strumento che Logic apre per ogni patch (letto dal Mixer di Logic con i file di prova). Non elencati = non verificati.
+PATCH_PLUGIN = {**{n: 'Sampler' for n in (0, 1, 2, 3, 6, 8, 9, 11, 12, 13, 14, 15, 21, 22, 23, 24, 25, 26, 27, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 55, 56, 57, 58, 59, 60, 61, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74)},
+                4: 'Vintage Electric Piano', 5: 'ES2', 50: 'ES2', 51: 'Retro Synth', 54: 'Alchemy', 62: 'ES2', 63: 'Retro Synth', 7: 'Vintage Clav', 10: 'Sculpture', 16: 'Vintage B3 Organ', 17: 'Vintage B3 Organ',
+                18: 'Vintage B3 Organ', 28: 'Sculpture', 29: 'Sculpture', 38: 'ES2', 39: 'Alchemy', 75: 'Sampler', 76: 'Sculpture', 77: 'Sampler', 78: 'Sampler', 79: 'Sculpture',
+                80: 'Retro Synth', 81: 'ES2', 83: 'Sampler', 84: 'Retro Synth', 85: 'Alchemy', 86: 'ES2', 87: 'ES2', 88: 'ES2', 89: 'ES2',
+                90: 'Alchemy', 91: 'Retro Synth', 92: 'ES2', 93: 'Alchemy', 94: 'Alchemy', 95: 'ES2', 96: 'ES2', 97: 'Sculpture',
+                98: 'Sculpture', 99: 'Sculpture', 100: 'Sculpture', 101: 'Retro Synth', 102: 'Alchemy', 103: 'ES2', 104: 'Sampler'}
+# Patch verificate per (ruolo, plug-in richiesto dalla guida); si usa quella gia' scelta per il genere se ha gia' il plug-in giusto
+_PLUGIN_POOLS = {
+    'sub_bass': {'Alchemy': [39], 'ES2': [38]},
+    'bassline': {'Alchemy': [39], 'ES2': [38], 'Studio Bass': [33, 35, 36, 32, 34]},
+    'pad': {'Alchemy': [90, 94, 93, 85], 'ES2': [88, 89, 95, 92, 50], 'Sculpture': [97, 98, 99, 100], 'Retro Synth': [91, 51],
+            'Vintage B3 Organ': [17], 'Studio Strings': [44, 48, 45, 52]},
+    'chords': {'Alchemy': [94, 90, 93, 85], 'ES2': [92, 88, 89, 50], 'Sculpture': [97, 98, 99], 'Retro Synth': [91, 51], 'Vintage Electric Piano': [4],
+               'Vintage Clav': [7], 'Vintage B3 Organ': [16, 17, 18], 'Studio Strings': [44, 48, 45, 52]},
+    'arp': {'Alchemy': [93, 94, 102, 85], 'Retro Synth': [80, 84], 'ES2': [96, 87, 81], 'Sculpture': [99, 98, 97, 28], 'Vintage Electric Piano': [4]},
+    'lead': {'Alchemy': [85, 102, 93], 'Retro Synth': [80, 84, 63], 'ES2': [81, 87, 86, 62], 'Sculpture': [98, 97, 76, 29], 'Vintage Electric Piano': [4],
+             'Studio Strings': [44, 48], 'Studio Horns': [83, 55, 61, 60]},
+    'fx_perc': {'Alchemy': [102, 94, 93], 'ES2': [96, 103], 'Retro Synth': [101], 'Sculpture': [99, 98, 97]}}
+_ROLE_GUIDE = {'sub_bass': 'Sub Bass', 'bassline': 'Bassline', 'pad': 'Pad', 'chords': 'Chords', 'arp': 'Arp', 'lead': 'Lead', 'fx_perc': 'FX Perc'}
+
+def _guide_plugin(genre, role):
+    for r, chain in GUIDE.get(genre, []):
+        if r == _ROLE_GUIDE.get(role):
+            n = chain.split(' -> ')[0].split('(')[0].strip().lower()
+            return {'es2': 'ES2', 'alchemy': 'Alchemy', 'retro synth': 'Retro Synth', 'sculpture': 'Sculpture', 'vintage electric piano': 'Vintage Electric Piano',
+                    'vintage clav': 'Vintage Clav', 'vintage b3 organ': 'Vintage B3 Organ', 'studio strings': 'Studio Strings',
+                    'studio horns': 'Studio Horns', 'studio bass': 'Studio Bass'}.get(n)
+    return None
 
 def role_program(genre, key):
     """Program GM per un ruolo: per-genere se attivo e se il genere e' in tabella, altrimenti la mappa fissa precedente."""
     row = GENRE_PROGRAMS.get(genre) if PROG_OPTS.get('genre') else None
     if row:
-        if key in _PROG_ROLES: return row[_PROG_ROLES.index(key)]
-        if key == 'bass': return row[1]
-        if key == 'reese': return row[0]
+        role = {'bass': 'bassline', 'reese': 'sub_bass'}.get(key, key)
+        if role in _PROG_ROLES:
+            prog = row[_PROG_ROLES.index(role)]
+            if PROG_OPTS.get('match'):
+                want = _guide_plugin(genre, role)
+                pool = _PLUGIN_POOLS.get(role, {}).get(want)
+                if want and pool and prog not in pool and PATCH_PLUGIN.get(prog) != want:   # Studio Bass/Strings/Horns: va bene la patch campionata piu' vicina
+                    prog = pool[sum(map(ord, genre)) % len(pool)]   # scelta stabile per genere, cosi' i generi non suonano tutti uguali
+            return prog
     return _PROG_OLD.get(key)
 
 # ================= MARKER DI SEZIONE + AUTOMAZIONI FILTRO (CC74) =================
@@ -2743,8 +3010,10 @@ with col1:
     rev_note = st.selectbox("Nota del reverse cymbal", [119, 57, None], format_func=lambda n: {119: "119 - Reverse Cymbal (Roland GS)", 57: "57 - Crash 2 (GM)", None: "Nessuno"}[n]) if use_trans else GM_REVERSE
     use_human = st.checkbox("Humanize (micro-timing e velocity nei generi organici)", value=True)
     drum_kit_choice = st.selectbox("Kit batteria (program change)", ["Auto per genere"] + [f"{k} - {v}" for k, v in DRUM_KITS.items()], help="Logic carica il kit corrispondente al program GM della traccia drum")
+    PROG_OPTS['drum_override'] = None if drum_kit_choice == 'Auto per genere' else int(drum_kit_choice.split(' - ')[0])
     use_genre_programs = st.checkbox("Strumenti Logic diversi per genere (program GM scelti tra le patch verificate)", value=True)
     PROG_OPTS['genre'] = use_genre_programs
+    PROG_OPTS['match'] = st.checkbox("Abbina il plug-in della guida (ES2, Alchemy, Retro Synth, Sculpture) quando esiste una patch adatta", value=True)
     use_preset_names = st.checkbox("Nome traccia con il preset della guida Logic (es. \"Bass - Retro Synth (Deep Bass)\")", value=False)
 
 with col2:
@@ -2755,6 +3024,7 @@ with col2:
             except Exception as _e: st.error(f"JSON non valido: {_e}")
         st.download_button("Scarica le timeline attuali (JSON)", data=timelines_to_json(), file_name="midi_forge_timelines.json", mime="application/json")
         if TIMELINE_FILE_MSG: st.caption(TIMELINE_FILE_MSG)
+        if CORPUS_FILE_MSG: st.caption(CORPUS_FILE_MSG)
         if GUIDE_FILE_MSG: st.caption(GUIDE_FILE_MSG)
         st.caption("Formato: {\"deep\": [[\"Intro DJ\", 16, \"kick hat pad\"], ...]}. Strati: " + " ".join(LAYER_ORDER) + ". Un file midi_forge_timelines.json accanto allo script viene caricato in automatico.")
     genre_list = sorted(GENRES.keys(), key=lambda k: _ascii(GENRE_LABELS.get(k, k)).lower())   # ordine alfabetico per nome
