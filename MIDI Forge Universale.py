@@ -51,7 +51,7 @@ GENRES = {
     'onkyo': {'bpm_default': 50, 'bars_default': 124, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.02, 'swing': 0.0},
     'psytrance': {'bpm_default': 145, 'bars_default': 224, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0]*16, 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [0,1,1,1, 0,1,1,1, 0,1,1,1, 0,1,1,1], 'ghost': [0]*16, 'arp_density': 0.8, 'swing': 0.0},
     'r&b': {'bpm_default': 95, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'arp_density': 0.55, 'swing': 0.2, 'lazy': 0.12},
-    'reggae': {'bpm_default': 76, 'bars_default': 68, 'kick': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [3,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.03, 'lazy': 0.1, 'chord_off': 2, 'snare_note': 37},
+    'reggae': {'bpm_default': 76, 'bars_default': 68, 'kick': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [3,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,1, 1,0,0,0, 1,0,0,1, 1,0,0,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.03, 'lazy': 0.1, 'chord_off': 2, 'snare_note': 37},
     'reggaeton': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,1,0, 0,1,0,0, 0,0,1,0, 0,1,0,0], 'clap': [0]*16, 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.0},
     'soul': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.25, 'lazy': 0.08},
     'soulful_house': {'bpm_default': 123, 'bars_default': 128, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,2,3, 1,3,2,3, 1,3,2,3, 1,3,2,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.15},
@@ -548,7 +548,7 @@ GENRE_STYLE = {
     'chiptune': dict(seventh=0.0, bass_style='rolling'),
     'commerciale_90s': dict(seventh=0.3),
     'deep': dict(seventh=1.0, ninth=0.6, bass_style='sync'),
-    'disco': dict(seventh=0.8, ninth=0.2, bass_style='octave'),
+    'disco': dict(seventh=0.8, ninth=0.2, bass_style='disco'),
     'drum_n_bass': dict(seventh=0.4, bass_style='reese'),
     'dub_techno': dict(seventh=0.9, ninth=0.2, bass_style='dubsub'),
     'dubstep': dict(seventh=0.2, bass_style='wobble'),
@@ -583,7 +583,7 @@ GENRE_STYLE = {
 for _k, _s in GENRE_STYLE.items(): GENRES[_k].update(_s)
 #   funk: slap/pop | walk: giro sulle note dell'accordo | arp: arpeggio | dubsub: sub sostenuto sulla tonica | wobble: sub sostenuto + LFO sul filtro (dubstep)
 #   rollacc: 16esimi tra i kick con accento sui levare (psytrance, jungle) | fretless: 8vi con glide (space disco) | logdrum: colpi brevi con glide (amapiano) | long: 808 lungo con glide | rolling / offbeat / octave / sync / acid / reese: vedi sopra
-BASS_ROOT_P = {'rollacc': 0.97, 'fretless': 0.85, 'rolling': 0.97, 'offbeat': 0.92, 'acid': 0.7, 'octave': 0.9, 'long': 0.85, 'reese': 0.9, 'dubsub': 0.98, 'funk': 0.8, 'wobble': 0.95, 'logdrum': 0.75}
+BASS_ROOT_P = {'rollacc': 0.97, 'fretless': 0.85, 'rolling': 0.97, 'offbeat': 0.92, 'acid': 0.7, 'octave': 0.9, 'disco': 0.9, 'long': 0.85, 'reese': 0.9, 'dubsub': 0.98, 'funk': 0.8, 'wobble': 0.95, 'logdrum': 0.75}
 
 def _bass_pc(style, hit, cpcs, rpc, root_p):
     """Nota (classe di altezza) del basso: arp = arpeggio sull'accordo (synthpop), walk = giro sulle note dell'accordo (soul, armonico)."""
@@ -596,6 +596,7 @@ def _bass_shape(style, hit, gap, room, step=0):
     if style == 'acid':
         return (12 if random.random() < 0.2 else 0), (gap + 1 if random.random() < 0.35 else gap), (22 if random.random() < 0.3 else 0)
     if style == 'octave': return (12 if hit % 2 else 0), gap, 0
+    if style == 'disco': return (12 if (hit % 2 and random.random() < 0.18) else 0), gap, 0      # ottave solo ogni tanto (12% dei salti nei 20 MIDI disco)
     if style == 'rollacc': return 0, gap, (14 if step % 4 == 2 else -16)          # 16esimi tra i kick: accento sui levare (3, 7, 11, 15)
     if style == 'long': return (12 if random.random() < 0.12 else 0), min(gap * 2, room), 0
     if style in ('reese', 'dubsub', 'wobble'): return 0, min(gap * 2, room), 0          # note lunghe e sostenute
@@ -956,6 +957,10 @@ def _melody_bar(positions, strong, ct, root_deg, n, st, variant):
         if i == 0 and first_of_phrase: x = near(x, tonic)                                    # la frase parte da una nota di tonica
         mv, cur = x - (prev_end if (i == 0 and prev_end is not None) else cur), x      # il salto fra una battuta e l'altra conta
         out[s_] = cur
+    pl = list(positions)
+    for i in range(1, len(pl) - 1):          # una nota estranea all'accordo e' ammessa solo come nota di passaggio o di volta (par. 25-28): raggiunta e lasciata per grado
+        x, a_, b_ = out[pl[i]], out[pl[i - 1]], out[pl[i + 1]]
+        if x % n not in ct and not (abs(x - a_) <= 1 and abs(b_ - x) <= 1): out[pl[i]] = near(x)
     st['phrase_start'] = False
     if variant == 2 and positions:
         fin = near(cur, tonic)
@@ -1024,6 +1029,12 @@ def _gaps(steps, size=16, cap=4):
 def _pc_pitch(pc, lo):
     return lo + ((pc - lo) % 12)
 
+def _deg_pitch(root, scale, dg, lo):
+    """Altezza del grado dg (0 = tonica, n = ottava sopra) in ordine crescente: la tonica cade nella finestra [lo-6, lo+6) e i gradi salgono sempre,
+    cosi' il contorno melodico scritto in gradi resta lo stesso in altezze (prima il pitch class era riportato nell'ottava sopra lo, e il grado dopo il 'giro' scendeva di quasi un'ottava)."""
+    n = len(scale)
+    return lo + ((root - lo + 6) % 12) - 6 + 12 * (dg // n) + scale[dg % n]
+
 def _bass_pitch(pc, lo=28, hi=45):
     p = _pc_pitch(pc, lo)
     return p if p <= hi else p - 12
@@ -1048,7 +1059,7 @@ BPM_RANGES = {
     'chiptune': [(112, 128)],
     'commerciale_90s': [(105, 128), (125, 138)],      # secondo range: Eurodance (mediana ~131 bpm nel Lakh clean)
     'deep': [(118, 126)],
-    'disco': [(110, 130)],
+    'disco': [(108, 132)],
     'drone': [(60, 100)],
     'drum_n_bass': [(160, 180)],
     'dub_techno': [(112, 130)],
@@ -1076,7 +1087,7 @@ BPM_RANGES = {
     'onkyo': [(50, 90)],
     'psytrance': [(140, 150)],
     'r&b': [(60, 110)],
-    'reggae': [(70, 90)],
+    'reggae': [(70, 100)],
     'reggaeton': [(90, 100)],
     'soul': [(60, 110), (95, 125)],      # soul piu' mosso (mediana ~116 bpm nel Lakh clean)
     'soulful_house': [(120, 125)],
@@ -1093,7 +1104,8 @@ BPM_RANGES = {
     'vaporwave': [(60, 80)],
 }
 LOOSE_SNARE = {'breakcore', 'glitch', 'hyperpop', 'idm', 'minimalismo_ritmico', 'sperimentale'}   # snare non vincolato al backbeat
-FIXED_KICK = {'dubstep', 'future_bass', 'jungle', 'reggae', 'reggaeton', 'uk_garage'}   # il kick e' identita' del genere
+REGGAE_BACKBEAT = 0.4      # probabilita' (per seed) che il reggae usi kick+rullante su 2 e 4 (6 brani su 10 nei MIDI analizzati) invece del one-drop sul 3
+FIXED_KICK = {'disco', 'dubstep', 'future_bass', 'jungle', 'reggae', 'reggaeton', 'uk_garage'}   # il kick e' identita' del genere
 BASS_FIXED = {'amapiano', 'hardstyle', 'jungle', 'psytrance', 'uk_garage'}   # il pattern di basso e' l'identita' del genere
 GHOST_FIXED = {'jungle', 'trip_hop'}   # i ghost snare sono identita' del genere (Amen: 8, 10, 16)
 
@@ -1167,8 +1179,9 @@ PATTERN_LIB = {
       'hat': ['x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg', 'x-Xg x-Xg x-Xg x-Xg'],
       'bass': ['x--- --x- ---- --x-', 'x--x --x- --x- -x--', 'x-x- ---x --x- x---', 'x--- -x-- --x- x--x']},
  'disco': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- ---x x---'],
-      'hat': ['xxXx xxXx xxXx xxXx', 'x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg'],
-      'bass': ['x-xx -xx- x-xx -xx-', 'x--x x-x- x--x x-x-', 'xx-x xx-x xx-x xx-x', 'x-x- xx-x x-x- xx-x']},
+      'kick': ['x--- x--- x--- x---'] * 16 + ['x--- ---- x--- ----'] * 2 + ['x--- ---x x--- ----', 'x--- ---- x--- x---'],       # su 20 brani: 16 four-on-the-floor, 2 con kick solo su 1 e 3 (Boogie Wonderland, Funky Town), Boogima e Get Down sincopati
+      'hat': ['x-x- x-x- x-x- x-x-'] * 3 + ['x-X- x-X- x-X- x-X-'] * 2 + ['xgXg xgXg xgXg xgXg'],      # 8vi in 16 brani su 20, 16esimi negli altri
+      'bass': ['x-x- x-x- x-x- x-x-'] * 2 + ['x-x- x-x- ---- x---', 'x-x- ---- x-x- --x-', 'x--- --x- x--- --x-', 'x--- --x- ---- --x-', 'x--- x--- x--- x---']},   # pattern di basso dei MIDI disco (i 5 pattern in piu' dei secondi 10 brani portavano i colpi dispari al 22% contro il 14% dei file, quindi non sono inclusi)
  'drum_n_bass': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'],
       'kick': ['x--- ---- --x- ----', 'x--- --x- --x- ----', 'x--- ---- --x- --x-', 'x--x ---- --x- ----'],
       'hat': ['xxxx xxxx xxxx xxxx', 'xgxg xgxg xgxg xgxg', 'x-xx x-xx x-xx x-xx'],
@@ -1232,7 +1245,8 @@ PATTERN_LIB = {
       'hat': ['xgxg xgxg xgxg xgxg', 'xgXg xgxg xgXg xgxg', 'x-xg x-xg x-xg x-xx'],
       'bass': ['x--- --x- x--- --x-', 'x--- ---x --x- x---', 'x-x- --x- x--- ----']},
  'reggae': {'hat': ['g-x- x-x- x-x- x-x-', 'x-x- x-x- x-x- x-x-', 'g-x- x-x- g-x- x-xg'],
-      'bass': ['x--- ---- x--- ----', 'x--x ---- x--x ----', '---- --x- x--x --x-', 'x--- --x- x--- -x--']},
+      'bass': ['x--- ---- x--- ----', 'x--x ---- x--x ----', '---- --x- x--x --x-', 'x--- --x- x--- -x--',
+              'x-x- x--- ---- xxx-', 'x-x- x--- --x- x---', 'x--x -xx- --x- xx--', 'x--x ---x x--x x--x']},      # ultimi 4: pattern di basso ricavati da MIDI di Marley/UB40
  'reggaeton': {'hat': ['x-x- x-x- x-x- x-x-', '--x- --x- --x- --x-', 'x-xx x-xx x-xx x-xx', 'x-x- x-xx x-x- x-xx'],
       'bass': ['x--x --x- x--- ----', 'x--x --x- x--x --x-', 'x--- --x- x--x ----']},
  'soul': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'],
@@ -1300,6 +1314,7 @@ def vary_genre(g, seed, name=None):
     snare, clap = list(g.get('snare', [0] * 16)), list(g.get('clap', [0] * 16))
     if lib.get('snare'): snare = _pat(rs.choice(lib['snare']), True)
     if lib.get('clap'): clap = _pat(rs.choice(lib['clap']), True)
+    if (name or g.get('_name')) == 'reggae' and rs.random() < REGGAE_BACKBEAT: kick = _pat('---- x--- ---- x---', True); snare = list(kick)
     if any(snare) and name in LOOSE_SNARE:
         snare = _mutate(snare, rs, {s for s in range(0, 16, 4) if snare[s]}, [2, 3, 6, 7, 10, 11, 14, 15], 0.3, 0.1, 0.3, 2)
     ghost = list(g.get('ghost', [0] * 16))
@@ -1573,7 +1588,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
                     arp_counter += 1
             elif s in mel and random.random() < factor:
                 dg = mel[s]
-                _note(tracks['arp'], tick + sw, mel_dur.get(s, 1) * q - 20, _pc_pitch((root + scale[dg % n]) % 12, arp_base) + 12 * (dg // n), av, 1)
+                _note(tracks['arp'], tick + sw, mel_dur.get(s, 1) * q - 20, _deg_pitch(root, scale, dg, arp_base), av, 1)
 
     tr_ = {k: v for k, v in tracks.items() if v}
     if g.get('free_time'): _free_time(tr_, g['free_time'])
@@ -1725,8 +1740,8 @@ _L_MINOR = {
     'trap': [[0, 5, 6, 4], [0, 5, 3, 6], [0, 6, 5, 4], [0, 0, 5, 6]], 'hip_hop': [[0, 5, 3, 6], [0, 3, 5, 6], [5, 3, 0, 6], [0, 6, 5, 6]],
     'reggaeton': [[0, 6, 5, 6], [0, 5, 6, 0], [0, 3, 6, 5]], 'trip_hop': [[0, 5, 3, 6], [0, 3, 0, 6], [5, 3, 0, 0]],
     'r&b': [[3, 6, 2, 5], [0, 5, 3, 6], [5, 3, 0, 6]], 'soul': [[3, 6, 2, 5], [0, 5, 3, 6], [0, 3, 6, 2]],
-    'funk': [[0, 0, 3, 3], [0, 3, 0, 6], [0, 0, 3, 6]], 'disco': [[3, 6, 2, 5], [0, 3, 6, 2], [5, 3, 0, 6]],
-    'space_disco': [[0, 3, 6, 5], [3, 6, 2, 5], [0, 5, 3, 6]], 'reggae': [[0, 3, 0, 3], [0, 6, 0, 6], [0, 3, 0, 6]],
+    'funk': [[0, 0, 3, 3], [0, 3, 0, 6], [0, 0, 3, 6]], 'disco': [[3, 6, 2, 5], [0, 3, 6, 2], [5, 3, 0, 6], [0, 0, 0, 0], [0, 4, 0, 4], [6, 0, 0, 0], [6, 0, 4, 0], [0, 3, 0, 3], [5, 4, 5, 4], [3, 0, 0, 4]],
+    'space_disco': [[0, 3, 6, 5], [3, 6, 2, 5], [0, 5, 3, 6]], 'reggae': [[0, 3, 0, 3], [0, 6, 0, 6], [0, 3, 0, 6], [0, 2, 0, 6], [0, 3, 5, 4]],
     'drum_n_bass': [[0, 5, 2, 6], [0, 6, 5, 6], [0, 3, 5, 6]], 'jungle': [[0, 0, 3, 0], [0, 0, 5, 6], [0, 0, 0, 0]],
     'dubstep': [[0, 0, 0, 5], [0, 0, 6, 5], [0, 0, 5, 6]], 'breakcore': [[0, 0, 0, 0], [0, 0, 6, 0], [0, 0, 5, 6]],
     'glitch': [[0, 3, 2, 6], [0, 5, 3, 6], [0, 0, 5, 6]], 'idm': [[0, 3, 2, 6], [0, 2, 5, 6], [0, 5, 3, 0]],
@@ -1735,13 +1750,20 @@ _L_MINOR = {
     'noise': [[0, 0, 0, 0], [0, 0, 6, 0]], 'harsh_noise': [[0, 0, 0, 0]], 'musique_concrete': [[0, 0, 0, 0], [0, 0, 5, 0], [0, 3, 0, 6]],
     'sperimentale': [[0, 3, 2, 6], [0, 0, 5, 0], [0, 5, 3, 0]], 'minimalismo_ritmico': [[0, 0, 2, 0], [0, 0, 3, 0], [0, 0, 0, 5]],
     'armonico': [[3, 6, 2, 5], [0, 5, 3, 6], [0, 3, 6, 2]]}
-_L_MAJOR = [[0, 4, 5, 3], [0, 5, 3, 4], [0, 3, 4, 3], [0, 5, 1, 4], [0, 3, 0, 4]]   # I-V-vi-IV, I-vi-IV-V, ...
+_L_MAJOR = [[0, 4, 5, 3], [0, 5, 3, 4], [0, 3, 4, 3], [0, 5, 1, 4], [0, 3, 0, 4], [0, 3, 1, 4], [3, 4, 0, 5]]   # + I-IV-ii-V e IV-V-I-vi (giri pop, Fonzi)
+_L_MAJOR_GENRE = {'disco': [[5, 0, 5, 0], [5, 4, 3, 4], [2, 1, 2, 4], [0, 0, 0, 0], [4, 0, 4, 0], [5, 6, 0, 0], [5, 4, 3, 3]],      # vi-I, vi-V-IV-V (Bee Gees), III-ii-III-V (Get Down), vamp sulla tonica
+                  'reggae': [[0, 3, 0, 3], [0, 4, 3, 4], [0, 1, 4, 0], [0, 1, 3, 0], [3, 3, 4, 5]]}   # giri dei MIDI reggae analizzati (I-IV, I-V-IV-V, I-ii-V-I, I-ii-IV-I, IV-IV-V-vi)
+_L_MAJOR_CLOSE = [[0, 3, 4, 0], [0, 1, 4, 0], [3, 1, 4, 0]]      # giri che chiudono con la cadenza V-I (De Cia: l'armonizzazione conclude con V -> I)   # I-V-vi-IV, I-vi-IV-V, ...
 
 def _pick_loops(g, scale):
     """Due giri (A e B) tipici del genere; se la scala ha la terza maggiore si usano giri da modo maggiore."""
     major = 4 in scale[:3]
-    pool = _L_MAJOR if major else _L_MINOR.get(g.get('_name'))
+    pool = _L_MAJOR_GENRE.get(g.get('_name'), _L_MAJOR) if major else _L_MINOR.get(g.get('_name'))
     if not pool or random.random() < 0.15: return None      # il 15% resta casuale per varieta'
+    if major and g.get('_name') not in _L_MAJOR_GENRE:       # periodo di 8 battute: A chiude sulla dominante (semicadenza, 'proposta'), B risolve con V-I (cadenza, 'risposta')
+        a = list(random.choice([x for x in pool if x[-1] == 4]))
+        b = list(random.choice(_L_MAJOR_CLOSE if random.random() < 0.65 else [x for x in pool if x != a]))
+        return a, b
     a = list(random.choice(pool)); b = list(random.choice([x for x in pool if x != a] or pool))
     return a, b
 
@@ -1850,7 +1872,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             pos_t = [j for j in range(12) if not (trip_n == 6 and j % 2) and (full_t or j % 3 == 0)]
             mel_t = _melody_bar(pos_t, {j for j in pos_t if j % 3 == 0}, {d % n, (d + 2) % n, (d + 4) % n}, d, n, mel_st, 0 if bar % 4 < 2 else (1 if bar % 4 == 2 else 2))
             for j in pos_t:
-                _note(tracks['lead'], base + j * step_t, step_t - 10, _pc_pitch(pc_of(mel_t[j] % n), lead_oct) + 12 * (mel_t[j] // n), int((88 if full_t else 70) * lf_t), 5)
+                _note(tracks['lead'], base + j * step_t, step_t - 10, _deg_pitch(root, scale, mel_t[j], lead_oct), int((88 if full_t else 70) * lf_t), 5)
         l_steps = [] if trip else [s for s, v in enumerate(lead) if v is not None]
         if ('lead' in layers or 'leadl' in layers) and l_steps:
             full, lf, gaps = 'lead' in layers, _fade(B, 'lead'), _gaps(l_steps)
@@ -1859,7 +1881,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             cb = _corpus_bar(g, bar, n, ct_deg, mel_st) if L == 16 else None
             for s, dg, du_ in (cb or ()):
                 if not full and s not in gst: continue
-                _note(tracks['lead'], base + s * q, (du_ if full else 8) * q - 10, _pc_pitch(pc_of(dg % n), lead_oct) + 12 * (dg // n), int((88 if full else 70) * lf), 5)
+                _note(tracks['lead'], base + s * q, (du_ if full else 8) * q - 10, _deg_pitch(root, scale, dg, lead_oct), int((88 if full else 70) * lf), 5)
             for s in (range(L) if cb is None else ()):
                 lp = pi[s]
                 if lead[lp] is None: continue
@@ -1868,7 +1890,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
                 du = gp * q - 10 if full else 2 * TICKS_BEAT - 10
                 dg = mel.get(s)
                 if dg is None: continue
-                _note(tracks['lead'], base + s * q, du, _pc_pitch(pc_of(dg % n), lead_oct) + 12 * (dg // n), int((88 if full else 70) * lf), 5)
+                _note(tracks['lead'], base + s * q, du, _deg_pitch(root, scale, dg, lead_oct), int((88 if full else 70) * lf), 5)
 
         # FX: impatto quando entra qualcosa di nuovo + riser nelle ultime 2 battute di una sezione con rullata
         if idx == 0 and (layers - prev):
