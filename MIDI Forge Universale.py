@@ -35,7 +35,7 @@ GENRES = {
     'glitch': {'bpm_default': 128, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,1, 0,0,0,0, 1,0,0,0], 'arp_density': 0.95, 'swing': 0.1},
     'hardstyle': {'bpm_default': 150, 'bars_default': 112, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.5, 'swing': 0.0, 'lead_triplet': True},
     'harsh_noise': {'bpm_default': 100, 'bars_default': 68, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [1]*16, 'arp_density': 1.0, 'swing': 0.0, 'meter': ['7/8', '9/8', '4/4']},
-    'hip_hop': {'bpm_default': 92, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.3, 'swing': 0.2, 'lazy': 0.12},
+    'hip_hop': {'bpm_default': 92, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.2, 'lazy': 0.12},
     'house_90s': {'bpm_default': 122, 'bars_default': 112, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,2,0, 0,0,2,0, 0,0,2,0, 0,0,2,0], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.05},
     'hyperpop': {'bpm_default': 140, 'bars_default': 56, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [1,1,1,1, 1,0,1,1, 1,1,1,0, 1,1,1,1], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.0, 'meter_sections': ['4/4', '4/4', '7/8', '3/4', '4/4', '4/4'], 'tempo_plan': [70, 140, 94, 120, 170, 70], 'hat_sub': True},
     'idm': {'bpm_default': 135, 'bars_default': 72, 'kick': [1,0,0,1, 0,1,0,1, 0,0,0,1, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,0,1,0, 1,0,1,0], 'hat': [1]*16, 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,0,1,0], 'arp_density': 0.85, 'swing': 0.1},
@@ -53,7 +53,7 @@ GENRES = {
     'r&b': {'bpm_default': 95, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,1], 'arp_density': 0.55, 'swing': 0.2, 'lazy': 0.12},
     'reggae': {'bpm_default': 76, 'bars_default': 68, 'kick': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [3,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,1, 1,0,0,0, 1,0,0,1, 1,0,0,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.03, 'lazy': 0.1, 'chord_off': 2, 'snare_note': 37},
     'reggaeton': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,1,0, 0,1,0,0, 0,0,1,0, 0,1,0,0], 'clap': [0]*16, 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.0},
-    'soul': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,1, 0,0,0,0, 0,0,1,0, 0,0,0,1], 'arp_density': 0.6, 'swing': 0.25, 'lazy': 0.08},
+    'soul': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0], 'arp_density': 0.6, 'swing': 0.25, 'lazy': 0.08, 'chord_off': 0},
     'soulful_house': {'bpm_default': 123, 'bars_default': 128, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,2,3, 1,3,2,3, 1,3,2,3, 1,3,2,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.15},
     'space_disco': {'bpm_default': 120, 'bars_default': 128, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'ghost': [0]*16, 'arp_density': 0.6, 'swing': 0.02},
     'sperimentale': {'bpm_default': 100, 'bars_default': 72, 'kick': [1,0,0,0, 0,0,0,1, 0,1,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,1,0,0, 0,0,0,1, 0,0,0,0], 'hat': [0,1,0,0, 1,0,0,1, 0,0,1,0, 1,0,0,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 1,0,0,1], 'arp_density': 0.7, 'swing': 0.1, 'meter': ['5/16', '7/16', '4/4']},
@@ -1071,7 +1071,7 @@ BPM_RANGES = {
     'glitch': [(80, 115), (128, 148)],
     'hardstyle': [(145, 155)],
     'harsh_noise': [(60, 120)],
-    'hip_hop': [(85, 95)],
+    'hip_hop': [(85, 100), (85, 100), (96, 114)],      # MIDI con rullante su 2 e 4: 88-114 BPM, mediana circa 100
     'house_90s': [(118, 125)],
     'hyperpop': [(120, 170)],
     'idm': [(100, 140)],
@@ -1087,7 +1087,7 @@ BPM_RANGES = {
     'onkyo': [(50, 90)],
     'psytrance': [(140, 150)],
     'r&b': [(60, 110)],
-    'reggae': [(70, 100)],
+    'reggae': [(66, 90), (66, 90), (88, 100)],      # fonti: roots 65-90 (spesso 70-80), lovers rock 70-90; sopra i 90 i MIDI di Marley/UB40
     'reggaeton': [(90, 100)],
     'soul': [(60, 110), (95, 125)],      # soul piu' mosso (mediana ~116 bpm nel Lakh clean)
     'soulful_house': [(120, 125)],
@@ -1104,10 +1104,14 @@ BPM_RANGES = {
     'vaporwave': [(60, 80)],
 }
 LOOSE_SNARE = {'breakcore', 'glitch', 'hyperpop', 'idm', 'minimalismo_ritmico', 'sperimentale'}   # snare non vincolato al backbeat
-REGGAE_BACKBEAT = 0.4      # probabilita' (per seed) che il reggae usi kick+rullante su 2 e 4 (6 brani su 10 nei MIDI analizzati) invece del one-drop sul 3
-FIXED_KICK = {'disco', 'dubstep', 'future_bass', 'jungle', 'reggae', 'reggaeton', 'uk_garage'}   # il kick e' identita' del genere
-BASS_FIXED = {'amapiano', 'hardstyle', 'jungle', 'psytrance', 'uk_garage'}   # il pattern di basso e' l'identita' del genere
-GHOST_FIXED = {'jungle', 'trip_hop'}   # i ghost snare sono identita' del genere (Amen: 8, 10, 16)
+HIPHOP_HALFTIME = 0.15     # probabilita' (per seed) del rullante solo sul 3 (half-time, come trap e alcuni brani hip hop dei MIDI analizzati)
+REGGAE_BACKBEAT = 0.20     # probabilita' (per seed) di kick+rullante su 2 e 4 (stile ska/rocksteady, 6 brani su 10 nei MIDI analizzati); sul 3 il one-drop e' il default
+REGGAE_ROCKERS = 0.15      # rockers: kick su 1 e 3, rimshot sul 3
+REGGAE_STEPPERS = 0.15     # steppers: kick su tutti e quattro i quarti, rimshot sul 3
+REGGAE_SKANK24 = 0.25      # probabilita' (per seed) che lo skank cada sui battiti 2 e 4 invece che sul levare di ogni tempo (2 brani su 9 nei MIDI analizzati, e come dicono le guide)
+FIXED_KICK = {'hip_hop', 'soul', 'disco', 'dubstep', 'future_bass', 'jungle', 'reggae', 'reggaeton', 'uk_garage'}   # il kick e' identita' del genere
+BASS_FIXED = {'hip_hop', 'amapiano', 'hardstyle', 'jungle', 'psytrance', 'uk_garage'}   # il pattern di basso e' l'identita' del genere
+GHOST_FIXED = {'jungle', 'trip_hop', 'soul', 'hip_hop'}   # i ghost snare sono identita' del genere (Amen: 8, 10, 16)
 
 def _default_bpm(name, g, seed):
     """BPM di default: se il genere ha un piano di tempo (Hyperpop) il valore centrale, altrimenti un BPM nel range del genere scelto dal seed."""
@@ -1212,10 +1216,11 @@ PATTERN_LIB = {
  'hardstyle': {'hat': ['--x- --x- --x- --x-', '--X- --X- --X- --X-'],
       'bass': ['--x- --x- --x- --x-'],
       'clap': ['---- x--- ---- x---', '---- x--- ---- x--x']},
- 'hip_hop': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--- --x- x---', '---- x--x ---- x---'],
-      'kick': ['x--- --x- x--- ----', 'x--- --x- x-x- ----', 'x-x- ---- x--- --x-', 'x--- ---x x--- -x--'],
-      'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgxg xgx- xgxx'],
-      'bass': ['x--- --x- x--- --x-', 'x--- ---x x--x ----', 'x-x- --x- x--- -x--']},
+ 'hip_hop': {'snare': ['---- x--- ---- x---'] * 5 + ['---- x--- ---- x--x'],      # nei MIDI il rullante e' quasi sempre solo su 2 e 4 (83% dei colpi)
+      'kick': ['x--- --x- x--- ----', 'x--- --x- x-x- ----', 'x-x- ---- x--- --x-', 'x--- ---x x--- -x--',
+               'x--x ---- --x- ----', 'x--x ---- x--x ----', 'x-x- --x- x-x- --x-', 'x-x- ---x x-x- ----', 'x-x- -x-- x-x- ----'],      # ultimi 5: kick dei MIDI hip hop
+      'hat': ['x-x- x-x- x-x- x-x-'] * 4 + ['x-x- xgxg x-x- xgxg', 'xgxg xgxg xgxg xgxg'],      # ottavi in 6 brani su 10 con hi-hat, sedicesimi negli altri
+      'bass': ['x--- ---- ---- ----'] * 2 + ['x--- ---- ---- x---', 'x--- ---- x--- ----', 'x--- ---- x--- --x-', 'x-x- x-x- x-x- x-x-']},      # basso rado: mediana 2 note per battuta nei MIDI
  'house_90s': {'hat': ['--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
       'bass': ['--x- --x- --x- --x-', '--x- --x- --xx --x-', 'x-x- --x- --x- x---'],
       'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---']},
@@ -1244,15 +1249,15 @@ PATTERN_LIB = {
       'kick': ['x--- --x- x--- ----', 'x--- --x- x--- -x--', 'x--- ---x x--- --x-', 'x-x- ---- x--- --x-'],
       'hat': ['xgxg xgxg xgxg xgxg', 'xgXg xgxg xgXg xgxg', 'x-xg x-xg x-xg x-xx'],
       'bass': ['x--- --x- x--- --x-', 'x--- ---x --x- x---', 'x-x- --x- x--- ----']},
- 'reggae': {'hat': ['g-x- x-x- x-x- x-x-', 'x-x- x-x- x-x- x-x-', 'g-x- x-x- g-x- x-xg'],
+ 'reggae': {'hat': ['g-X- g-X- g-X- g-X-'] * 2 + ['x-X- x-X- x-X- x-X-'] * 2 + ['g-x- x-x- x-x- x-x-', 'g-X- x-X- g-X- x-Xg'],      # accento sulle 'e' (il levare): nei MIDI l'hi-hat e' piu' forte sul levare in 6 brani su 10
       'bass': ['x--- ---- x--- ----', 'x--x ---- x--x ----', '---- --x- x--x --x-', 'x--- --x- x--- -x--',
               'x-x- x--- ---- xxx-', 'x-x- x--- --x- x---', 'x--x -xx- --x- xx--', 'x--x ---x x--x x--x']},      # ultimi 4: pattern di basso ricavati da MIDI di Marley/UB40
  'reggaeton': {'hat': ['x-x- x-x- x-x- x-x-', '--x- --x- --x- --x-', 'x-xx x-xx x-xx x-xx', 'x-x- x-xx x-x- x-xx'],
       'bass': ['x--x --x- x--- ----', 'x--x --x- x--x --x-', 'x--- --x- x--x ----']},
  'soul': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'],
-      'kick': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--- -x--'],
-      'hat': ['xgxg xgxg xgxg xgxg', 'x-x- x-x- x-x- x-x-', 'xgx- xgx- xgx- xgxg'],
-      'bass': ['x--- ---- x--- --x-', 'x--- --x- x--- ----', 'x-x- ---- x--- --x-']},
+      'kick': ['x--- ---- x--- ----', 'x--- ---x x--- ----', 'x--- --x- x--- --x-', 'x--- ---x x--- ---x', 'x--- ---- x-x- --x-', 'x--- ---x x-x- ----'],      # kick dei MIDI soul (1 e 3 con spinte sincopate)
+      'hat': ['x-x- x-x- x-x- x-x-'] * 3 + ['x-xg x-xg x-xg x-xg', 'x-x- x-xg x-x- x-xg'],      # ottavi nella maggior parte dei brani, con qualche sedicesimo
+      'bass': ['x--- ---- x--- --x-', 'x--- --x- ---- x-x-', 'x--- ---x x--- -x-x', 'x--- ---x x--x x--x', 'x--- x-x- x-x- x-x-', 'x-xx -xx- x-x- x-x-']},    # pattern di basso dei MIDI soul (3-9 note per battuta)
  'soulful_house': {'hat': ['xgXg xgXg xgXg xgXg', 'x-Xg x-Xg x-Xg x-Xg'],
       'bass': ['--x- --x- --x- --x-', '--x- --x- -xx- --x-', 'x-x- --x- --x- x---'],
       'clap': ['---- x--- ---- x---', '---- x--- ---- x--x']},
@@ -1314,7 +1319,12 @@ def vary_genre(g, seed, name=None):
     snare, clap = list(g.get('snare', [0] * 16)), list(g.get('clap', [0] * 16))
     if lib.get('snare'): snare = _pat(rs.choice(lib['snare']), True)
     if lib.get('clap'): clap = _pat(rs.choice(lib['clap']), True)
-    if (name or g.get('_name')) == 'reggae' and rs.random() < REGGAE_BACKBEAT: kick = _pat('---- x--- ---- x---', True); snare = list(kick)
+    if (name or g.get('_name')) == 'hip_hop' and rs.random() < HIPHOP_HALFTIME: snare = _pat('---- ---- x--- ----', True)
+    if (name or g.get('_name')) == 'reggae':
+        _r = rs.random()
+        if _r < REGGAE_BACKBEAT: kick = _pat('---- x--- ---- x---', True); snare = list(kick)
+        elif _r < REGGAE_BACKBEAT + REGGAE_ROCKERS: kick = _pat('x--- ---- x--- ----', True)
+        elif _r < REGGAE_BACKBEAT + REGGAE_ROCKERS + REGGAE_STEPPERS: kick = _pat('x--- x--- x--- x---', True)
     if any(snare) and name in LOOSE_SNARE:
         snare = _mutate(snare, rs, {s for s in range(0, 16, 4) if snare[s]}, [2, 3, 6, 7, 10, 11, 14, 15], 0.3, 0.1, 0.3, 2)
     ghost = list(g.get('ghost', [0] * 16))
@@ -1326,6 +1336,12 @@ def vary_genre(g, seed, name=None):
         bass = _mutate(bass, rs, {0}, [2, 3, 6, 7, 10, 11, 14, 15], 0.15 if four else 0.3, 0.1 if four else 0.15, 0.2 if four else 0.35, 1 if four else 2)
     hat = _vary_hat(hat_src, rs, groove, 0.10 if four else 0.2) if any(g['hat']) else list(g['hat'])
     g2.update(kick=kick, snare=snare, clap=clap, ghost=ghost, bass=bass, hat=hat)
+    if (name or g.get('_name')) == 'hip_hop': g2['chord_off'] = rs.choice([0, 0, 0, 0, 2])      # accordi sul battere (80% nei MIDI)
+    if (name or g.get('_name')) == 'soul': g2.update(swing8=rs.choice([0, 0, 0, 0, 0, 0.16, 0.16]), chord_off=rs.choice([0, 0, 0, 0, 0, 2]))      # accordi sul battere (67% nei MIDI), a volte sul levare      # 7 brani su 10 dritti, 3 con ottavi in terzine
+    if (name or g.get('_name')) == 'reggae':
+        if rs.random() < REGGAE_SKANK24: g2.update(chord_off=0, skank24=True)
+        g2['swing8'] = rs.choice([0, 0, 0, 0.08, 0.125, 0.16, 0.16])      # ottavi del levare dritti o in swing (nei MIDI: 4 brani su 10 dritti, gli altri con levare ritardato)
+        g2['skank_double'] = rs.random() < 0.4                              # secondo colpo (un sedicesimo dopo il levare): 'double skank' / bubble
     # linea di percussioni del seed (rimshot / claves / shaker / tamburello / cowbell) sui levare, solo nel drop
     taken = {s for s in range(16) if kick[s] or snare[s]}
     cand = [s for s in (2, 3, 6, 7, 10, 11, 14, 15) if s not in taken]
@@ -1426,7 +1442,7 @@ def build_drum_events(g, secmap, bm=None):
             if pause_from is not None and s >= pause_from: continue
             p = pi[s]
             tick = base + s * q
-            sw = int(g['swing'] * q) if s % 2 == 1 else 0
+            sw = int(g['swing'] * q) if s % 2 == 1 else (int(g.get('swing8', 0) * 4 * q) if s % 4 == 2 else 0)
             # KICK
             if 'kick' in layers and P['kick'][p] and s not in fill_set:
                 if not energy: vel = (110 + R(0, 5)) if s in gst else (95 + R(0, 10))
@@ -1714,7 +1730,7 @@ def _add_reese(g, tracks):
 # Synth-pop 53%, Reggae 50%, Disco 46%, Funk 40%, R&B 34%, Soul 30%. Gli altri generi non hanno dati: valori stimati (non misurati).
 _P_MINOR = {'techno': .82, 'minimal_techno': .82, 'underground': .82, 'industrial': .85, 'acid': .8, 'hip_hop': .70, 'trap': .85, 'trance': .68,
             'psytrance': .85, 'edm_2000s': .58, 'elettronico': .58, 'synthpop': .53, 'reggae': .50, 'disco': .46, 'space_disco': .5, 'funk': .40,
-            'r&b': .34, 'soul': .30, 'house_90s': .54, 'commerciale_90s': .5, 'ambient': .5, 'drone': .6}
+            'r&b': .34, 'soul': .15, 'house_90s': .54, 'commerciale_90s': .5, 'ambient': .5, 'drone': .6}
 _MINOR_SCALES = (('Minore naturale', 60), ('Dorico', 20), ('Pentatonica minore', 10), ('Minore armonica', 5), ('Frigio', 5))
 _MAJOR_SCALES = (('Maggiore', 75), ('Misolidio', 25))
 
@@ -1741,7 +1757,7 @@ _L_MINOR = {
     'reggaeton': [[0, 6, 5, 6], [0, 5, 6, 0], [0, 3, 6, 5]], 'trip_hop': [[0, 5, 3, 6], [0, 3, 0, 6], [5, 3, 0, 0]],
     'r&b': [[3, 6, 2, 5], [0, 5, 3, 6], [5, 3, 0, 6]], 'soul': [[3, 6, 2, 5], [0, 5, 3, 6], [0, 3, 6, 2]],
     'funk': [[0, 0, 3, 3], [0, 3, 0, 6], [0, 0, 3, 6]], 'disco': [[3, 6, 2, 5], [0, 3, 6, 2], [5, 3, 0, 6], [0, 0, 0, 0], [0, 4, 0, 4], [6, 0, 0, 0], [6, 0, 4, 0], [0, 3, 0, 3], [5, 4, 5, 4], [3, 0, 0, 4]],
-    'space_disco': [[0, 3, 6, 5], [3, 6, 2, 5], [0, 5, 3, 6]], 'reggae': [[0, 3, 0, 3], [0, 6, 0, 6], [0, 3, 0, 6], [0, 2, 0, 6], [0, 3, 5, 4]],
+    'space_disco': [[0, 3, 6, 5], [3, 6, 2, 5], [0, 5, 3, 6]], 'reggae': [[0, 3, 0, 3], [0, 6, 0, 6], [0, 3, 0, 6], [0, 2, 0, 6], [0, 3, 5, 4], [0, 6, 5, 4], [0, 3, 0, 4]],
     'drum_n_bass': [[0, 5, 2, 6], [0, 6, 5, 6], [0, 3, 5, 6]], 'jungle': [[0, 0, 3, 0], [0, 0, 5, 6], [0, 0, 0, 0]],
     'dubstep': [[0, 0, 0, 5], [0, 0, 6, 5], [0, 0, 5, 6]], 'breakcore': [[0, 0, 0, 0], [0, 0, 6, 0], [0, 0, 5, 6]],
     'glitch': [[0, 3, 2, 6], [0, 5, 3, 6], [0, 0, 5, 6]], 'idm': [[0, 3, 2, 6], [0, 2, 5, 6], [0, 5, 3, 0]],
@@ -1751,8 +1767,9 @@ _L_MINOR = {
     'sperimentale': [[0, 3, 2, 6], [0, 0, 5, 0], [0, 5, 3, 0]], 'minimalismo_ritmico': [[0, 0, 2, 0], [0, 0, 3, 0], [0, 0, 0, 5]],
     'armonico': [[3, 6, 2, 5], [0, 5, 3, 6], [0, 3, 6, 2]]}
 _L_MAJOR = [[0, 4, 5, 3], [0, 5, 3, 4], [0, 3, 4, 3], [0, 5, 1, 4], [0, 3, 0, 4], [0, 3, 1, 4], [3, 4, 0, 5]]   # + I-IV-ii-V e IV-V-I-vi (giri pop, Fonzi)
-_L_MAJOR_GENRE = {'disco': [[5, 0, 5, 0], [5, 4, 3, 4], [2, 1, 2, 4], [0, 0, 0, 0], [4, 0, 4, 0], [5, 6, 0, 0], [5, 4, 3, 3]],      # vi-I, vi-V-IV-V (Bee Gees), III-ii-III-V (Get Down), vamp sulla tonica
-                  'reggae': [[0, 3, 0, 3], [0, 4, 3, 4], [0, 1, 4, 0], [0, 1, 3, 0], [3, 3, 4, 5]]}   # giri dei MIDI reggae analizzati (I-IV, I-V-IV-V, I-ii-V-I, I-ii-IV-I, IV-IV-V-vi)
+_L_MAJOR_GENRE = {'soul': [[0, 3, 0, 3], [0, 4, 0, 4], [3, 4, 0, 0], [0, 0, 5, 5], [4, 3, 4, 3], [5, 1, 0, 1], [0, 2, 3, 0], [0, 0, 0, 0]],      # giri dei MIDI soul (I-IV, I-V, IV-V-I-I, I-I-vi-vi, V-IV-V-IV, vi-ii-I-ii, I-iii-IV-I, vamp)
+                  'disco': [[5, 0, 5, 0], [5, 4, 3, 4], [2, 1, 2, 4], [0, 0, 0, 0], [4, 0, 4, 0], [5, 6, 0, 0], [5, 4, 3, 3]],      # vi-I, vi-V-IV-V (Bee Gees), III-ii-III-V (Get Down), vamp sulla tonica
+                  'reggae': [[0, 3, 0, 3], [0, 4, 3, 4], [0, 1, 4, 0], [0, 1, 3, 0], [3, 3, 4, 5], [0, 3, 4, 3], [0, 5, 3, 4], [0, 4, 5, 3]]}   # giri dei MIDI reggae analizzati (I-IV, I-V-IV-V, I-ii-V-I, I-ii-IV-I, IV-IV-V-vi)
 _L_MAJOR_CLOSE = [[0, 3, 4, 0], [0, 1, 4, 0], [3, 1, 4, 0]]      # giri che chiudono con la cadenza V-I (De Cia: l'armonizzazione conclude con V -> I)   # I-V-vi-IV, I-vi-IV-V, ...
 
 def _pick_loops(g, scale):
@@ -1840,12 +1857,15 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
 
         # CHORDS: stab (chords) o accordi lunghi (chordsl)
         c_steps, c_dur, c_vel = [], 0, 0
-        if 'chords' in layers: c_steps, c_dur, c_vel = [x + chord_off for x in gstarts if x + chord_off < L], q + q // 2, (65 + int(25 * ramp)) if roll_any else 80
+        if 'chords' in layers: c_steps, c_dur, c_vel = [x + chord_off for x in gstarts if x + chord_off < L and (not g.get('skank24') or x in (4, 12))], q + q // 2, (65 + int(25 * ramp)) if roll_any else 80
         elif 'chordsl' in layers: c_steps, c_dur, c_vel = [gstarts[0], gstarts[len(gstarts) // 2]], 2 * TICKS_BEAT - 20, 58
         cf = _fade(B, 'chords')
+        if g.get('skank_double') and 'chords' in layers: c_steps = sorted(set(c_steps + [x + 1 for x in c_steps if x + 1 < L]))
         for s in c_steps:
             if 'chords' in layers and not roll_any and random.random() > 0.85: continue
-            for pc in cpcs: _note(tracks['chords'], base + s * q, c_dur, _pc_pitch(pc, 55), int((c_vel + R(0, 8)) * cf), 3)
+            _dbl = bool(g.get('skank_double')) and s % 4 == 3
+            _sw8 = int(g.get('swing8', 0) * 4 * q) if s % 4 in (2, 3) else 0
+            for pc in cpcs: _note(tracks['chords'], base + s * q + _sw8, c_dur // 2 if _dbl else c_dur, _pc_pitch(pc, 55), int((c_vel + R(0, 8)) * cf * (0.75 if _dbl else 1.0)), 3)
 
         # ARP sulle note dell'accordo (arp = densita' del genere, arpl = meta')
         if 'arp' in layers or 'arpl' in layers:
