@@ -1077,14 +1077,14 @@ BPM_RANGES = {
     'armonico': [(60, 120)],
     'breakcore': [(170, 230)],
     'chiptune': [(112, 128)],
-    'commerciale_90s': [(105, 128), (125, 138)],      # secondo range: Eurodance (mediana ~131 bpm nel Lakh clean)
+    'commerciale_90s': [(105, 128), (125, 138), (130, 142)],      # 59 brani: mediana 130-133 BPM, un quinto sopra i 138      # secondo range: Eurodance (mediana ~131 bpm nel Lakh clean)
     'deep': [(118, 126)],
     'disco': [(108, 132)],
     'drone': [(60, 100)],
     'drum_n_bass': [(160, 180)],
     'dub_techno': [(112, 130)],
     'dubstep': [(138, 142)],
-    'edm_2000s': [(126, 130)],
+    'edm_2000s': [(126, 130), (128, 134)],      # house 2000s: 127-136 BPM
     'elettronico': [(95, 140)],
     'funk': [(95, 120)],
     'future_bass': [(140, 160)],
@@ -1092,7 +1092,7 @@ BPM_RANGES = {
     'hardstyle': [(145, 155)],
     'harsh_noise': [(60, 120)],
     'hip_hop': [(85, 100), (85, 100), (96, 114)],      # MIDI con rullante su 2 e 4: 88-114 BPM, mediana circa 100
-    'house_90s': [(118, 125), (118, 125), (118, 125), (126, 132)],      # un seed su quattro e' 'progressive': piu' veloce (nei pack progressive i tempi sono 128-140)
+    'house_90s': [(118, 125), (122, 128), (126, 132), (128, 134)],      # 21 brani house: 123-140 BPM, mediana 128 (sono per lo piu' 2000s: la fascia bassa resta quella dei 90s)      # un seed su quattro e' 'progressive': piu' veloce (nei pack progressive i tempi sono 128-140)
     'hyperpop': [(120, 170)],
     'idm': [(100, 140)],
     'industrial': [(110, 140)],
@@ -1114,9 +1114,9 @@ BPM_RANGES = {
     'soulful_house': [(120, 125)],
     'space_disco': [(110, 130)],
     'sperimentale': [(88, 132)],
-    'synthpop': [(111, 127)],
+    'synthpop': [(111, 127), (122, 135)],      # tempi dei brani (elenco): 115-135, mediana 128
     'synthwave': [(80, 110)],
-    'techno': [(123, 135), (123, 135), (136, 144)],      # 10 brani: 123-142 BPM, mediana circa 130
+    'techno': [(123, 135), (130, 140), (136, 146)],      # 23 brani: 123-155 BPM, mediana 135
     'trance': [(120, 150)],
     'trap': [(130, 150)],
     'trip_hop': [(70, 90)],
@@ -1134,7 +1134,7 @@ REGGAE_BACKBEAT = 0.20     # probabilita' (per seed) di kick+rullante su 2 e 4 (
 REGGAE_ROCKERS = 0.15      # rockers: kick su 1 e 3, rimshot sul 3
 REGGAE_STEPPERS = 0.15     # steppers: kick su tutti e quattro i quarti, rimshot sul 3
 REGGAE_SKANK24 = 0.25      # probabilita' (per seed) che lo skank cada sui battiti 2 e 4 invece che sul levare di ogni tempo (2 brani su 9 nei MIDI analizzati, e come dicono le guide)
-FIXED_KICK = {'jazz', 'hip_hop', 'soul', 'disco', 'dubstep', 'future_bass', 'jungle', 'reggae', 'reggaeton', 'uk_garage'}   # il kick e' identita' del genere
+FIXED_KICK = {'commerciale_90s', 'synthpop', 'jazz', 'hip_hop', 'soul', 'disco', 'dubstep', 'future_bass', 'jungle', 'reggae', 'reggaeton', 'uk_garage'}   # il kick e' identita' del genere
 BASS_FIXED = {'jazz', 'hip_hop', 'amapiano', 'hardstyle', 'jungle', 'psytrance', 'uk_garage'}   # il pattern di basso e' l'identita' del genere
 GHOST_FIXED = {'jungle', 'trip_hop', 'soul', 'hip_hop', 'funk', 'r&b'}   # i ghost snare sono identita' del genere (Amen: 8, 10, 16)
 
@@ -1202,8 +1202,9 @@ PATTERN_LIB = {
  'chiptune': {'hat': ['--x- --x- --x- --x-', 'x-x- x-x- x-x- x-x-'],
       'bass': ['x--- ---- x--- ----', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--- x---']},
  'commerciale_90s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
-      'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
-      'bass': ['x-x- x-x- x-x- x-x-', 'x--x --x- x--x --x-', 'x-xx -x-x x-xx -x-x']},
+      'kick': ['x--- x--- x--- x---'] * 7 + ['x--- ---- x--- ----'],      # 59 brani eurodance/dance-pop: kick a quattro quarti nell'86%, su 1 e 3 nel 12%
+      'hat': ['x-x- x-x- x-x- x-x-'] * 2 + ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', 'xxx- xxx- xxx- xxx-', '--X- --X- --X- --X-'],      # ottavi nella meta' dei brani, sedicesimi in un terzo, levare in pochi
+      'bass': ['x-x- x-x- x-x- x-x-', 'x--x --x- x--x --x-', 'x-xx -x-x x-xx -x-x', 'x-xx x-xx x-xx x-xx', '--x- --x- --x- --x-', 'x--- --x- x--- --x-']},      # pattern di basso piu' frequenti nei brani
  'deep': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---'],
       'hat': ['x-X- x-X- x-X- x-X-', 'xgXg xgXg xgXg xgXg', 'x-Xg x-Xg x-Xg x-Xg'],
       'bass': ['x--- --x- ---- --x-', 'x--x --x- --x- -x--', 'x-x- ---x --x- x---', 'x--- -x-- --x- x--x']},
@@ -1223,7 +1224,7 @@ PATTERN_LIB = {
       'bass': ['x--- ---- x--- ----', 'x--- --x- x--- ----', 'x--- ---- x--x ----', 'x--x ---- x--- ----']},
  'edm_2000s': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
       'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
-      'bass': ['--x- --x- --x- --x-', 'x-x- x-x- x-x- x-x-', '-xx- -xx- -xx- -xx-', 'xxxx xxxx xxxx xxxx']},
+      'bass': ['--x- --x- --x- --x-', 'x-x- x-x- x-x- x-x-', '-xx- -xx- -xx- -xx-', 'xxxx xxxx xxxx xxxx', 'x--x --x- x--x --x-', 'x-x- x--x --x- x-x-', 'x--- x-x- x-x- ----', 'x-x- x-xx x-x- x-x-']},
  'elettronico': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
       'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-'],
       'bass': ['x--x --x- x--x --x-', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--x -x--']},
@@ -1248,7 +1249,8 @@ PATTERN_LIB = {
       'hat': ['x-x- x-x- x-x- x-x-'] * 4 + ['x-x- xgxg x-x- xgxg', 'xgxg xgxg xgxg xgxg'],      # ottavi in 6 brani su 10 con hi-hat, sedicesimi negli altri
       'bass': ['x--- ---- ---- ----'] * 2 + ['x--- ---- ---- x---', 'x--- ---- x--- ----', 'x--- ---- x--- --x-', 'x-x- x-x- x-x- x-x-']},      # basso rado: mediana 2 note per battuta nei MIDI
  'house_90s': {'hat': ['--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
-      'bass': ['--x- --x- --x- --x-', '--x- --x- --xx --x-', 'x-x- --x- --x- x---'],
+      'bass': ['--x- --x- --x- --x-', '--x- --x- --xx --x-', 'x-x- --x- --x- x---',
+               'x--x --x- x--x --x-', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--- x---', 'x-x- x--x --x- x-x-', 'x--- x-x- x-x- ----'],      # ultimi 5: basso dei MIDI house (20 brani, mediana 6 note per battuta)
       'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- x--x ---- x---']},
  'hyperpop': {'kick': ['x--- ---- x--- ----', 'x-x- --x- x--x ----', 'x--x --x- --x- x-x-', 'x-x- x--- --x- -x-x', 'x--- -x-x x--x ----'],
       'hat': ['xxxx x-xx xxx- xxxx', 'x-xx -xxx x-x- xxxx', 'xgxx xgxg xxxg xxgx'],
@@ -1298,14 +1300,15 @@ PATTERN_LIB = {
       'hat': ['x-x- -xx- x--x -x--', 'xxxx ---- xxxx ----', 'x-xx -x-x x-x- xx--'],
       'bass': ['x--- x--x ---x ----', 'x-x- ---- x--x -x--']},
  'synthpop': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
+      'kick': ['x--- x--- x--- x---'] * 3 + ['x--- ---- x--- ----'] * 4,      # 7 brani synth pop anni 80: 3 con kick a quattro quarti, 4 solo su 1 e 3
       'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', 'x-x- x-x- x-x- x-x-'],
       'bass': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x--x x--x x--x x--x']},
  'synthwave': {'hat': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x-X- x-X- x-X- x-X-'],
       'bass': ['xxxx xxxx xxxx xxxx', 'x-x- x-x- x-x- x-x-', 'x-xx x-xx x-xx x-xx'],
       'snare': ['---- x--- ---- x---', '---- x--- ---- x--x']},
- 'techno': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- ---- ---- x---'],
-      'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-', '-xXx -xXx -xXx -xXx'],
-      'bass': ['-xxx -xxx -xxx -xxx', '-x-x -x-x -x-x -x-x',
+ 'techno': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x', '---- ---- ---- ----', '---- ---- ---- ----', '---- ---- ---- ----'],      # 3 varianti su 5 senza clap: 11 brani techno su 16 non hanno clap ne' rullante
+      'hat': ['x-x- x-x- x-x- x-x-'] * 2 + ['x-X- x-X- x-X- x-X-'] * 2 + ['--X- --X- --X- --X-'] * 2 + ['xxXx xxXx xxXx xxXx', 'xxx- xxx- xxx- xxx-'],      # techno puro: ottavi in 8 brani su 16, levare 3, sedicesimi 4
+      'bass': ['-xxx -xxx -xxx -xxx', '-x-x -x-x -x-x -x-x', '--x- --x- --x- --x-', 'x-x- x-x- xxx- x-x-', 'xxx- xxxx xxx- x-x-', 'x-xx xxxx x-xx x-xx',
                'x-xx -x-x x-xx -x-x', 'x--x x-x- xx-x x---', 'x-x- x-x- x-x- x-x-', 'x--- x--- x--- x---', 'x--- ---- ---- ----']},
  'trance': {'snare': ['---- x--- ---- x---', '---- x--- ---- x--x'],
       'hat': ['xxXx xxXx xxXx xxXx', '--X- --X- --X- --X-', 'x-X- x-X- x-X- x-X-'],
@@ -1372,6 +1375,7 @@ def vary_genre(g, seed, name=None):
         bass = _mutate(bass, rs, {0}, [2, 3, 6, 7, 10, 11, 14, 15], 0.15 if four else 0.3, 0.1 if four else 0.15, 0.2 if four else 0.35, 1 if four else 2)
     hat = _vary_hat(hat_src, rs, groove, 0.10 if four else 0.2) if any(g['hat']) else list(g['hat'])
     g2.update(kick=kick, snare=snare, clap=clap, ghost=ghost, bass=bass, hat=hat)
+    if (name or g.get('_name')) == 'techno': g2['open_voicing'] = rs.random() < 0.5      # 5 brani techno su 9 con accordi hanno voicing aperto (estensione 18-47 semitoni)
     if (name or g.get('_name')) == 'jazz':
         g2['swing8'] = 0 if _jfusion else rs.choice([0.16, 0.16, 0.16, 0.16, 0.11])      # swing: levare in terzine (0,63-0,75 nei brani acustici); fusion/smooth: ottavi dritti
         if _jfusion: g2.update(hat_note=GM_HAT_CLOSED, kick_scale=1.0, pedal_hat=False, ghost=[0] * 16, clap=[0] * 16)
@@ -1895,7 +1899,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         # PAD: accordo lungo
         if 'pad' in layers:
             pad_vel = int(((62 if energy else 52) + (int(15 * ramp) if roll_any else 0)) * _fade(B, 'pad'))
-            if g.get('open_pad'):       # voicing aperto: fondamentale e quinta in basso, terza/settima/nona sopra (pack Deep House: nota piu bassa 53, piu alta 69)
+            if g.get('open_pad') or g.get('open_voicing'):       # voicing aperto: fondamentale e quinta in basso, terza/settima/nona sopra (pack Deep House: nota piu bassa 53, piu alta 69)
                 _pps = [_pc_pitch(cpcs[0], 48), _pc_pitch(cpcs[2], 48)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]
             else: _pps = [_pc_pitch(pc, 48) for pc in cpcs]
             for _pp in _pps: _note(tracks['pad'], base, bt - 10, _pp, pad_vel, 2)
@@ -1910,7 +1914,8 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             if 'chords' in layers and not roll_any and random.random() > 0.85: continue
             _dbl = bool(g.get('skank_double')) and s % 4 == 3
             _sw8 = int(g.get('swing8', 0) * 4 * q) if s % 4 in (2, 3) else 0
-            for pc in cpcs: _note(tracks['chords'], base + s * q + _sw8, c_dur // 2 if _dbl else c_dur, _pc_pitch(pc, 55), int((c_vel + R(0, 8)) * cf * (0.75 if _dbl else 1.0)), 3)
+            _cvs = ([_pc_pitch(cpcs[0], 43), _pc_pitch(cpcs[2], 55)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]) if g.get('open_voicing') else [_pc_pitch(pc, 55) for pc in cpcs]      # aperto: fondamentale giu', terza/settima su
+            for _pv in _cvs: _note(tracks['chords'], base + s * q + _sw8, c_dur // 2 if _dbl else c_dur, _pv, int((c_vel + R(0, 8)) * cf * (0.75 if _dbl else 1.0)), 3)
 
         # ARP sulle note dell'accordo (arp = densita' del genere, arpl = meta')
         if 'arp' in layers or 'arpl' in layers:
