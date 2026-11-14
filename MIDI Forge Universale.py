@@ -947,6 +947,9 @@ def _mel_template(k=16):
         out.append(sign * random.choices([0, 1, 2], weights=[1, 7, 2])[0])
     return out
 
+MOTIF_REPLAY = {0}       # varianti di battuta che riusano il motivo realizzato (0 = battuta di motivo; con 1 e 2 il recupero dei salti ampi scende di circa 7 punti)
+MOTIF_PHRASE_REUSE = True      # la frase dispari riparte dal motivo della precedente
+
 # Gradi "attivi" (2, 4, 6, 7) e loro risoluzione sul grado inattivo piu' vicino (Goetschius, Exercises in Melody-Writing, par. 4-6)
 _ACTIVE_RES = {6: 1, 5: -1, 3: -1, 1: -1}
 
@@ -960,13 +963,14 @@ def _melody_bar(positions, strong, ct, root_deg, n, st, variant):
     cts = [k for k in range(lo, hi + 1) if k % n in ct] or [0]
     tonic = [k for k in cts if k % n in (0, 2, 4)] or cts          # note della triade di tonica contenute nell'accordo
     near = lambda x, pool=cts: min(pool, key=lambda c: (abs(c - x), c))
+    first_of_phrase = st.get('phrase_start', False)
     tpl = st.get('tpl') or _mel_template()
+    if st.get('real') and not first_of_phrase and variant in MOTIF_REPLAY: tpl = st['real']        # il motivo gia' realizzato nella frase ritorna riconoscibile (stessi passi), adattato all'accordo (DeSantis, Variazione 1-3)
     if variant == 1: tpl = [-t if random.random() < 0.3 else t for t in tpl]
     elif variant == 2: tpl = list(reversed(tpl))
     prev_end = st.get('cur')
     cur = near(prev_end if prev_end is not None else n // 2)
     mv = st.get('mv', 0)
-    first_of_phrase = st.get('phrase_start', False)
     out = {}
     for i, s_ in enumerate(positions):
         step = tpl[i % len(tpl)]
@@ -989,6 +993,8 @@ def _melody_bar(positions, strong, ct, root_deg, n, st, variant):
             cand = [fin - 1, fin + 1]
             dom = [c for c in cand if lo <= c <= hi and c % n in (4, 6, 1)]
             if positions[-2] not in strong: out[positions[-2]] = (dom or [c for c in cand if lo <= c <= hi] or [fin])[0]
+    if first_of_phrase and len(positions) > 1:                                              # motivo realizzato dalla prima battuta della frase: passi tra note successive
+        seq = [out[s_] for s_ in positions]; st['real'] = [0] + [seq[i] - seq[i - 1] for i in range(1, len(seq))]
     st['cur'], st['mv'] = cur, mv
     return out
 
@@ -1637,7 +1643,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
             elif op == 'invert': motif = list(reversed(motif)); m_cur = motif
             else: m_cur = [None if random.random() < 0.3 else x for x in motif]
         if not remix:       # melodia sul basso del momento: gradi congiunti e nota dell'accordo sui tempi forti, chiusura sulla fondamentale
-            if bar % 4 == 0: mel_st['tpl'] = _mel_template(); mel_st['phrase_start'] = True
+            if bar % 4 == 0: mel_st['tpl'] = list(mel_st['real']) if (MOTIF_PHRASE_REUSE and (bar // 4) % 2 == 1 and mel_st.get('real')) else _mel_template(); mel_st['phrase_start'] = True
             bd = bass_prog[bar % 4] % n
             mel = _melody_bar([s_ for s_ in range(L) if m_cur[pi[s_]] is not None], gst | set(range(0, L, 4)), {bd, (bd + 2) % n, (bd + 4) % n}, bd, n, mel_st,
                               0 if bar % 4 < 2 else (1 if bar % 4 == 2 else 2))
@@ -1919,7 +1925,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
                 elif op == 'invert': lead_base = list(reversed(lead_base)); blk = lead_base
                 else: blk = _thin(lead_base, 0.3)
             lead_q, lead_a = _question(blk, n), _answer(blk)      # frase di 4 battute: domanda, domanda, domanda variata, risposta
-            mel_st['tpl'] = _mel_template()                        # nuovo contorno melodico per la frase
+            mel_st['tpl'] = list(mel_st['real']) if (MOTIF_PHRASE_REUSE and (bar // 4) % 2 == 1 and mel_st.get('real')) else _mel_template()      # frase pari: nuovo contorno; frase dispari: torna il motivo della precedente (A A')
             mel_st['phrase_start'] = True
         lead = lead_a if bar % 4 == 3 else (_thin(lead_q) if bar % 4 == 2 else lead_q)
         d = (prog_a if (bar // 4) % 2 == 0 else prog_b)[bar % 4]
