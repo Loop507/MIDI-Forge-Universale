@@ -1844,6 +1844,26 @@ _L_MAJOR_GENRE = {'jazz': [[1, 4, 0, 5], [0, 5, 1, 4], [2, 5, 1, 4], [1, 4, 0, 3
                   'reggae': [[0, 3, 0, 3], [0, 4, 3, 4], [0, 1, 4, 0], [0, 1, 3, 0], [3, 3, 4, 5], [0, 3, 4, 3], [0, 5, 3, 4], [0, 4, 5, 3]]}   # giri dei MIDI reggae analizzati (I-IV, I-V-IV-V, I-ii-V-I, I-ii-IV-I, IV-IV-V-vi)
 _L_MAJOR_CLOSE = [[0, 3, 4, 0], [0, 1, 4, 0], [3, 1, 4, 0]]      # giri che chiudono con la cadenza V-I (De Cia: l'armonizzazione conclude con V -> I)   # I-V-vi-IV, I-vi-IV-V, ...
 
+# Voice leading (DeSantis "Voice Leading and Inversions"; RedBow pp. 13-14): di ogni accordo si sceglie l'inversione (ottava di ogni nota) che sposta meno le voci rispetto all'accordo
+# precedente, tenendo ferme le note comuni; l'accordo resta in una finestra di registro e di ampiezza limitata. Nessuna scelta casuale: il resto della generazione non cambia.
+VL_DRIFT = 1.5        # peso dello scostamento del centro dell'accordo dal registro d'origine (semitoni di movimento per semitono di deriva)
+VL_SPAN_MAX = 14       # ampiezza massima dell'accordo in semitoni
+VL_WIN = (-4, 17)      # finestra di registro rispetto a lo: [lo-4, lo+17)
+
+def _vl_voice(prev, pcs, lo):
+    """Altezze dell'accordo (classi di altezza pcs) con minimo spostamento da prev (lista di altezze ordinate, o None). Senza prev: impilato in [lo, lo+12) come prima."""
+    base = [_pc_pitch(pc, lo) for pc in pcs]
+    if not prev or len(prev) != len(pcs): return base
+    import itertools
+    opts = [[p for p in range(lo + VL_WIN[0], lo + VL_WIN[1]) if p % 12 == pc % 12] for pc in pcs]
+    best = None
+    for combo in itertools.product(*opts):
+        srt = sorted(combo)
+        if len(set(srt)) < len(srt) or srt[-1] - srt[0] > VL_SPAN_MAX: continue
+        key = (sum(abs(a - b) for a, b in zip(srt, prev)) + VL_DRIFT * abs(sum(srt) / len(srt) - (lo + 6)), srt[-1] - srt[0])      # penalita' di deriva: l'accordo resta vicino al registro d'origine
+        if best is None or key < best[0]: best = (key, list(combo))
+    return best[1] if best else base
+
 def _pick_loops(g, scale):
     """Due giri (A e B) tipici del genere; se la scala ha la terza maggiore si usano giri da modo maggiore."""
     major = 4 in scale[:3]
@@ -1883,6 +1903,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     trip_n, trip_mot = 6, None
     arp_mode, R = 'up', random.randint
     mel_st = {'cur': None, 'tpl': _mel_template()}
+    vl_prev = {}
 
     for bar, B in enumerate(secmap):
         layers, idx, length, prev = B['layers'], B['idx'], B['length'], B['prev']
@@ -1927,7 +1948,8 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             pad_vel = int(((62 if energy else 52) + (int(15 * ramp) if roll_any else 0)) * _fade(B, 'pad'))
             if g.get('open_pad') or g.get('open_voicing'):       # voicing aperto: fondamentale e quinta in basso, terza/settima/nona sopra (pack Deep House: nota piu bassa 53, piu alta 69)
                 _pps = [_pc_pitch(cpcs[0], 48), _pc_pitch(cpcs[2], 48)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]
-            else: _pps = [_pc_pitch(pc, 48) for pc in cpcs]
+            else:
+                _pps = _vl_voice(vl_prev.get('pad'), cpcs, 48); vl_prev['pad'] = sorted(_pps)
             for _pp in _pps: _note(tracks['pad'], base, bt - 10, _pp, pad_vel, 2)
 
         # CHORDS: stab (chords) o accordi lunghi (chordsl)
@@ -1935,12 +1957,14 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         if 'chords' in layers: c_steps, c_dur, c_vel = [x + chord_off for x in gstarts if x + chord_off < L and (not g.get('skank24') or x in (4, 12))], q + q // 2, (65 + int(25 * ramp)) if roll_any else 80
         elif 'chordsl' in layers: c_steps, c_dur, c_vel = [gstarts[0], gstarts[len(gstarts) // 2]], 2 * TICKS_BEAT - 20, 58
         cf = _fade(B, 'chords')
+        _cv_vl = None
+        if c_steps and not g.get('open_voicing'): _cv_vl = _vl_voice(vl_prev.get('chords'), cpcs, 55); vl_prev['chords'] = sorted(_cv_vl)
         if g.get('skank_double') and 'chords' in layers: c_steps = sorted(set(c_steps + [x + 1 for x in c_steps if x + 1 < L]))
         for s in c_steps:
             if 'chords' in layers and not roll_any and random.random() > 0.85: continue
             _dbl = bool(g.get('skank_double')) and s % 4 == 3
             _sw8 = int(g.get('swing8', 0) * 4 * q) if s % 4 in (2, 3) else 0
-            _cvs = ([_pc_pitch(cpcs[0], 43), _pc_pitch(cpcs[2], 55)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]) if g.get('open_voicing') else [_pc_pitch(pc, 55) for pc in cpcs]      # aperto: fondamentale giu', terza/settima su
+            _cvs = ([_pc_pitch(cpcs[0], 43), _pc_pitch(cpcs[2], 55)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]) if g.get('open_voicing') else (_cv_vl or [_pc_pitch(pc, 55) for pc in cpcs])      # aperto: fondamentale giu', terza/settima su
             for _pv in _cvs: _note(tracks['chords'], base + s * q + _sw8, c_dur // 2 if _dbl else c_dur, _pv, int((c_vel + R(0, 8)) * cf * (0.75 if _dbl else 1.0)), 3)
 
         # ARP sulle note dell'accordo (arp = densita' del genere, arpl = meta')
