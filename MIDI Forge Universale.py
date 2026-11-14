@@ -52,7 +52,7 @@ GENRES = {
     'psytrance': {'bpm_default': 145, 'bars_default': 224, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0]*16, 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [0,1,1,1, 0,1,1,1, 0,1,1,1, 0,1,1,1], 'ghost': [0]*16, 'arp_density': 0.8, 'swing': 0.0},
     'r&b': {'bpm_default': 95, 'bars_default': 76, 'kick': [1,0,0,0, 0,0,1,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,1, 0,0,0,0, 0,0,0,0], 'arp_density': 0.55, 'swing': 0.2, 'lazy': 0.12},
     'reggae': {'bpm_default': 76, 'bars_default': 68, 'kick': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0]*16, 'hat': [3,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,1, 1,0,0,0, 1,0,0,1, 1,0,0,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.03, 'lazy': 0.1, 'chord_off': 2, 'snare_note': 37},
-    'reggaeton': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,1,0, 0,1,0,0, 0,0,1,0, 0,1,0,0], 'clap': [0]*16, 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.0},
+    'reggaeton': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,1, 0,0,1,0, 0,0,0,1, 0,0,1,0], 'clap': [0]*16, 'hat': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.5, 'swing': 0.0},
     'jazz': {'bpm_default': 140, 'bars_default': 80, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0]*16, 'hat': [1,0,0,0, 1,0,2,0, 1,0,0,0, 1,0,2,0], 'bass': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'ghost': [0,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.3, 'swing': 0.0, 'lazy': 0.05, 'chord_off': 0, 'hat_note': 51, 'kick_scale': 0.45, 'pedal_hat': True},
     'soul': {'bpm_default': 95, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,1,0], 'ghost': [0,0,0,0, 0,0,0,0, 0,0,1,0, 0,0,0,0], 'arp_density': 0.6, 'swing': 0.25, 'lazy': 0.08, 'chord_off': 0},
     'soulful_house': {'bpm_default': 123, 'bars_default': 128, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,2,3, 1,3,2,3, 1,3,2,3, 1,3,2,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.15},
@@ -1281,7 +1281,7 @@ PATTERN_LIB = {
  'reggae': {'hat': ['g-X- g-X- g-X- g-X-'] * 2 + ['x-X- x-X- x-X- x-X-'] * 2 + ['g-x- x-x- x-x- x-x-', 'g-X- x-X- g-X- x-Xg'],      # accento sulle 'e' (il levare): nei MIDI l'hi-hat e' piu' forte sul levare in 6 brani su 10
       'bass': ['x--- ---- x--- ----', 'x--x ---- x--x ----', '---- --x- x--x --x-', 'x--- --x- x--- -x--',
               'x-x- x--- ---- xxx-', 'x-x- x--- --x- x---', 'x--x -xx- --x- xx--', 'x--x ---x x--x x--x']},      # ultimi 4: pattern di basso ricavati da MIDI di Marley/UB40
- 'reggaeton': {'hat': ['x-x- x-x- x-x- x-x-', '--x- --x- --x- --x-', 'x-xx x-xx x-xx x-xx', 'x-x- x-xx x-x- x-xx'],
+ 'reggaeton': {'hat': ['x-x- x-x- x-x- x-x-', '--x- --x- --x- --x-', 'x-xx x-xx x-xx x-xx', 'x-x- x-xx x-x- x-xx', 'x--x x-x- x--x x-x-'],      # ultimo: hi-hat che segue il dembow (Gasolina)
       'bass': ['x--x --x- x--- ----', 'x--x --x- x--x --x-', 'x--- --x- x--x ----']},
  'jazz': {'kick': ['x--- x--- x--- x---'] * 3 + ['x--- ---- ---- ----', 'x--- ---- --x- ----'],      # kick leggero sui quarti (feathering) o rado
       'hat': ['x--- x-X- x--- x-X-'] * 3 + ['x--- x-X- x-x- x-X-'],                                  # ride 'spang-a-lang': quarti + il levare del 2 e del 4 (in swing)
@@ -1300,7 +1300,7 @@ PATTERN_LIB = {
       'hat': ['x-x- -xx- x--x -x--', 'xxxx ---- xxxx ----', 'x-xx -x-x x-x- xx--'],
       'bass': ['x--- x--x ---x ----', 'x-x- ---- x--x -x--']},
  'synthpop': {'clap': ['---- x--- ---- x---', '---- x--- ---- x--x'],
-      'kick': ['x--- x--- x--- x---'] * 3 + ['x--- ---- x--- ----'] * 4,      # 7 brani synth pop anni 80: 3 con kick a quattro quarti, 4 solo su 1 e 3
+      'kick': ['x--- x--- x--- x---'] * 7 + ['x--- ---- x--- ----'] * 4,      # 11 brani synth pop: 7 con kick a quattro quarti, 4 solo su 1 e 3
       'hat': ['x-X- x-X- x-X- x-X-', 'xxXx xxXx xxXx xxXx', 'x-x- x-x- x-x- x-x-'],
       'bass': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x--x x--x x--x x--x']},
  'synthwave': {'hat': ['x-x- x-x- x-x- x-x-', 'xxxx xxxx xxxx xxxx', 'x-X- x-X- x-X- x-X-'],
@@ -1552,6 +1552,31 @@ def _pool_at(pools, first, last, ob):
         b = b - 1 if b > first else last
     return ob, []
 
+# Basso e kick come composito (DeSantis, "Bass Lines and Kick Drums as a Single Composite"): il basso ritmico non resta acceso sopra un colpo di kick che non e' il suo attacco,
+# cosi' il low-end e' una sola linea pulita. Stili con note lunghe per natura (808, sub, reese, walking) restano liberi. Regola scelta senza dati di sovrapposizione reali (nei MIDI dell'utente ci sono solo le distribuzioni, non l'incrocio kick-basso).
+BK_FREE_STYLES = {'long', 'reese', 'dubsub', 'wobble', 'logdrum', 'walk'}
+BK_GAP = 10          # tick di silenzio tra la fine del basso e il kick
+BK_MIN_BODY = 30     # un kick entro questi tick dall'attacco del basso e' considerato simultaneo (la nota non si taglia)
+
+def _bass_kick_composite(g, tracks, key):
+    """Accorcia le note di tracks[key] che attraversano un kick (solo per i generi con regola stretta). Ritorna il numero di note accorciate."""
+    if g.get('bass_style') in BK_FREE_STYLES or not tracks.get(key) or not tracks.get('drums'): return 0
+    kicks = sorted(e['tick'] for e in tracks['drums'] if e['type'] == 'on' and e['pitch'] == GM_KICK)
+    if not kicks: return 0
+    import bisect
+    open_on, cut = {}, 0
+    for e in sorted(tracks[key], key=lambda x: (x['tick'], x['type'] != 'off')):
+        k = (e.get('channel', 0), e['pitch'])
+        if e['type'] == 'on': open_on.setdefault(k, []).append(e['tick']); continue
+        lst = open_on.get(k)
+        if not lst: continue
+        start = lst.pop(0)
+        i = bisect.bisect_right(kicks, start + BK_MIN_BODY)
+        if i < len(kicks) and kicks[i] < e['tick']:
+            e['tick'] = max(start + 1, kicks[i] - BK_GAP); cut += 1
+    return cut
+
+
 def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
     """extract  = REMIX: riarrangia il MIDI originale (stesse armonie/melodia) sul groove del genere.
        generate = NUOVO TEMA: compone basso e motivo nuovi usando le note (pesate) del MIDI originale.
@@ -1652,6 +1677,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
                 _note(tracks['arp'], tick + sw, mel_dur.get(s, 1) * q - 20, _deg_pitch(root, scale, dg, arp_base), av, 1)
 
     tr_ = {k: v for k, v in tracks.items() if v}
+    _bass_kick_composite(g, tr_, 'bass')
     if g.get('free_time'): _free_time(tr_, g['free_time'])
     if g.get('human') and g.get('humanize', True): _humanize(tr_, g['human'], seed)
     return tr_, root, scale
@@ -1992,6 +2018,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
         _add_reese(g, tracks)
     drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
+    if submode != 'faithful': _bass_kick_composite(g, tracks, 'bassline')      # il basso fedele resta quello del MIDI caricato
     tracks = {k: v for k, v in tracks.items() if v}
     if g.get('free_time'): _free_time(tracks, g['free_time'])
     if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
@@ -2012,6 +2039,7 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     _add_reese(g, tracks)
     drums = build_drum_events(g, secmap, bm)
     if drums: tracks['drums'] = drums
+    _bass_kick_composite(g, tracks, 'bassline')
     tracks = {k: v for k, v in tracks.items() if v}
     if g.get('free_time'): _free_time(tracks, g['free_time'])
     if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
@@ -2982,7 +3010,7 @@ def build_midi_file(tracks, bpm, mode, submode, headers=None, label=None, key_na
     return buf
 
 def _style_line(g):
-    return f"   Basso: {g.get('bass_style') or 'standard'} | accordi: settima {g.get('seventh', 0.35):.0%}, nona {g.get('ninth', 0.0):.0%} dei brani"
+    return f"   Basso: {g.get('bass_style') or 'standard'} ({'libero sul kick' if g.get('bass_style') in BK_FREE_STYLES else 'tagliato prima di ogni kick'}) | accordi: settima {g.get('seventh', 0.35):.0%}, nona {g.get('ninth', 0.0):.0%} dei brani"
 
 def _meter_line(meter_plan):
     if not meter_plan: return "   4/4 (tutto il brano)"
