@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import mido
-import random
+import random, zlib
 import io
 import json
 import re
@@ -15,8 +15,8 @@ st.set_page_config(page_title="MIDI Forge Universale", page_icon="🎛️", layo
 # ================= DATABASE DEI GENERI =================
 GENRES = {
     'acid': {'bpm_default': 135, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,1, 0,1,0,1, 1,0,1,0, 1,1,0,1], 'arp_density': 0.85, 'swing': 0.0},
-    'afro_house': {'bpm_default': 122, 'bars_default': 96, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.08},
-    'amapiano': {'bpm_default': 112, 'bars_default': 96, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,1,1,0, 0,0,1,0, 0,1,0,0], 'ghost': [0]*16, 'arp_density': 0.25, 'swing': 0.16},
+    'afro_house': {'bpm_default': 122, 'bars_default': 192, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.08},
+    'amapiano': {'bpm_default': 112, 'bars_default': 192, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,1,1,0, 0,0,1,0, 0,1,0,0], 'ghost': [0]*16, 'arp_density': 0.25, 'swing': 0.16},
     'ambient': {'bpm_default': 80, 'bars_default': 124, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0},
     'armonico': {'bpm_default': 100, 'bars_default': 60, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,0, 0,0,1,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.7, 'swing': 0.1},
     'breakcore': {'bpm_default': 200, 'bars_default': 52, 'kick': [1,0,0,1, 0,1,0,0, 1,0,1,0, 0,0,1,0], 'snare': [0,0,1,0, 1,0,0,1, 0,1,0,0, 1,0,0,1], 'hat': [1]*16, 'bass': [1,0,0,1, 0,0,1,0, 1,0,0,0, 0,1,0,1], 'arp_density': 0.8, 'swing': 0.05, 'meter': ['7/8', '7/8', '4/4', '13/8']},
@@ -192,18 +192,18 @@ TIMELINES = {
           ('Build-up', 16, 'hat pad bassl roll'),
           ('Drop / Main 2', 32, 'kick hat clap open perc pad bass fill'),
           ('Outro', 32, 'kick hat')],
- 'afro_house': [('Intro DJ', 16, 'kick hat perc'),
-          ('Groove', 16, 'kick hat clap open perc bass'),
-          ('Main 1', 16, 'kick hat clap open perc bass pad chords lead'),
-          ('Breakdown', 8, 'perc lead'),
-          ('Main 2', 24, 'kick hat clap open perc bass pad chords arp lead fill'),
-          ('Outro', 16, 'kick hat perc')],
- 'amapiano': [('Intro percussiva', 16, 'hat perc bassl'),
-          ('Groove base', 16, 'kick hat perc bass'),
-          ('Primo picco', 16, 'kick hat clap perc bass pad chords lead'),
-          ('Sezione calma', 16, 'hat perc pad'),
-          ('Secondo picco', 16, 'kick hat clap open perc bass pad chords arp lead fill'),
-          ('Outro', 16, 'kick hat perc')],
+ 'afro_house': [('Intro progressiva', 32, 'hat perc pad chordsl'),                 # scheda Afro House: intro con pad, Rhodes e percussioni leggere, il kick entra dopo
+          ('Build-up', 32, 'kick hat perc bass pad chordsl'),
+          ('Peak / Main 1', 32, 'kick hat clap open perc bass pad chords lead'),
+          ('Breakdown', 16, 'perc pad chords lead'),
+          ('Main 2 / Secondo drop', 48, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 32, 'kick hat perc pad')],
+ 'amapiano': [('Intro atmosferica', 32, 'hat perc pad chordsl bassl'),               # scheda Amapiano: intro atmosferica con accordi, shaker e log drum lontano
+          ('Build', 32, 'kick hat perc bassl pad chords'),
+          ('Groove principale', 48, 'kick hat clap perc bass pad chords lead'),
+          ('Bridge', 32, 'hat perc pad chords leadl'),                                 # percussioni ridotte, accordi in evidenza
+          ('Secondo picco', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro', 16, 'hat perc bassl pad')],
  'ambient': [('Fade in', 32, 'pad'),
           ('Evoluzione 1', 32, 'pad chordsl'),
           ('Trasformazione', 32, 'chordsl leadl'),
@@ -560,7 +560,7 @@ GENRE_STYLE = {
         ('conga',  [64]*4 + [63]*3 + [62]*3, [1,.17,0,1, .67,.33,1,.33, .33,0,.67,.67, 0,.33,1,0], (70, 112), (8, 10)),
         ('bongo',  [60, 60, 61], [0,.17,.33,0, 0,.5,0,.33, 0,.67,0,.33, 0,.04,.04,.04], (66, 96), (17, 9)),
         ('tom',    [45, 47], [0,0,.17,0, 0,0,0,.17, 0,0,0,0, 0,.21,.08,.08], (86, 108), (13, 10)),
-        ('bell',   [68, 68, 56, 56, 67], [0,.33,.67,0, 0,.33,.67,0, 0,.33,.67,0, 0,0,.67,0], (73, 78), (7, 10))]),
+        ('bell',   [68, 68, 56, 56, 67], [0,.33,.67,0, 0,.33,.67,0, 0,.33,.67,0, 0,0,.67,0], (73, 78), (7, 10))], lead_thin=0.7, lead_merge=0.6, lead_rest=4, lead_repeat=True),
     'amapiano': dict(seventh=0.6, ninth=0.2, bass_style='logdrum'),
     'armonico': dict(seventh=0.8, ninth=0.4, bass_style='walk'),
     'chiptune': dict(seventh=0.0, bass_style='rolling'),
@@ -570,7 +570,7 @@ GENRE_STYLE = {
     'drum_n_bass': dict(seventh=0.4, bass_style='reese'),
     'dub_techno': dict(seventh=0.9, ninth=0.2, bass_style='dubsub'),
     'dubstep': dict(seventh=0.2, bass_style='wobble'),
-    'edm_2000s': dict(seventh=0.0, bass_style='offbeat'),
+    'edm_2000s': dict(seventh=0.0, bass_style='offbeat', lead_thin=0.6, lead_merge=0.6, lead_rest=4, lead_repeat=True),
     'elettronico': dict(seventh=0.35),
     'funk': dict(seventh=0.9, ninth=0.3, bass_style='funk', ghost_p=0.4, ghost_vel=(18, 32)),      # ghost_p: probabilita' per posizione; ghost_vel: velocity 15-30% (scheda funk)
     'future_bass': dict(seventh=0.7, ninth=0.3, bass_style='long'),
@@ -580,7 +580,7 @@ GENRE_STYLE = {
     'hyperpop': dict(seventh=0.3),
     'industrial': dict(seventh=0.1, bass_style='rolling'),
     'jungle': dict(seventh=0.3, bass_style='rollacc'),
-    'minimal_techno': dict(seventh=0.2),
+    'minimal_techno': dict(seventh=0.2, lead_keep=8, lead_rest=4, lead_repeat=True),
     'musique_concrete': dict(seventh=0.3),
     'psytrance': dict(seventh=0.0, bass_style='rollacc'),
     'r&b': dict(seventh=0.95, ninth=0.5, bass_style='long'),
@@ -592,8 +592,8 @@ GENRE_STYLE = {
     'space_disco': dict(seventh=0.9, ninth=0.3, bass_style='fretless'),
     'synthpop': dict(seventh=0.15, bass_style='arp'),
     'synthwave': dict(seventh=0.4, bass_style='octave'),
-    'techno': dict(seventh=0.1, bass_style='rolling'),
-    'trance': dict(seventh=0.0, bass_style='offbeat'),
+    'techno': dict(seventh=0.1, bass_style='rolling', lead_keep=8, lead_rest=4, lead_repeat=True),
+    'trance': dict(seventh=0.0, bass_style='offbeat', lead_thin=0.7, lead_merge=0.6, lead_rest=4, lead_repeat=True),
     'trap': dict(seventh=0.3, bass_style='long', hat_roll=0.7),      # hat_roll: probabilita' di un roll di hi-hat nelle battute adatte
     'trip_hop': dict(seventh=0.8, ninth=0.3, bass_style='dubsub'),
     'uk_garage': dict(seventh=0.5, bass_style='long'),
@@ -929,13 +929,16 @@ _CORPUS_FAMILY = {'techno': 'Techno', 'minimal_techno': 'Techno', 'industrial': 
                   'soulful_house': 'Deep House', 'uk_garage': 'Deep House', 'trance': 'Trance', 'psytrance': 'Trance', 'edm_2000s': 'Trance',
                   'elettronico': 'Electro', 'acid': 'Electro', 'synthwave': 'Electro', 'space_disco': 'Electro'}
 
+LEAD_THIN_MIN_JUMP = 3       # si assorbono solo le note dei sedicesimi deboli che distano almeno 3 gradi dalla precedente (provato: cosi' la densita' cala senza aumentare i salti)
+
 def _corpus_bar(g, bar, n, ct, st):
     """Una battuta di melodia dal corpus: a ogni frase (4 battute) si scelgono due motivi (il secondo spesso e' il primo ripetuto);
     sui tempi forti la nota si sposta sulla nota dell'accordo piu' vicina. Ritorna [(step, grado_assoluto, durata)] oppure None."""
     pats = CORPUS.get(_CORPUS_FAMILY.get(g.get('_name')))
     if not pats: return None
     if bar % 4 == 0 or 'p1' not in st:
-        st['p1'] = random.choice(pats); st['p2'] = st['p1'] if random.random() < 0.4 else random.choice(pats)
+        if g.get('lead_repeat') and (bar // 4) % 2 == 1 and 'p1' in st: pass                     # frase dispari: tornano i motivi della frase precedente (A A')
+        else: st['p1'] = random.choice(pats); st['p2'] = st['p1'] if random.random() < 0.4 else random.choice(pats)
     pat, off = (st['p1'] if bar % 4 < 2 else st['p2']), 16 * (bar % 2)
     cts = [k for k in range(-n, 2 * n + 1) if k % n in ct]
     out = []
@@ -944,6 +947,33 @@ def _corpus_bar(g, bar, n, ct, st):
         dg = deg + n * octv
         if (s_ - off) % 4 == 0 and dg % n not in ct: dg = min(cts, key=lambda c: (abs(c - dg), c))
         out.append((s_ - off, dg, du))
+    # Respiro e note lunghe (scheda Trance/Afro House: il lead e' la voce che emerge, non un flusso di sedicesimi; MIDI Notebin: 3-4 note per battuta, con pause, motivo che ritorna).
+    # Le trasformazioni usano un generatore deterministico legato al motivo e alla posizione, cosi' lo stesso motivo ritorna con la stessa forma e non consumano numeri casuali.
+    thin, pm, pr = g.get('lead_thin', 0), g.get('lead_merge', 0), g.get('lead_rest', 0)
+    if (thin or pm) and out:
+        rz = random.Random(zlib.crc32(repr((pat, off)).encode()))
+        mg = [list(out[0])]
+        for s_, dg, du in out[1:]:
+            l = mg[-1]
+            absorb = thin and s_ % 2 == 1 and l[0] + l[2] == s_ and l[2] + du <= 8 and rz.random() < thin and abs(dg - l[1]) >= LEAD_THIN_MIN_JUMP     # sedicesimo debole: la nota precedente si allunga
+            same = pm and l[1] == dg and l[0] + l[2] == s_ and l[2] + du <= 8 and rz.random() < pm                # nota ripetuta: si lega
+            if absorb or same: l[2] += du
+            else: mg.append([s_, dg, du])
+        out = [tuple(x) for x in mg]
+    lk = g.get('lead_keep', 0)
+    if lk and out:
+        # Lead ipnotico (guida Techno: monofonico e rado, 4-8 note in 4 battute; MIDI Notebin: 1,8 note per battuta, linea che si muove poco): restano le note sui tempi principali,
+        # ognuna si avvicina alla precedente scegliendo la nota d'accordo piu' vicina, e dura fino alla successiva (al massimo meta' battuta).
+        kept, prev = [x for x in out if x[0] % lk == 0], st.get('lk_prev')
+        rz2 = random.Random(zlib.crc32(repr((pat, off, 'k')).encode())); res = []
+        for s_, dg, du in kept:
+            if prev is not None and abs(dg - prev) > 2 and rz2.random() < 0.7: dg = min(cts, key=lambda c: (abs(c - prev), c))
+            res.append((s_, dg)); prev = dg
+        st['lk_prev'] = prev
+        out = [(s_, dg, min(8, (res[k + 1][0] if k + 1 < len(res) else 16) - s_)) for k, (s_, dg) in enumerate(res)]
+    if pr and bar % 2 == 1:
+        cut = 16 - (pr if bar % 4 == 3 else pr // 2)        # pausa a fine frase (4 battute) e piu' breve a fine di ogni coppia di battute
+        out = [(s_, dg, min(du, cut - s_)) for s_, dg, du in out if s_ < cut]
     return out
 
 def _mel_template(k=16):
