@@ -483,13 +483,16 @@ TIMELINES = {
           ('Verse 2', 16, 'kick hat clap bass pad arp leadl'),
           ('Bridge', 8, 'pad arp'),
           ('Chorus finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
- 'techno': [('Intro DJ', 32, 'kick hat'),
-          ('Build', 32, 'kick hat clap open bass'),
-          ('Main 1', 32, 'kick hat clap open perc bass chords arp'),
-          ('Breakdown', 16, 'pad'),
-          ('Build-up', 16, 'hat pad roll'),
-          ('Drop / Main 2', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
-          ('Outro', 32, 'kick hat')],
+ 'techno': [('Intro DJ', 32, 'kick hat'),                                          # guida Techno: blocchi da 16/32 battute; intro DJ-friendly, solo kick e hi-hat
+          ('Build-up 1', 16, 'kick hat perc bass'),                                 # layering graduale: entra la bassline con piu' percussioni
+          ('Build-up 2', 16, 'kick hat clap open perc bass chordsl'),               # poi il clap, l'open hat e uno stab di accordi
+          ('Main 1 / First Drop', 32, 'kick hat clap open perc bass chords arp'),   # groove completo
+          ('Breakdown', 16, 'perc pad leadl'),                                      # si toglie il kick (e il basso): restano pad, percussioni a tenere il polso e una melodia sottile
+          ('Build-up', 16, 'hat pad roll'),                                         # tensione prima del ritorno
+          ('Second Drop / Variation', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
+          ('Outro 1', 16, 'kick hat clap open perc bass'),                          # outro DJ-friendly a rimozione graduale: prima i synth
+          ('Outro 2', 8, 'kick hat open bass'),                                     # poi le percussioni
+          ('Outro 3', 8, 'kick hat')],                                              # infine il basso: restano kick e hi-hat per il mix out
  'trance': [('Intro lunga', 64, 'kick hat pad arpl'),
           ('Main 1', 32, 'kick hat clap open bass pad arpl lead'),
           ('Breakdown', 32, 'pad chordsl lead'),
@@ -632,9 +635,14 @@ DEFAULT_TIMELINE = _parse_timeline([
     ('Intro', 8, 'kick hat'), ('Break', 8, 'kick hat pad chordsl arpl bassl'), ('Build-up', 8, 'kick hat clap bass pad chords arp roll'),
     ('Drop', 24, 'kick hat clap open perc bass pad chords arp lead fill'), ('Break 2', 8, 'kick hat pad chordsl leadl bassl'), ('Outro', 8, 'kick hat')])
 
+BLOCK8_GENRES = ('techno',)      # generi la cui struttura varia col seed solo a blocchi da 8 battute (guida Techno: blocchi da 16/32 battute per il mix del DJ)
+_BLOCK8_SIGS = set()             # riempito dopo la costruzione dei generi: firma = nomi delle sezioni (resta valida anche se l'interfaccia copia la timeline)
+
 def timeline_unit(tl):
-    """Le sezioni si allocano a blocchi di 4 battute; se la timeline ha sezioni non multiple di 4 (silenzi, eventi singoli) a battuta singola."""
-    return 4 if all(b % 4 == 0 for _n, b, _l in (tl or DEFAULT_TIMELINE)) else 1
+    """Le sezioni si allocano a blocchi di 4 battute (8 per i generi in BLOCK8_GENRES); se la timeline ha sezioni non multiple di 4 (silenzi, eventi singoli) a battuta singola."""
+    tl = tl or DEFAULT_TIMELINE
+    if tuple(n for n, _b, _l in tl) in _BLOCK8_SIGS and all(b % 8 == 0 for _n, b, _l in tl): return 8
+    return 4 if all(b % 4 == 0 for _n, b, _l in tl) else 1
 
 LAYER_ORDER = ['kick', 'hat', 'clap', 'open', 'perc', 'bass', 'bassl', 'pad', 'chords', 'chordsl', 'arp', 'arpl', 'lead', 'leadl', 'roll', 'rolls', 'fill', 'event']
 
@@ -665,6 +673,8 @@ def apply_timelines(data):
         GENRES[k]['timeline'] = tl
         GENRES[k]['bars_default'] = sum(b for _n, b, _l in tl)
     return len(parsed)
+
+_BLOCK8_SIGS.update(tuple(n for n, _b, _l in GENRES[k]['timeline']) for k in BLOCK8_GENRES if GENRES.get(k, {}).get('timeline'))
 
 TIMELINE_FILE_MSG = ''
 try:
