@@ -30,7 +30,7 @@ GENRES = {
     'dubstep': {'bpm_default': 140, 'bars_default': 144, 'kick': [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.25, 'swing': 0.0, 'roll32': True},
     'edm_2000s': {'bpm_default': 128, 'bars_default': 100, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0], 'arp_density': 0.85, 'swing': 0.0},
     'elettronico': {'bpm_default': 130, 'bars_default': 84, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [1,0,0,1, 0,0,1,0, 0,1,0,0, 1,0,0,1], 'arp_density': 0.75, 'swing': 0.0},
-    'funk': {'bpm_default': 112, 'bars_default': 56, 'kick': [1,0,0,1, 0,0,0,0, 1,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [2,1,1,1, 2,1,1,1, 2,1,1,1, 2,1,1,1], 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,1,0,0], 'ghost': [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,1,0], 'arp_density': 0.6, 'swing': 0.05},
+    'funk': {'bpm_default': 112, 'bars_default': 56, 'kick': [1,0,0,1, 0,0,0,0, 1,0,1,0, 0,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0]*16, 'hat': [2,1,1,1, 2,1,1,1, 2,1,1,1, 2,1,1,1], 'bass': [1,0,0,1, 0,1,0,0, 1,0,0,1, 0,1,0,0], 'ghost': [0,1,1,0, 0,1,0,1, 0,1,0,1, 0,1,1,1], 'arp_density': 0.6, 'swing': 0.05},      # ghost: 9 sedicesimi liberi tra i colpi principali (scheda funk: ghost note quasi ovunque)
     'future_bass': {'bpm_default': 150, 'bars_default': 80, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'clap': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'ghost': [0]*16, 'arp_density': 0.5, 'swing': 0.0, 'chord_off': 2, 'hat_triplet': True, 'roll32': True},
     'glitch': {'bpm_default': 128, 'bars_default': 60, 'kick': [1,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'snare': [0,0,0,0, 0,0,0,0, 1,0,0,0, 0,0,0,0], 'hat': [1]*16, 'bass': [1,0,0,0, 0,0,0,1, 0,0,0,0, 1,0,0,0], 'arp_density': 0.95, 'swing': 0.1},
     'hardstyle': {'bpm_default': 150, 'bars_default': 112, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.5, 'swing': 0.0, 'lead_triplet': True},
@@ -404,10 +404,10 @@ TIMELINES = {
           ('Dialogo', 4, 'event arpl')],
  'psytrance': [('Intro ipnotica', 32, 'kick hat bass pad arpl'),
           ('Build 1', 32, 'kick hat open bass pad arp roll'),
-          ('Drop 1', 32, 'kick hat open perc bass pad arp lead fill'),
-          ('Sezione centrale', 32, 'kick hat open perc bass pad arp lead'),
-          ('Build 2', 32, 'kick hat open bass pad arp roll'),
-          ('Drop 2', 32, 'kick hat open perc bass pad chords arp lead fill'),
+          ('First Break', 32, 'pad arpl lead'),                                       # il break toglie la batteria e il basso (scheda Psytrance); il ritorno del kick usa la pausa prima del drop
+          ('Drop 1 (Groove)', 32, 'kick hat open perc bass pad arp lead fill'),
+          ('Second Break', 32, 'pad arpl lead'),
+          ('Peak', 32, 'kick hat open perc bass pad chords arp lead fill'),
           ('Outro', 32, 'kick hat bass')],
  'r&b': [('Intro', 8, 'pad chordsl'),
           ('Strofa 1', 16, 'kick hat clap bass chords leadl'),
@@ -553,7 +553,14 @@ for _k, _v in GENRES.items():
 #   rolling: basso fisso sulla tonica tra i kick (techno) | offbeat: basso sui levare (trance) | sync: sincopato (deep)
 GENRE_STYLE = {
     'acid': dict(seventh=0.5, bass_style='acid'),
-    'afro_house': dict(seventh=0.5),
+    # perc_layers: (nome, altezze GM, probabilita' per sedicesimo, velocity, micro-offset medio/deviazione in tick). Distribuzioni da 3 MIDI Afro House di Notebin (generatore, non musica reale)
+    # e dalla scheda Afro House (poliritmia: shaker in sedicesimi, conga in sincope, bongo, tom come marcatori, campana; percussioni leggermente dietro la griglia).
+    'afro_house': dict(seventh=0.5, perc_layers=[
+        ('shaker', [70]*4 + [69]*4 + [82], [.67,.67,1,.67, .67,.67,1,.67, .67,.67,1,.67, .67,.67,1,.67], (57, 90), (8, 10)),
+        ('conga',  [64]*4 + [63]*3 + [62]*3, [1,.17,0,1, .67,.33,1,.33, .33,0,.67,.67, 0,.33,1,0], (70, 112), (8, 10)),
+        ('bongo',  [60, 60, 61], [0,.17,.33,0, 0,.5,0,.33, 0,.67,0,.33, 0,.04,.04,.04], (66, 96), (17, 9)),
+        ('tom',    [45, 47], [0,0,.17,0, 0,0,0,.17, 0,0,0,0, 0,.21,.08,.08], (86, 108), (13, 10)),
+        ('bell',   [68, 68, 56, 56, 67], [0,.33,.67,0, 0,.33,.67,0, 0,.33,.67,0, 0,0,.67,0], (73, 78), (7, 10))]),
     'amapiano': dict(seventh=0.6, ninth=0.2, bass_style='logdrum'),
     'armonico': dict(seventh=0.8, ninth=0.4, bass_style='walk'),
     'chiptune': dict(seventh=0.0, bass_style='rolling'),
@@ -565,7 +572,7 @@ GENRE_STYLE = {
     'dubstep': dict(seventh=0.2, bass_style='wobble'),
     'edm_2000s': dict(seventh=0.0, bass_style='offbeat'),
     'elettronico': dict(seventh=0.35),
-    'funk': dict(seventh=0.9, ninth=0.3, bass_style='funk'),
+    'funk': dict(seventh=0.9, ninth=0.3, bass_style='funk', ghost_p=0.4, ghost_vel=(18, 32)),      # ghost_p: probabilita' per posizione; ghost_vel: velocity 15-30% (scheda funk)
     'future_bass': dict(seventh=0.7, ninth=0.3, bass_style='long'),
     'hardstyle': dict(seventh=0.0, bass_style='offbeat'),
     'hip_hop': dict(seventh=0.6, ninth=0.2, bass_style='long'),
@@ -587,7 +594,7 @@ GENRE_STYLE = {
     'synthwave': dict(seventh=0.4, bass_style='octave'),
     'techno': dict(seventh=0.1, bass_style='rolling'),
     'trance': dict(seventh=0.0, bass_style='offbeat'),
-    'trap': dict(seventh=0.3, bass_style='long'),
+    'trap': dict(seventh=0.3, bass_style='long', hat_roll=0.7),      # hat_roll: probabilita' di un roll di hi-hat nelle battute adatte
     'trip_hop': dict(seventh=0.8, ninth=0.3, bass_style='dubsub'),
     'uk_garage': dict(seventh=0.5, bass_style='long'),
     'vaporwave': dict(seventh=0.9, ninth=0.5, bass_style='long'),
@@ -1487,6 +1494,18 @@ def build_drum_events(g, secmap, bm=None):
         fill_set = {x[0] for x in tfill}
         fill_bar = 'fill' in layers and idx % 8 == 7 and not tfill
         trip_bar = bool(g.get('hat_triplet')) and 'clap' in layers and idx % 4 == 3 and L >= 8
+        # Roll di hi-hat (trap): raffica di 1/32, terzine di 1/32 o 1/64 come accento. Mai sopra kick, rullante o ghost; velocity che cresce verso la battuta
+        # successiva o decresce dopo l'attacco prima del rullante. Fonti: guide di produzione trap (roll "prima di uno snare o a fine frase"), non dati misurati.
+        roll_plan, roll_cover = {}, set()
+        if g.get('hat_roll') and 'clap' in layers and 'hat' in layers and L == 16 and not in_roll and not fill_bar and not tfill and not trip_bar and pause_from is None:
+            def _free(st_): return not (P['kick'][pi[st_]] or P['snare'][(pi[st_] - sn_shift) % 16] or P['ghost'][pi[st_]])
+            cands = []
+            if idx % 2 == 1: cands += [(14, 2, 'cresc'), (15, 1, 'cresc')]
+            if idx % 4 == 2: cands += [(s_ - 1, 1, 'decay') for s_ in range(1, L) if P['snare'][(pi[s_] - sn_shift) % 16]]
+            cands = [c for c in cands if all(_free(c[0] + k) for k in range(c[1]))]
+            if cands and random.random() < g['hat_roll']:
+                st_, span_, d_ = random.choice(cands)
+                roll_plan[st_] = (random.choice((2, 2, 3, 3, 4)), span_, d_); roll_cover = set(range(st_, st_ + span_))
         for s in range(L):
             if pause_from is not None and s >= pause_from: continue
             p = pi[s]
@@ -1502,6 +1521,14 @@ def build_drum_events(g, secmap, bm=None):
             # HI-HAT (con 'open': open hat sui levare al posto del chiuso)
             hat_on = 'hat' in layers and P['hat'][p]
             op = 'open' in layers and s in open_steps
+            if s in roll_cover:
+                hat_on = op = False
+                if s in roll_plan:
+                    n_, span_, d_ = roll_plan[s]; tot = n_ * span_
+                    for i_ in range(tot):
+                        f_ = i_ / max(1, tot - 1)
+                        v_ = (55 + int(45 * f_)) if d_ == 'cresc' else (100 - int(45 * f_))
+                        _note(ev, tick + i_ * q // n_, max(1, q // n_ - 6), g.get('hat_note', GM_HAT_CLOSED), v_ + R(-4, 4), DRUM_CH)
             if trip_bar and s >= L - 4:                                  # roll di hi-hat in terzine (1/8T) nell'ultimo beat ogni 4 battute
                 if s == L - 4:
                     for i_ in range(3): _note(ev, tick + i_ * (4 * q // 3), 4 * q // 3 - 10, GM_HAT_CLOSED, 68 + i_ * 14 + R(0, 8), DRUM_CH)
@@ -1526,13 +1553,16 @@ def build_drum_events(g, secmap, bm=None):
                 _note(ev, tick, q // 2, GM_SNARE if s % 2 == 0 else GM_TOM_HIGH, 70 + (s - (L - 4)) * 15, DRUM_CH)
             elif 'clap' in layers and s not in fill_set:
                 if P['snare'][(p - sn_shift) % 16]: _note(ev, tick + sw + lazy, q // 2, g.get('snare_note', GM_SNARE), (90 if roll_any else 105) + R(0, 10), DRUM_CH)
-                elif P['ghost'][p] and random.random() < 0.65: _note(ev, tick + sw, q // 2, GM_SNARE, 36 + R(0, 14), DRUM_CH)
+                elif P['ghost'][p] and random.random() < g.get('ghost_p', 0.65): _note(ev, tick + sw, q // 2, GM_SNARE, R(*g.get('ghost_vel', (36, 50))), DRUM_CH)
                 if P['clap'][p]: _note(ev, tick + sw + lazy, q // 2, GM_CLAP, 90 + R(0, 10), DRUM_CH)
             # PERCUSSIONI
             if 'perc' in layers and not in_roll and not (fill_bar and s >= L - 4) and s not in fill_set:
                 if P['perc'][p]: _note(ev, tick + sw, q // 2, g.get('perc_note', GM_RIMSHOT), 55 + R(0, 30), DRUM_CH)
-                if s % 2 == 1 and random.random() < 0.15:
+                if s % 2 == 1 and random.random() < 0.15 and not g.get('perc_layers'):
                     _note(ev, tick + sw, q // 2, GM_RIMSHOT if random.random() < 0.5 else GM_TOM_HIGH, 50 + R(0, 40), DRUM_CH)
+                for _nm, _pits, _pr, _vl, _of in g.get('perc_layers', ()):      # voci di percussione indipendenti, ognuna col suo pattern e il suo micro-offset
+                    if random.random() < _pr[p]:
+                        _note(ev, max(0, tick + sw + max(-10, min(30, int(random.gauss(_of[0], _of[1]))))), q // 2, random.choice(_pits), R(*_vl), DRUM_CH)
         for s_, pch, v in tfill:
             _note(ev, base + s_ * q, q // 2, pch, min(127, int(v * (1.0 if big else 0.8)) + R(0, 6)), DRUM_CH)
     return ev
