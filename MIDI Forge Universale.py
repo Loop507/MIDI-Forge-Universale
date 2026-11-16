@@ -14,7 +14,7 @@ st.set_page_config(page_title="MIDI Forge Universale", page_icon="🎛️", layo
 
 # ================= DATABASE DEI GENERI =================
 GENRES = {
-    'acid': {'bpm_default': 135, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,1, 0,1,0,1, 1,0,1,0, 1,1,0,1], 'arp_density': 0.85, 'swing': 0.0},
+    'acid': {'bpm_default': 126, 'bars_default': 92, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,1,2,1, 1,1,2,1, 1,1,2,1, 1,1,2,1], 'bass': [1,0,1,1, 0,1,0,1, 1,0,1,0, 1,1,0,1], 'arp_density': 0.85, 'swing': 0.0},
     'afro_house': {'bpm_default': 122, 'bars_default': 192, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0], 'ghost': [0]*16, 'arp_density': 0.3, 'swing': 0.08},
     'amapiano': {'bpm_default': 112, 'bars_default': 192, 'kick': [1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0], 'snare': [0]*16, 'clap': [0,0,0,0, 1,0,0,0, 0,0,0,0, 1,0,0,0], 'hat': [1,3,1,3, 1,3,1,3, 1,3,1,3, 1,3,1,3], 'bass': [0,0,1,0, 0,1,1,0, 0,0,1,0, 0,1,0,0], 'ghost': [0]*16, 'arp_density': 0.25, 'swing': 0.16},
     'ambient': {'bpm_default': 80, 'bars_default': 124, 'kick': [0]*16, 'snare': [0]*16, 'hat': [0]*16, 'bass': [0]*16, 'arp_density': 0.15, 'swing': 0.0},
@@ -185,13 +185,17 @@ FAMILY = {'bass': 'bass', 'bassl': 'bass', 'pad': 'pad', 'chords': 'chords', 'ch
 SYN_FACTOR = {'arp': 1.0, 'lead': 1.0, 'chords': 0.85, 'arpl': 0.5, 'leadl': 0.5, 'chordsl': 0.5, 'pad': 0.5}
 
 TIMELINES = {
- 'acid': [('Intro DJ', 32, 'kick hat pad bassl'),
-          ('Groove building', 32, 'kick hat perc pad bass'),
-          ('Main 1', 32, 'kick hat clap perc pad bass fill'),
-          ('Breakdown', 16, 'pad bass'),
-          ('Build-up', 16, 'hat pad bassl roll'),
-          ('Drop / Main 2', 32, 'kick hat clap open perc pad bass fill'),
-          ('Outro', 32, 'kick hat')],
+ 'acid': [('Intro DJ 1', 8, 'kick'),                                              # guida Acid: parte la cassa sola, poi gli hi-hat, infine la linea acid filtrata/chiusa
+          ('Intro DJ 2', 8, 'kick hat'),
+          ('Intro DJ 3', 16, 'kick hat bassl'),
+          ('Groove building', 32, 'kick hat perc bass'),                            # il groove si stabilisce e il cutoff della 303 si apre gradualmente
+          ('Main 1', 32, 'kick hat clap perc bass fill'),
+          ('Breakdown', 16, 'bass pad'),                                            # esce la cassa: restano la 303 e le atmosfere
+          ('Build-up', 8, 'hat bass pad roll'),
+          ('Drop / Main 2', 48, 'kick hat clap open perc bass chordsl fill'),       # rientro: 303 piu' aperta e aggressiva (cutoff e risonanza piu' alti), stab secondari
+          ('Outro 1', 8, 'kick hat clap perc bass'),                                # outro DJ-friendly: la 303 si chiude, le percussioni scompaiono, resta la cassa
+          ('Outro 2', 8, 'kick hat bass'),
+          ('Outro 3', 8, 'kick')],
  'afro_house': [('Intro progressiva', 32, 'hat perc pad chordsl'),                 # scheda Afro House: intro con pad, Rhodes e percussioni leggere, il kick entra dopo
           ('Build-up', 32, 'kick hat perc bass pad chordsl'),
           ('Peak / Main 1', 32, 'kick hat clap open perc bass pad chords lead'),
@@ -483,16 +487,26 @@ TIMELINES = {
           ('Verse 2', 16, 'kick hat clap bass pad arp leadl'),
           ('Bridge', 8, 'pad arp'),
           ('Chorus finale', 16, 'kick hat clap open perc bass pad chords arp lead fill')],
- 'techno': [('Intro DJ', 32, 'kick hat'),                                          # guida Techno: blocchi da 16/32 battute; intro DJ-friendly, solo kick e hi-hat
-          ('Build-up 1', 16, 'kick hat perc bass'),                                 # layering graduale: entra la bassline con piu' percussioni
-          ('Build-up 2', 16, 'kick hat clap open perc bass chordsl'),               # poi il clap, l'open hat e uno stab di accordi
-          ('Main 1 / First Drop', 32, 'kick hat clap open perc bass chords arp'),   # groove completo
-          ('Breakdown', 16, 'perc pad leadl'),                                      # si toglie il kick (e il basso): restano pad, percussioni a tenere il polso e una melodia sottile
-          ('Build-up', 16, 'hat pad roll'),                                         # tensione prima del ritorno
-          ('Second Drop / Variation', 32, 'kick hat clap open perc bass pad chords arp lead fill'),
-          ('Outro 1', 16, 'kick hat clap open perc bass'),                          # outro DJ-friendly a rimozione graduale: prima i synth
-          ('Outro 2', 8, 'kick hat open bass'),                                     # poi le percussioni
-          ('Outro 3', 8, 'kick hat')],                                              # infine il basso: restano kick e hi-hat per il mix out
+ 'techno': [('Intro 1', 2, 'kick'),      # scala (guida Techno + richiesta): uno strato alla volta ogni 2 battute, l'outro e' lo specchio dell'intro
+          ('Intro 2', 2, 'kick hat'),
+          ('Intro 3', 2, 'kick hat perc'),
+          ('Intro 4', 2, 'kick hat perc clap open'),
+          ('Intro 5', 2, 'kick hat perc clap open bass'),
+          ('Intro 6', 2, 'kick hat perc clap open bass chords'),
+          ('Intro 7', 2, 'kick hat perc clap open bass chords pad'),
+          ('Intro 8', 2, 'kick hat perc clap open bass chords pad arp'),
+          ('Main 1 / First Drop', 64, 'kick hat perc clap open bass chords pad arp fill'),
+          ('Breakdown', 16, 'perc pad leadl'),                                  # si toglie il kick (e il basso): restano pad, percussioni e una melodia sottile
+          ('Build-up', 16, 'hat pad roll'),                                      # tensione prima del ritorno
+          ('Second Drop / Variation', 64, 'kick hat perc clap open bass chords pad arp lead fill'),
+          ('Outro 1', 2, 'kick hat perc clap open bass chords pad arp'),
+          ('Outro 2', 2, 'kick hat perc clap open bass chords pad'),
+          ('Outro 3', 2, 'kick hat perc clap open bass chords'),
+          ('Outro 4', 2, 'kick hat perc clap open bass'),
+          ('Outro 5', 2, 'kick hat perc clap open'),
+          ('Outro 6', 2, 'kick hat perc'),
+          ('Outro 7', 2, 'kick hat'),
+          ('Outro 8', 2, 'kick')],                                                 # l'uscita e' lo specchio dell'intro: ultime 2 battute solo kick
  'trance': [('Intro lunga', 64, 'kick hat pad arpl'),
           ('Main 1', 32, 'kick hat clap open bass pad arpl lead'),
           ('Breakdown', 32, 'pad chordsl lead'),
@@ -555,7 +569,7 @@ for _k, _v in GENRES.items():
 #   reese: note sostenute + seconda traccia leggermente scordata (pitch bend) con filtro che si muove (DnB)
 #   rolling: basso fisso sulla tonica tra i kick (techno) | offbeat: basso sui levare (trance) | sync: sincopato (deep)
 GENRE_STYLE = {
-    'acid': dict(seventh=0.5, bass_style='acid'),
+    'acid': dict(seventh=0.5, bass_style='acid', pad_lo=62, chords_lo=64),      # pad e accordi sopra la banda della 303 (80-250 Hz)
     # perc_layers: (nome, altezze GM, probabilita' per sedicesimo, velocity, micro-offset medio/deviazione in tick). Distribuzioni da 3 MIDI Afro House di Notebin (generatore, non musica reale)
     # e dalla scheda Afro House (poliritmia: shaker in sedicesimi, conga in sincope, bongo, tom come marcatori, campana; percussioni leggermente dietro la griglia).
     'afro_house': dict(seventh=0.5, perc_layers=[
@@ -595,7 +609,7 @@ GENRE_STYLE = {
     'space_disco': dict(seventh=0.9, ninth=0.3, bass_style='fretless'),
     'synthpop': dict(seventh=0.15, bass_style='arp'),
     'synthwave': dict(seventh=0.4, bass_style='octave'),
-    'techno': dict(seventh=0.1, bass_style='rolling', lead_keep=8, lead_rest=4, lead_repeat=True),
+    'techno': dict(seventh=0.1, bass_style='rolling', lead_keep=8, lead_rest=4, lead_repeat=True, filter_slow=True, pan={'lead': 40, 'pad': 88, 'arp': 84, 'chords': 78}),
     'trance': dict(seventh=0.0, bass_style='offbeat', lead_thin=0.7, lead_merge=0.6, lead_rest=4, lead_repeat=True),
     'trap': dict(seventh=0.3, bass_style='long', hat_roll=0.7),      # hat_roll: probabilita' di un roll di hi-hat nelle battute adatte
     'trip_hop': dict(seventh=0.8, ninth=0.3, bass_style='dubsub'),
@@ -635,13 +649,13 @@ DEFAULT_TIMELINE = _parse_timeline([
     ('Intro', 8, 'kick hat'), ('Break', 8, 'kick hat pad chordsl arpl bassl'), ('Build-up', 8, 'kick hat clap bass pad chords arp roll'),
     ('Drop', 24, 'kick hat clap open perc bass pad chords arp lead fill'), ('Break 2', 8, 'kick hat pad chordsl leadl bassl'), ('Outro', 8, 'kick hat')])
 
-BLOCK8_GENRES = ('techno',)      # generi la cui struttura varia col seed solo a blocchi da 8 battute (guida Techno: blocchi da 16/32 battute per il mix del DJ)
+BLOCK8_GENRES = ('techno', 'acid')      # generi la cui struttura varia col seed solo a blocchi da 8 battute (guida Techno: blocchi da 16/32 battute per il mix del DJ)
 _BLOCK8_SIGS = set()             # riempito dopo la costruzione dei generi: firma = nomi delle sezioni (resta valida anche se l'interfaccia copia la timeline)
 
 def timeline_unit(tl):
     """Le sezioni si allocano a blocchi di 4 battute (8 per i generi in BLOCK8_GENRES); se la timeline ha sezioni non multiple di 4 (silenzi, eventi singoli) a battuta singola."""
     tl = tl or DEFAULT_TIMELINE
-    if tuple(n for n, _b, _l in tl) in _BLOCK8_SIGS and all(b % 8 == 0 for _n, b, _l in tl): return 8
+    if tuple(n for n, _b, _l in tl) in _BLOCK8_SIGS and all(b % 8 == 0 for _n, b, _l in tl if b >= 8) and all(b % 2 == 0 for _n, b, _l in tl): return 8
     return 4 if all(b % 4 == 0 for _n, b, _l in tl) else 1
 
 LAYER_ORDER = ['kick', 'hat', 'clap', 'open', 'perc', 'bass', 'bassl', 'pad', 'chords', 'chordsl', 'arp', 'arpl', 'lead', 'leadl', 'roll', 'rolls', 'fill', 'event']
@@ -685,30 +699,48 @@ try:
 except NameError: pass
 except Exception as _e: TIMELINE_FILE_MSG = f"midi_forge_timelines.json ignorato: {_e}"
 
+def _ladder_split(tl, unit):
+    """Gradini di ingresso e di uscita: le sezioni piu' corte dell'unita' in testa e in coda hanno lunghezza fissa (es. 2 battute: uno strato alla volta);
+    il resto e' il corpo del brano, che varia col seed a blocchi interi. Ritorna (testa, corpo, coda)."""
+    tl = list(tl); h = t = 0
+    if unit > 1:
+        while h < len(tl) - 1 and tl[h][1] < unit: h += 1
+        while t < len(tl) - 1 - h and tl[len(tl) - 1 - t][1] < unit: t += 1
+    return tl[:h], tl[h:len(tl) - t], tl[len(tl) - t:]
+
 def min_bars(g):
     tl = g.get('timeline') or DEFAULT_TIMELINE
-    return timeline_unit(tl) * len(tl)
+    u = timeline_unit(tl)
+    head, mid, tail = _ladder_split(tl, u)
+    return sum(b for _n, b, _l in head + tail) + u * len(mid)
 
 def compute_structure(bars, timeline=None, seed=None):
     """Distribuisce le battute sulle sezioni della timeline del genere (multipli di 4, o di 1 se la timeline ha eventi singoli). A durata di default si ottengono
     esattamente le lunghezze della timeline; con altre durate le sezioni scalano in proporzione. Con un seed le sezioni
     centrali variano (+-20% circa). Ritorna (battute, [(nome, inizio, lunghezza, strati)])."""
     tl = timeline or DEFAULT_TIMELINE
-    n = len(tl)
     unit = timeline_unit(tl)
-    bars = max(unit * n, (int(bars) // unit) * unit)
-    units = bars // unit
-    w = [float(b) for _n, b, _l in tl]
+    head, mid, tail = _ladder_split(tl, unit)
+    fixed = sum(b for _n, b, _l in head + tail)
+    n = len(mid)
+    bars = max(fixed + unit * n, fixed + ((int(bars) - fixed) // unit) * unit)
+    units = (bars - fixed) // unit
+    w = [float(b) for _n, b, _l in mid]
     if seed is not None:
         rs = random.Random(int(seed) * 31 + 7)
-        for i in range(1, n - 1): w[i] *= rs.uniform(0.8, 1.25)
+        lo, hi = (0, n) if (head or tail) else (1, n - 1)       # con i gradini in testa e in coda variano tutte le sezioni del corpo
+        for i in range(lo, hi): w[i] *= rs.uniform(0.8, 1.25)
     tot, alloc = sum(w), [1] * n
     for _ in range(units - n):
         k = max(range(n), key=lambda i: w[i] / tot * units - alloc[i])
         alloc[k] += 1
     sections, pos = [], 0
-    for (name, _b, layers), a in zip(tl, alloc):
+    for name, b, layers in head:
+        sections.append((name, pos, b, layers)); pos += b
+    for (name, _b, layers), a in zip(mid, alloc):
         sections.append((name, pos, a * unit, layers)); pos += a * unit
+    for name, b, layers in tail:
+        sections.append((name, pos, b, layers)); pos += b
     return bars, sections
 
 # ================= METRI (battuta = N sedicesimi raggruppati) =================
@@ -774,11 +806,13 @@ def legacy_name(layers, seen_drop):
 def section_map(sections, bars):
     """Per ogni battuta: dict con sec (nome storico), idx (indice nella sezione), length, layers, prev (strati della sezione prima), label."""
     out, prev, seen = [], frozenset(), False
+    block8 = tuple(n for n, _s, _l, _ls in sections) in _BLOCK8_SIGS
     for label, _s, length, layers in sections:
         sec = legacy_name(layers, seen)
         if sec == 'drop': seen = True
+        ladder = block8 and length < 8                       # gradino di ingresso/uscita (una battuta o due): niente crash, pausa o fill di transizione
         for i in range(length):
-            out.append({'sec': sec, 'idx': i, 'length': length, 'layers': layers, 'prev': prev, 'label': label})
+            out.append({'sec': sec, 'idx': i, 'length': length, 'layers': layers, 'prev': prev, 'label': label, 'ladder': ladder})
         prev = layers
     return out[:bars]
 
@@ -1123,7 +1157,7 @@ def _fold(p, lo=60, hi=83):
 # Ogni genere ha un'identita' (ancore: kick sul battere, backbeat, dembow...) e il seed sposta/aggiunge/toglie il resto,
 # cosi' due brani dello stesso genere hanno batteria, basso e armonia diversi.
 BPM_RANGES = {
-    'acid': [(135, 150)],
+    'acid': [(120, 130)],      # guida Acid: tempo tipico 120-128 BPM, mediana 126
     'afro_house': [(120, 125)],
     'amapiano': [(110, 115)],
     'ambient': [(60, 90)],
@@ -1502,7 +1536,7 @@ def build_drum_events(g, secmap, bm=None):
         new_sec = bool(nxt and nxt['idx'] == 0)
         # crash all'inizio di una sezione forte (o quando il kick esce / entrano molti strati insieme)
         crash_now = False
-        if use_tr and idx == 0 and bar > 0:
+        if use_tr and idx == 0 and bar > 0 and not B.get('ladder'):
             strong_in = _entry_strong(layers, prev)
             kick_out = 'kick' in prev and 'kick' not in layers
             if strong_in or (big and (kick_out or len(layers - prev) >= 3)):
@@ -1510,7 +1544,7 @@ def build_drum_events(g, secmap, bm=None):
                 _note(ev, base, TICKS_BEAT * 2, GM_CRASH, (105 if big else 72) - (15 if (kick_out and not strong_in) else 0) + R(0, 8), DRUM_CH)
         # reverse cymbal + pausa di un beat prima del drop
         pause_from = None
-        if use_tr and big and new_sec and _pause_before(nxt['layers'], layers) and L >= 8:
+        if use_tr and big and new_sec and _pause_before(nxt['layers'], layers) and L >= 8 and not B.get('ladder'):
             pause_from = L - 4
             sb = bar - 1 if idx >= 1 else bar
             rn = g.get('reverse_note', GM_REVERSE)
@@ -1529,7 +1563,7 @@ def build_drum_events(g, secmap, bm=None):
         sn_shift = 4 if g.get('snare_shift') and (idx // 2) % 2 == 1 else 0   # drill: snare dal beat 3 al beat 4 ogni 2 battute
         # fill di fine sezione (diverso a ogni transizione)
         tfill = []
-        if use_tr and new_sec and idx == length - 1 and pause_from is None and not in_roll and L >= 8 and (layers & {'kick', 'clap'}) and nxt['layers'] != layers:
+        if use_tr and new_sec and idx == length - 1 and pause_from is None and not in_roll and L >= 8 and not B.get('ladder') and (layers & {'kick', 'clap'}) and nxt['layers'] != layers:
             tfill = _transition_fill(L, big)
         fill_set = {x[0] for x in tfill}
         fill_bar = 'fill' in layers and idx % 8 == 7 and not tfill
@@ -2025,7 +2059,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             if g.get('open_pad') or g.get('open_voicing'):       # voicing aperto: fondamentale e quinta in basso, terza/settima/nona sopra (pack Deep House: nota piu bassa 53, piu alta 69)
                 _pps = [_pc_pitch(cpcs[0], 48), _pc_pitch(cpcs[2], 48)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]
             else:
-                _pps = _vl_voice(vl_prev.get('pad'), cpcs, 48); vl_prev['pad'] = sorted(_pps)
+                _pps = _vl_voice(vl_prev.get('pad'), cpcs, g.get('pad_lo', 48)); vl_prev['pad'] = sorted(_pps)
             for _pp in _pps: _note(tracks['pad'], base, bt - 10, _pp, pad_vel, 2)
 
         # CHORDS: stab (chords) o accordi lunghi (chordsl)
@@ -2034,13 +2068,13 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         elif 'chordsl' in layers: c_steps, c_dur, c_vel = [gstarts[0], gstarts[len(gstarts) // 2]], 2 * TICKS_BEAT - 20, 58
         cf = _fade(B, 'chords')
         _cv_vl = None
-        if c_steps and not g.get('open_voicing'): _cv_vl = _vl_voice(vl_prev.get('chords'), cpcs, 55); vl_prev['chords'] = sorted(_cv_vl)
+        if c_steps and not g.get('open_voicing'): _cv_vl = _vl_voice(vl_prev.get('chords'), cpcs, g.get('chords_lo', 55)); vl_prev['chords'] = sorted(_cv_vl)
         if g.get('skank_double') and 'chords' in layers: c_steps = sorted(set(c_steps + [x + 1 for x in c_steps if x + 1 < L]))
         for s in c_steps:
             if 'chords' in layers and not roll_any and random.random() > 0.85: continue
             _dbl = bool(g.get('skank_double')) and s % 4 == 3
             _sw8 = int(g.get('swing8', 0) * 4 * q) if s % 4 in (2, 3) else 0
-            _cvs = ([_pc_pitch(cpcs[0], 43), _pc_pitch(cpcs[2], 55)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]) if g.get('open_voicing') else (_cv_vl or [_pc_pitch(pc, 55) for pc in cpcs])      # aperto: fondamentale giu', terza/settima su
+            _cvs = ([_pc_pitch(cpcs[0], 43), _pc_pitch(cpcs[2], 55)] + [_pc_pitch(pc, 60) for pc in [cpcs[1]] + cpcs[3:]]) if g.get('open_voicing') else (_cv_vl or [_pc_pitch(pc, g.get('chords_lo', 55)) for pc in cpcs])      # aperto: fondamentale giu', terza/settima su
             for _pv in _cvs: _note(tracks['chords'], base + s * q + _sw8, c_dur // 2 if _dbl else c_dur, _pv, int((c_vel + R(0, 8)) * cf * (0.75 if _dbl else 1.0)), 3)
 
         # ARP sulle note dell'accordo (arp = densita' del genere, arpl = meta')
@@ -2144,6 +2178,8 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     if g.get('free_time'): _free_time(tracks, g['free_time'])
     if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
     if split_drums and 'drums' in tracks: tracks = split_drum_track(tracks)
+    for _k, _v in (g.get('pan') or {}).items():              # posizione stereo (CC10): kick e basso al centro, lead a sinistra, texture a destra (guida Techno)
+        if _k in tracks: headers[_k] = [{'type': 'control_change', 'control': 10, 'value': _v}]
     return tracks, root, scale, headers, bars
 
 def _events_to_notes(events):
@@ -2913,8 +2949,8 @@ def section_markers(sections, bm):
     """[(tick, testo)] un marker per sezione: nome, battuta di inizio e strati che entrano (compaiono nella Marker List di Logic)."""
     out, prev = [], frozenset()
     for name, start, _length, layers in sections:
-        ins = sorted(layers - prev)
-        txt = f"{name} - bar {start + 1}" + (" | +" + " +".join(ins) if ins else "")
+        ins, outs = sorted(layers - prev), sorted(prev - layers)
+        txt = f"{name} - bar {start + 1}" + (" | +" + " +".join(ins) if ins else "") + (" | -" + " -".join(outs) if outs else "")
         out.append((bm[start]['start'], _ascii(txt)[:110]))
         prev = layers
     return out
@@ -2930,7 +2966,7 @@ def tempo_events(g, sections, bm):
 def _tempo_line(tempo_ev):
     return "   Tempo variabile: " + " -> ".join(str(b) for _t, b in tempo_ev) + " BPM (un cambio di tempo per sezione, scritto nel MIDI)"
 
-def build_automation(sections, bm, tracks, style=None):
+def build_automation(sections, bm, tracks, style=None, slow=False):
     """CC74 (cutoff/brightness) per le tracce melodiche: uno strato che entra apre il filtro in 4 battute (25 -> livello della sezione),
     i break lo chiudono un po', le sezioni con rullata (build) aprono il filtro fino a 127 nelle ultime 8 battute.
     Ritorna {chiave_traccia: [(tick, cc, valore)]}."""
@@ -2969,6 +3005,10 @@ def build_automation(sections, bm, tracks, style=None):
             elif last[k] == 127: pts[k][t0] = target                  # dopo il build il filtro torna subito al livello normale
             elif abs(target - last[k]) > 4: ramp(k, t0, t0 + min(2, length) * avg, last[k], target, min(2, length) * 4)
             last[k] = target
+            if slow and 'clap' in layers and (layers & {'arp', 'lead'}) and not roll_any and length >= 16 and (active - light):
+                # guida Techno: "il movimento del filtro e' l'arrangiamento": il cutoff si apre lentamente su tutta la sezione (16-32 battute)
+                v1 = min(127, target + 12)
+                ramp(k, t0 + (R * avg if fresh else 0), tend - avg, target if fresh else max(40, target - 40), v1, max(4, length * 2)); last[k] = v1
             if roll_any:
                 ramp(k, ts, tend, 25 if fresh else max(60, target - 40), 127, W * 4)
                 last[k] = 127
@@ -2990,6 +3030,31 @@ def build_automation(sections, bm, tracks, style=None):
             if glide:
                 rpn = [(0, 101, 0), (0, 100, 0), (0, 6, 12), (0, 38, 0), (0, 101, 127), (0, 100, 127)]
                 out[k] = rpn + sorted(out.get(k, []) + glide, key=lambda x: x[0])
+    # Acid (guida Acid: "il movimento del filtro e' il brano"): il cutoff e la risonanza (CC71) della 303 seguono la forma del brano: filtro chiuso nell'intro, apertura graduale nel groove,
+    # break piu' chiuso, e nel rientro la 303 e' piu' aperta e aggressiva (cutoff e risonanza piu' alti); nell'outro il filtro si richiude.
+    if style == 'acid' and 'bassline' in tracks:
+        pk, seen_break, seen_second, outro_i = list(out.get('bassline', [])), False, False, 0
+        PH = {'intro': (20, 55, 55, 65), 'groove': (55, 85, 65, 80), 'main': (85, 105, 80, 92), 'break': (95, 70, 92, 98), 'build': (None, None, 98, 118),
+              'second': (100, 127, 105, 122), 'outro': (110, 25, 100, 55)}
+        for name_, start_, length_, layers_ in sections:
+            if not (layers_ & {'bass', 'bassl'}): continue
+            t0_ = bm[start_]['start']; te_ = bm[start_ + length_ - 1]['start'] + bm[start_ + length_ - 1]['L'] * q
+            if layers_ & {'roll', 'rolls'}: ph = 'build'
+            elif 'kick' not in layers_: ph = 'break'; seen_break = True
+            elif seen_second: ph = 'outro'
+            elif seen_break and 'clap' in layers_: ph = 'second'; seen_second = True
+            elif 'clap' in layers_: ph = 'main'
+            elif layers_ & {'bass'}: ph = 'groove'
+            else: ph = 'intro'
+            c0, c1, r0, r1 = PH[ph]
+            if ph == 'outro':                                    # la chiusura del filtro e' continua sulle sezioni dell'outro (110 -> 70 -> 25)
+                c0, c1, r0, r1 = ((110, 70, 100, 78), (70, 25, 78, 55), (25, 25, 55, 55))[min(outro_i, 2)]; outro_i += 1
+            n_ = max(4, length_ * 2)
+            if c0 is not None:
+                pk = [x for x in pk if not (x[1] == 74 and t0_ <= x[0] < te_)]
+                pk += [(int(t0_ + (te_ - t0_) * i / n_), 74, int(round(c0 + (c1 - c0) * i / n_))) for i in range(n_)] + [(te_ - 1, 74, c1)]
+            pk += [(int(t0_ + (te_ - t0_) * i / n_), 71, int(round(r0 + (r1 - r0) * i / n_))) for i in range(n_)] + [(te_ - 1, 71, r1)]
+        out['bassline'] = sorted(pk, key=lambda x: x[0])
     # Wobble (dubstep): nei drop il cutoff del basso oscilla con un LFO sincronizzato (1/4, 1/8, 1/16 o 1/8T: cambia a ogni drop) e
     # ogni nota di basso parte con un tuffo di pitch bend (il "yoy", range 12 semitoni)
     if style == 'wobble':
@@ -3439,7 +3504,7 @@ if _gen_clicked or _regen_flag:
                     meter_plan = plan_meter(g_run, final_bars, uses_odd_meter(mode, submode, bool(notes_data)), seed)
                     _, sections_now = compute_structure(final_bars, g_run.get('timeline'), seed)
                     use_cc = auto_cc and not (mode == 'multitrack' and submode == 'faithful')   # in Faithful le tracce sono quelle originali
-                    automation = build_automation(sections_now, meter_plan, tracks, g_defaults.get('bass_style')) if use_cc else None
+                    automation = build_automation(sections_now, meter_plan, tracks, g_defaults.get('bass_style'), slow=bool(g_defaults.get('filter_slow'))) if use_cc else None
                     markers = section_markers(sections_now, meter_plan) if add_markers else None
                     tempo_ev = tempo_events(g_run, sections_now, meter_plan) if use_default_bpm else None
                     midi_buffer = build_midi_file(tracks, final_bpm, mode, submode, headers, label=label, key_name=_compute_key_signature(root, scale), meter_plan=meter_plan, automation=automation, markers=markers, tempo_events=tempo_ev, preset_names=guide_preset_names(genre, tracks) if use_preset_names else None, drum_program=auto_drum_program(genre) if drum_kit_choice == 'Auto per genere' else int(drum_kit_choice.split(' - ')[0]), genre=genre)
