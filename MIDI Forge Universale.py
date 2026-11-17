@@ -609,7 +609,7 @@ GENRE_STYLE = {
     'space_disco': dict(seventh=0.9, ninth=0.3, bass_style='fretless'),
     'synthpop': dict(seventh=0.15, bass_style='arp'),
     'synthwave': dict(seventh=0.4, bass_style='octave'),
-    'techno': dict(seventh=0.1, bass_style='rolling', lead_keep=8, lead_rest=4, lead_repeat=True, filter_slow=True, pan={'lead': 40, 'pad': 88, 'arp': 84, 'chords': 78}),
+    'techno': dict(seventh=0.1, bass_style='rolling', lead_keep=8, lead_rest=4, lead_repeat=True, filter_slow=True, pan={'lead': 40, 'pad': 88, 'arp': 84, 'chords': 78}, melodic_loops=0.7, bass_pedal=0.7),
     'trance': dict(seventh=0.0, bass_style='offbeat', lead_thin=0.7, lead_merge=0.6, lead_rest=4, lead_repeat=True),
     'trap': dict(seventh=0.3, bass_style='long', hat_roll=0.7),      # hat_roll: probabilita' di un roll di hi-hat nelle battute adatte
     'trip_hop': dict(seventh=0.8, ninth=0.3, bass_style='dubsub'),
@@ -1974,9 +1974,17 @@ def _vl_voice(prev, pcs, lo):
         if best is None or key < best[0]: best = (key, list(combo))
     return best[1] if best else base
 
+# Techno: le quattro progressioni piu' usate della guida (minore naturale o dorica) come periodi di 8 battute con un accordo ogni 2 battute: A = prime 4 battute, B = le successive
+_TECHNO_PAIRS = [([0, 0, 5, 5], [0, 0, 5, 5]),      # i-VI
+                 ([0, 0, 6, 6], [5, 5, 6, 6]),      # i-VII-VI(-VII)
+                 ([0, 0, 3, 3], [6, 6, 0, 0]),      # i-iv-VII(-i)
+                 ([0, 0, 5, 5], [2, 2, 6, 6])]      # i-VI-III-VII
+
 def _pick_loops(g, scale):
     """Due giri (A e B) tipici del genere; se la scala ha la terza maggiore si usano giri da modo maggiore."""
     major = 4 in scale[:3]
+    if g.get('_name') == 'techno' and not major and random.random() < g.get('melodic_loops', 0):
+        a, b = random.choice(_TECHNO_PAIRS); return list(a), list(b)
     pool = _L_MAJOR_GENRE.get(g.get('_name'), _L_MAJOR) if major else _L_MINOR.get(g.get('_name'))
     if not pool or random.random() < 0.15: return None      # il 15% resta casuale per varieta'
     if major and g.get('_name') not in _L_MAJOR_GENRE:       # periodo di 8 battute: A chiude sulla dominante (semicadenza, 'proposta'), B risolve con V-I (cadenza, 'risposta')
@@ -2001,10 +2009,12 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
     prog_a, prog_b = _pick_loops(g, scale) or (_rand_prog(), _rand_prog())
     use7 = random.random() < g.get('seventh', 0.35)       # accordi di settima (Deep, Soul, R&B... quasi sempre)
     use9 = random.random() < g.get('ninth', 0.0)          # con la nona
+    ped = bool(g.get('bass_pedal')) and random.random() < g['bass_pedal']      # basso a pedale: resta sulla tonica (con quinta, terza e settima) mentre gli accordi sopra si muovono
     bass_style = g.get('bass_style')
     chord_off = g['chord_off'] if 'chord_off' in g else random.choice([0, 1, 2, 2, 3])   # dove cadono gli stab degli accordi nel gruppo (reggae: sempre sul levare)
     arp_base, lead_oct = random.choice([60, 67, 72]), random.choice([67, 72])
     bass_root_p, lead_p = BASS_ROOT_P.get(bass_style, random.uniform(0.6, 0.9)), random.uniform(0.3, 0.6)
+    if ped: bass_root_p = min(bass_root_p, 0.85)
     bass_steps = [s for s in range(16) if g['bass'][s]]
     bass_gap = _gaps(bass_steps) if bass_steps else {}
     lead_base = [random.randrange(n) if random.random() < lead_p else None for _ in range(16)]
@@ -2043,12 +2053,14 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
         # SUB BASS + BASSLINE: il basso e' portante (bass = pattern del genere, bassl = solo sui battiti e piu' piano)
         if 'bass' in layers or 'bassl' in layers:
             soft, fb = 'bass' not in layers, _fade(B, 'bass')
-            _note(tracks['sub_bass'], base, bt - 20, _pc_pitch(rpc, 24), int((84 if soft else 100) * fb), 0)
+            bcp = [pc_of(0), pc_of(4), pc_of(4), pc_of(2), pc_of(6)] if ped else cpcs        # pedale: tonica, quinta (piu' frequente), terza, settima
+            brp = bcp[0]
+            _note(tracks['sub_bass'], base, bt - 20, _pc_pitch(brp, 24), int((84 if soft else 100) * fb), 0)
             hit = 0
             for s in range(L):
                 if not g['bass'][pi[s]]: continue
                 if soft and s not in gst: continue
-                pc = _bass_pc(bass_style, hit, cpcs, rpc, bass_root_p)
+                pc = _bass_pc(bass_style, hit, bcp, brp, bass_root_p)
                 gap = bass_gap[pi[s]] if L == 16 else min(bass_gap[pi[s]], L - s)
                 oc, dur, vx = _bass_shape(bass_style, hit, gap, L - s, s); hit += 1
                 _note(tracks['bassline'], base + s * q, dur * q - 15, _pc_pitch(pc, 36) + oc, min(127, max(1, int(((82 if soft else 95) + (5 if s in gst else 0) + vx) * fb))), 1)
