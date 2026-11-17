@@ -609,7 +609,7 @@ GENRE_STYLE = {
     'space_disco': dict(seventh=0.9, ninth=0.3, bass_style='fretless'),
     'synthpop': dict(seventh=0.15, bass_style='arp'),
     'synthwave': dict(seventh=0.4, bass_style='octave'),
-    'techno': dict(seventh=0.1, bass_style='rolling', lead_keep=8, lead_rest=4, lead_repeat=True, filter_slow=True, pan={'lead': 40, 'pad': 88, 'arp': 84, 'chords': 78}, melodic_loops=0.7, bass_pedal=0.7),
+    'techno': dict(seventh=0.1, bass_style='rolling', lead_keep=8, lead_rest=4, lead_repeat=True, filter_slow=True, pan={'lead': 40, 'pad': 88, 'arp': 84, 'chords': 78}, melodic_loops=0.7, bass_pedal=0.7, bass_approach=0.3, lead_sync=True),
     'trance': dict(seventh=0.0, bass_style='offbeat', lead_thin=0.7, lead_merge=0.6, lead_rest=4, lead_repeat=True),
     'trap': dict(seventh=0.3, bass_style='long', hat_roll=0.7),      # hat_roll: probabilita' di un roll di hi-hat nelle battute adatte
     'trip_hop': dict(seventh=0.8, ninth=0.3, bass_style='dubsub'),
@@ -708,6 +708,26 @@ def _ladder_split(tl, unit):
         while t < len(tl) - 1 - h and tl[len(tl) - 1 - t][1] < unit: t += 1
     return tl[:h], tl[h:len(tl) - t], tl[len(tl) - t:]
 
+# Scala di ingressi: dopo kick e hi-hat (sempre i primi due) l'ordine degli altri strati cambia da un brano all'altro; l'uscita e' sempre lo specchio dell'ingresso.
+_LADDER_TEMPLATES = [('perc', 'clap', 'bass', 'chords', 'pad', 'arp'), ('perc', 'bass', 'clap', 'pad', 'chords', 'arp'), ('clap', 'perc', 'bass', 'arp', 'pad', 'chords'),
+                     ('perc', 'bass', 'pad', 'clap', 'arp', 'chords'), ('clap', 'bass', 'perc', 'chords', 'arp', 'pad')]
+
+def _vary_ladder(head, tail, bars, seed):
+    """Con un seed: ordine degli strati della scala e passo (2 battute, a volte 4 nei brani lunghi) variano; senza seed resta la scala della timeline."""
+    if seed is None or len(head) != 8 or len(tail) != 8: return head, tail
+    cum = [l for _n, _b, l in head]
+    groups = [cum[0]] + [cum[i] - cum[i - 1] for i in range(1, 8)]
+    key = {'perc': groups[2], 'clap': groups[3], 'bass': groups[4], 'chords': groups[5], 'pad': groups[6], 'arp': groups[7]}
+    if not (cum[0] == frozenset({'kick'}) or 'kick' in groups[0]) or not all(any(t.startswith(k) for t in key[k]) for k in key if key[k]): return head, tail
+    rs = random.Random(int(seed) * 17 + 3)
+    order = rs.choice(_LADDER_TEMPLATES)
+    step = 4 if (bars >= 160 and rs.random() < 0.3) else head[0][1]
+    new_groups = [groups[0], groups[1]] + [key[k] for k in order]
+    states, cur = [], frozenset()
+    for g_ in new_groups:
+        cur = cur | g_; states.append(cur)
+    return [(head[i][0], step, states[i]) for i in range(8)], [(tail[i][0], step, states[7 - i]) for i in range(8)]
+
 def min_bars(g):
     tl = g.get('timeline') or DEFAULT_TIMELINE
     u = timeline_unit(tl)
@@ -721,6 +741,7 @@ def compute_structure(bars, timeline=None, seed=None):
     tl = timeline or DEFAULT_TIMELINE
     unit = timeline_unit(tl)
     head, mid, tail = _ladder_split(tl, unit)
+    head, tail = _vary_ladder(head, tail, bars, seed)
     fixed = sum(b for _n, b, _l in head + tail)
     n = len(mid)
     bars = max(fixed + unit * n, fixed + ((int(bars) - fixed) // unit) * unit)
@@ -1015,6 +1036,10 @@ def _corpus_bar(g, bar, n, ct, st):
             res.append((s_, dg)); prev = dg
         st['lk_prev'] = prev
         out = [(s_, dg, min(8, (res[k + 1][0] if k + 1 < len(res) else 16) - s_)) for k, (s_, dg) in enumerate(res)]
+    if g.get('lead_sync') and out:
+        # il lead e il basso/accordi respirano insieme: nella battuta in cui l'accordo cambia una nota lunga, nella battuta prima una pausa a fine frase
+        if st.get('chg_in'): out = [(0, out[0][1], 12)]
+        elif st.get('chg_next'): out = [(s_, dg, min(du, 12 - s_)) for s_, dg, du in out if s_ < 12]
     if pr and bar % 2 == 1:
         cut = 16 - (pr if bar % 4 == 3 else pr // 2)        # pausa a fine frase (4 battute) e piu' breve a fine di ogni coppia di battute
         out = [(s_, dg, min(du, cut - s_)) for s_, dg, du in out if s_ < cut]
@@ -2043,6 +2068,8 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             mel_st['phrase_start'] = True
         lead = lead_a if bar % 4 == 3 else (_thin(lead_q) if bar % 4 == 2 else lead_q)
         d = (prog_a if (bar // 4) % 2 == 0 else prog_b)[bar % 4]
+        d_next = (prog_a if ((bar + 1) // 4) % 2 == 0 else prog_b)[(bar + 1) % 4]
+        d_prev = (prog_a if ((bar - 1) // 4) % 2 == 0 else prog_b)[(bar - 1) % 4] if bar > 0 else d
         cpcs = [pc_of(d), pc_of(d + 2), pc_of(d + 4)] + ([pc_of(d + 6)] if use7 else []) + ([pc_of(d + 8)] if use9 else [])
         rpc = cpcs[0]
         ramp = idx / max(1, length - 1)
@@ -2057,10 +2084,13 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             brp = bcp[0]
             _note(tracks['sub_bass'], base, bt - 20, _pc_pitch(brp, 24), int((84 if soft else 100) * fb), 0)
             hit = 0
+            last_hit = max([s_ for s_ in range(L) if g['bass'][pi[s_]] and not (soft and s_ not in gst)] or [-1])
             for s in range(L):
                 if not g['bass'][pi[s]]: continue
                 if soft and s not in gst: continue
                 pc = _bass_pc(bass_style, hit, bcp, brp, bass_root_p)
+                if s == last_hit and not ped and d_next != d and g.get('bass_approach') and random.random() < g['bass_approach']:      # nota d'approccio sull'ultimo colpo prima del cambio di accordo: la quinta o mezzo tono sotto la nuova radice
+                    pc = pc_of(d + 4) if random.random() < 0.5 else (pc_of(d_next) - 1) % 12
                 gap = bass_gap[pi[s]] if L == 16 else min(bass_gap[pi[s]], L - s)
                 oc, dur, vx = _bass_shape(bass_style, hit, gap, L - s, s); hit += 1
                 _note(tracks['bassline'], base + s * q, dur * q - 15, _pc_pitch(pc, 36) + oc, min(127, max(1, int(((82 if soft else 95) + (5 if s in gst else 0) + vx) * fb))), 1)
@@ -2120,6 +2150,7 @@ def _arrange_generative(g, root, scale, secmap, tracks, bm=None):
             full, lf, gaps = 'lead' in layers, _fade(B, 'lead'), _gaps(l_steps)
             ct_deg = {d % n, (d + 2) % n, (d + 4) % n} | ({(d + 6) % n} if use7 else set())
             mel = _melody_bar([s_ for s_ in range(L) if lead[pi[s_]] is not None and (full or s_ in gst)], gst | {x for x in range(0, L, 4)}, ct_deg, d, n, mel_st, 0 if bar % 4 < 2 else (1 if bar % 4 == 2 else 2))
+            mel_st['chg_in'], mel_st['chg_next'] = d != d_prev, d_next != d
             cb = _corpus_bar(g, bar, n, ct_deg, mel_st) if L == 16 else None
             for s, dg, du_ in (cb or ()):
                 if not full and s not in gst: continue
