@@ -701,6 +701,7 @@ DEFAULT_TIMELINE = _parse_timeline([
 
 BLOCK8_GENRES = ('techno', 'acid')      # generi la cui struttura varia col seed solo a blocchi da 8 battute (guida Techno: blocchi da 16/32 battute per il mix del DJ)
 _BLOCK8_SIGS = set()             # riempito dopo la costruzione dei generi: firma = nomi delle sezioni (resta valida anche se l'interfaccia copia la timeline)
+_BODY_VARIANT_SIGS = set()       # firma = nomi delle sezioni della timeline Techno, per le varianti di Breakdown e Build-up
 
 def timeline_unit(tl):
     """Le sezioni si allocano a blocchi di 4 battute (8 per i generi in BLOCK8_GENRES); se la timeline ha sezioni non multiple di 4 (silenzi, eventi singoli) a battuta singola."""
@@ -739,6 +740,7 @@ def apply_timelines(data):
     return len(parsed)
 
 _BLOCK8_SIGS.update(tuple(n for n, _b, _l in GENRES[k]['timeline']) for k in BLOCK8_GENRES if GENRES.get(k, {}).get('timeline'))
+_BODY_VARIANT_SIGS.update(tuple(n for n, _b, _l in GENRES[k]['timeline']) for k in ('techno',) if GENRES.get(k, {}).get('timeline'))
 
 TIMELINE_FILE_MSG = ''
 try:
@@ -777,6 +779,21 @@ def _vary_ladder(head, tail, bars, seed):
         cur = cur | g_; states.append(cur)
     return [(head[i][0], step, states[i]) for i in range(8)], [(tail[i][0], step, states[7 - i]) for i in range(8)]
 
+# Techno: Breakdown e Build-up cambiano da un brano all'altro (stessa funzione, strati diversi). Nel breakdown il kick esce sempre (guida Techno); nel build-up puo' tornare presto.
+_BREAKDOWN_VARIANTS = [('perc', 'pad', 'leadl'), ('pad', 'arpl', 'leadl'), ('hat', 'pad', 'leadl'), ('chords', 'pad', 'leadl'), ('bassl', 'pad', 'leadl'), ('perc', 'chordsl', 'leadl')]
+_BUILDUP_VARIANTS = [('hat', 'pad', 'roll'), ('hat', 'pad', 'rolls', 'perc'), ('kick', 'hat', 'pad', 'roll'), ('perc', 'pad', 'chordsl', 'rolls'), ('hat', 'perc', 'pad', 'arpl', 'roll')]
+
+def _vary_body(tl, mid, seed):
+    """Con un seed: il Breakdown e il Build-up della Techno prendono una variante di strati (solo strati presenti nella timeline, quindi rispetta quelli spenti dall'utente)."""
+    allowed = set().union(*[set(l) for _n, _b, l in tl])
+    rs = random.Random(int(seed) * 13 + 5)
+    pick = {'Breakdown': rs.choice(_BREAKDOWN_VARIANTS), 'Build-up': rs.choice(_BUILDUP_VARIANTS)}
+    out = []
+    for name, b, layers in mid:
+        v = frozenset(pick.get(name, ())) & allowed
+        out.append((name, b, v if name in pick and v else layers))
+    return out
+
 def min_bars(g):
     tl = g.get('timeline') or DEFAULT_TIMELINE
     u = timeline_unit(tl)
@@ -791,6 +808,7 @@ def compute_structure(bars, timeline=None, seed=None):
     unit = timeline_unit(tl)
     head, mid, tail = _ladder_split(tl, unit)
     head, tail = _vary_ladder(head, tail, bars, seed)
+    if seed is not None and tuple(n for n, _b, _l in tl) in _BODY_VARIANT_SIGS: mid = _vary_body(tl, mid, seed)
     fixed = sum(b for _n, b, _l in head + tail)
     n = len(mid)
     bars = max(fixed + unit * n, fixed + ((int(bars) - fixed) // unit) * unit)
