@@ -1,7 +1,56 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import mido
-import random, zlib
+import bisect
+import itertools
+import math
+import random as _stdlib_random
+import threading
+import zlib
+
+
+class _ThreadRandom:
+    """Generatore casuale per thread: ogni sessione (thread) ha il suo flusso, quindi due utenti che generano nello stesso momento non si disturbano.
+    Stessa sequenza di random.seed(seed) seguito da random.*: i brani per un seed non cambiano."""
+    Random = _stdlib_random.Random
+    SystemRandom = _stdlib_random.SystemRandom
+
+    def __init__(self):
+        self._loc = threading.local()
+
+    def _rng(self):
+        r = getattr(self._loc, 'r', None)
+        if r is None:
+            r = self._loc.r = _stdlib_random.Random()
+        return r
+
+    def __getattr__(self, name):
+        return getattr(self._rng(), name)
+
+
+class _ThreadOpts:
+    """Opzioni modificate dall'interfaccia (kit di batteria, programmi): una copia per thread, partendo dai valori predefiniti."""
+
+    def __init__(self, defaults):
+        self._defaults, self._loc = dict(defaults), threading.local()
+
+    def _opts(self):
+        m = getattr(self._loc, 'm', None)
+        if m is None:
+            m = self._loc.m = dict(self._defaults)
+        return m
+
+    def get(self, key, default=None):
+        return self._opts().get(key, default)
+
+    def __getitem__(self, key):
+        return self._opts()[key]
+
+    def __setitem__(self, key, value):
+        self._opts()[key] = value
+
+
+random = _ThreadRandom()
 import io
 import json
 import re
@@ -85,7 +134,7 @@ GM_RIDE = 51          # ride (jazz): scelto con 'hat_note': 51 nella definizione
 GM_TOM_HIGH = 50
 GM_RIMSHOT = 37
 
-# ================= FUNZIONI AUXILIARIE =================
+# ================= FUNZIONI AUSILIARIE =================
 
 def _root_to_key_name(root, is_minor):
     return NOTE_NAMES[root] + ('m' if is_minor else '')
@@ -558,7 +607,8 @@ def _parse_timeline(rows):
         out.append((name, bars, ls))
     return out
 
-assert set(TIMELINES) == set(GENRES), set(TIMELINES) ^ set(GENRES)
+if set(TIMELINES) != set(GENRES):
+    raise ValueError(f"TIMELINES e GENRES non coincidono: {sorted(set(TIMELINES) ^ set(GENRES))}")
 for _k, _v in GENRES.items():
     _tl = _parse_timeline(TIMELINES[_k])
     _v['timeline'] = _tl
@@ -692,7 +742,6 @@ _BLOCK8_SIGS.update(tuple(n for n, _b, _l in GENRES[k]['timeline']) for k in BLO
 
 TIMELINE_FILE_MSG = ''
 try:
-    from pathlib import Path
     _tlp = Path(__file__).with_name('midi_forge_timelines.json')
     if _tlp.exists():
         TIMELINE_FILE_MSG = f"Timeline personalizzate caricate da {_tlp.name} ({apply_timelines(json.loads(_tlp.read_text(encoding='utf-8')))} generi)"
@@ -1698,7 +1747,6 @@ def _bass_kick_composite(g, tracks, key):
     if g.get('bass_style') in BK_FREE_STYLES or not tracks.get(key) or not tracks.get('drums'): return 0
     kicks = sorted(e['tick'] for e in tracks['drums'] if e['type'] == 'on' and e['pitch'] == GM_KICK)
     if not kicks: return 0
-    import bisect
     open_on, cut = {}, 0
     for e in sorted(tracks[key], key=lambda x: (x['tick'], x['type'] != 'off')):
         k = (e.get('channel', 0), e['pitch'])
@@ -1711,6 +1759,13 @@ def _bass_kick_composite(g, tracks, key):
             e['tick'] = max(start + 1, kicks[i] - BK_GAP); cut += 1
     return cut
 
+
+def _finalize_tracks(tracks, g, seed, split_drums=False):
+    """Coda comune delle tre generazioni: tempo libero, umanizzazione e (se richiesto) batteria divisa per strumento. Ordine invariato."""
+    if g.get('free_time'): _free_time(tracks, g['free_time'])
+    if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
+    if split_drums and 'drums' in tracks: tracks = split_drum_track(tracks)
+    return tracks
 
 def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
     """extract  = REMIX: riarrangia il MIDI originale (stesse armonie/melodia) sul groove del genere.
@@ -1813,8 +1868,7 @@ def generate_minimal(notes_data, g, submode, bars, seed, dna=None):
 
     tr_ = {k: v for k, v in tracks.items() if v}
     _bass_kick_composite(g, tr_, 'bass')
-    if g.get('free_time'): _free_time(tr_, g['free_time'])
-    if g.get('human') and g.get('humanize', True): _humanize(tr_, g['human'], seed)
+    tr_ = _finalize_tracks(tr_, g, seed)
     return tr_, root, scale
 
 # ================= GENERAZIONE MULTITRACK =================
@@ -1989,7 +2043,6 @@ def _vl_voice(prev, pcs, lo):
     """Altezze dell'accordo (classi di altezza pcs) con minimo spostamento da prev (lista di altezze ordinate, o None). Senza prev: impilato in [lo, lo+12) come prima."""
     base = [_pc_pitch(pc, lo) for pc in pcs]
     if not prev or len(prev) != len(pcs): return base
-    import itertools
     opts = [[p for p in range(lo + VL_WIN[0], lo + VL_WIN[1]) if p % 12 == pc % 12] for pc in pcs]
     best = None
     for combo in itertools.product(*opts):
@@ -2197,10 +2250,7 @@ def generate_multitrack(mid_file_bytes, g, submode, bars, seed, split_drums=True
     if drums: tracks['drums'] = drums
     if submode != 'faithful': _bass_kick_composite(g, tracks, 'bassline')      # il basso fedele resta quello del MIDI caricato
     tracks = {k: v for k, v in tracks.items() if v}
-    if g.get('free_time'): _free_time(tracks, g['free_time'])
-    if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
-    if split_drums and 'drums' in tracks:
-        tracks = split_drum_track(tracks)
+    tracks = _finalize_tracks(tracks, g, seed, split_drums)
     return tracks, root, scale, headers, bars
 
 def generate_from_scratch(g, dna, bars, seed, split_drums=True):
@@ -2218,9 +2268,7 @@ def generate_from_scratch(g, dna, bars, seed, split_drums=True):
     if drums: tracks['drums'] = drums
     _bass_kick_composite(g, tracks, 'bassline')
     tracks = {k: v for k, v in tracks.items() if v}
-    if g.get('free_time'): _free_time(tracks, g['free_time'])
-    if g.get('human') and g.get('humanize', True): _humanize(tracks, g['human'], seed)
-    if split_drums and 'drums' in tracks: tracks = split_drum_track(tracks)
+    tracks = _finalize_tracks(tracks, g, seed, split_drums)
     for _k, _v in (g.get('pan') or {}).items():              # posizione stereo (CC10): kick e basso al centro, lead a sinistra, texture a destra (guida Techno)
         if _k in tracks: headers[_k] = [{'type': 'control_change', 'control': 10, 'value': _v}]
     return tracks, root, scale, headers, bars
@@ -2879,7 +2927,7 @@ GENRE_PROGRAMS = {
     'minimalismo_ritmico': (39, 35, 95, 0, 96, 87, 99), 'armonico': (39, 33, 91, 0, 96, 85, 99)}
 _PROG_ROLES = ('sub_bass', 'bassline', 'pad', 'chords', 'arp', 'lead', 'fx_perc')
 _PROG_OLD = {'bass': 38, 'arp': 80, 'sub_bass': 39, 'bassline': 38, 'pad': 89, 'chords': 0, 'lead': 81, 'fx_perc': 117, 'reese': 39}
-PROG_OPTS = {'genre': True, 'match': True}
+PROG_OPTS = _ThreadOpts({'genre': True, 'match': True})
 
 # Plug-in strumento che Logic apre per ogni patch (letto dal Mixer di Logic con i file di prova). Non elencati = non verificati.
 PATCH_PLUGIN = {**{n: 'Sampler' for n in (0, 1, 2, 3, 6, 8, 9, 11, 12, 13, 14, 15, 21, 22, 23, 24, 25, 26, 27, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 52, 53, 55, 56, 57, 58, 59, 60, 61, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74)},
@@ -3101,7 +3149,6 @@ def build_automation(sections, bm, tracks, style=None, slow=False):
     # Wobble (dubstep): nei drop il cutoff del basso oscilla con un LFO sincronizzato (1/4, 1/8, 1/16 o 1/8T: cambia a ogni drop) e
     # ogni nota di basso parte con un tuffo di pitch bend (il "yoy", range 12 semitoni)
     if style == 'wobble':
-        import math
         rates = (480, 240, 120, 160)
         for k in ('bassline', 'bass'):
             if k not in tracks: continue
@@ -3121,7 +3168,6 @@ def build_automation(sections, bm, tracks, style=None, slow=False):
             out[k] = [(0, 101, 0), (0, 100, 0), (0, 6, 12), (0, 38, 0), (0, 101, 127), (0, 100, 127)] + sorted(pk, key=lambda x: x[0])
     # Reese: seconda traccia scordata (+0.17 semitoni) e cutoff che si muove lentamente (periodo 8 battute)
     if 'reese' in tracks:
-        import math
         end = bm[-1]['start'] + bm[-1]['L'] * q
         out['reese'] = [(0, 'pb', 700)] + [(t, 74, int(75 + 35 * math.sin(2 * math.pi * t / (8 * 1920)))) for t in range(0, end, 960)]
     return out
@@ -3240,7 +3286,7 @@ def generate_report(tracks, genre, mode, submode, bpm, bars, seed, root, scale, 
     g = g_used or GENRES[genre]
     report.extend(["PATTERN RITMICI (16 step, adattati ai gruppi del metro)", f"   Kick (GM 36):  {''.join(['#' if x else '.' for x in g['kick']])}", f"   Snare (GM 38): {''.join(['#' if x else '.' for x in g.get('snare', [0]*16)])}"])
     if 'clap' in g: report.append(f"   Clap (GM 39):  {''.join(['#' if x else '.' for x in g['clap']])}")
-    report.extend([f"   Hat (GM 42):   {''.join('.' if not x else ('+' if x == 3 else '#') for x in g['hat'])}  (+ = ghost)", f"   Bass:          {''.join(['#' if x else '.' for x in g['bass']])}", f"   Ghost snare: {''.join(['#' if x else '.' for x in g.get('ghost', [0]*16)])}", f"   Swing: {g['swing'] * 100:.0f}%", f"   Densità Arp: {g['arp_density'] * 100:.0f}%", "", "STRUTTURA STRUTTURA DEL GENERE (ingressi/uscite per strati)", *_structure_report(bars, g.get('timeline'), seed), "", "TRACCE OUTPUT"])
+    report.extend([f"   Hat (GM 42):   {''.join('.' if not x else ('+' if x == 3 else '#') for x in g['hat'])}  (+ = ghost)", f"   Bass:          {''.join(['#' if x else '.' for x in g['bass']])}", f"   Ghost snare: {''.join(['#' if x else '.' for x in g.get('ghost', [0]*16)])}", f"   Swing: {g['swing'] * 100:.0f}%", f"   Densità Arp: {g['arp_density'] * 100:.0f}%", "", "STRUTTURA DEL GENERE (ingressi/uscite per strati)", *_structure_report(bars, g.get('timeline'), seed), "", "TRACCE OUTPUT"])
     track_idx = 1
     for track_key in tracks.keys():
         if track_key in DRUM_TRACK_NAMES: report.append(f"   {track_idx}. {DRUM_TRACK_NAMES[track_key]} (Canale 10 - GM Drum Map)")
@@ -3445,7 +3491,6 @@ def _fav_id(e):
 
 def _fav_path():
     try:
-        from pathlib import Path
         return Path(__file__).with_name('midi_forge_favorites.json')
     except NameError:
         return None
@@ -3566,7 +3611,9 @@ if _gen_clicked or _regen_flag:
                         st.info("Questo brano ha cambi di metro o di tempo: in Logic aprilo con File > Apri (Cmd+O). Se lo importi in un progetto esistente, rispondi Si' a 'importa informazioni di tempo', altrimenti le battute non coincidono.")
                     st.success(f"Completato! (Tonica: {NOTE_NAMES[root]}, BPM: " + (f"variabile {min(b_ for _t, b_ in tempo_ev)}-{max(b_ for _t, b_ in tempo_ev)}" if tempo_ev else str(final_bpm)) + f", Seed: {seed})")
             except Exception as e:
-                st.error(f"Errore: {str(e)}")
+                st.error(f"Errore: {e}")
+                with st.expander("Dettagli tecnici"):
+                    st.exception(e)
 
 g = st.session_state.generated
 if g and g.get('midi_bytes') is not None and g.get('report_text'):
